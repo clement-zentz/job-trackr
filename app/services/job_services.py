@@ -1,5 +1,6 @@
 # app/services/job_services.py
 
+
 class JobService:
     @staticmethod
     def apply(job_data):
