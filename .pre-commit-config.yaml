@@ -1,0 +1,33 @@
+# .pre-commit-config.yaml
+
+repos:
+  # --- Lint / Format ---
+  - repo: https://github.com/psf/black
+    rev: 25.11.0  # check latest version https://github.com/psf/black/tags
+    hooks:
+      - id: black
+        name: Black formatter
+        language_version: python3
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.4 # check latest version https://github.com/astral-sh/ruff-pre-commit/tags
+    hooks:
+      - id: ruff
+        name: Ruff linter
+        args: [--fix]  # autofix simple errors
+
+  - repo: https://github.com/pycqa/isort
+    rev: 7.0.0 # check latest version https://github.com/PyCQA/isort/tags
+    hooks:
+      - id: isort
+        name: isort (python)
+
+  # --- SPDX Header Hook (local) ---
+  - repo: local
+    hooks:
+      - id: add-spdx-header
+        name: Add SPDX license header to Python files
+        entry: bash scripts/add_spdx_header.sh
+        language: system
+        types: [python]
+        pass_filenames: true
