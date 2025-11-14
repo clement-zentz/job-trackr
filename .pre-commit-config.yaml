@@ -1,6 +1,12 @@
 # .pre-commit-config.yaml
 
 repos:
+  - repo: https://github.com/pycqa/isort
+    rev: 7.0.0 # check latest version https://github.com/PyCQA/isort/tags
+    hooks:
+      - id: isort
+        name: isort (python)
+
   # --- Lint / Format ---
   - repo: https://github.com/psf/black
     rev: 25.11.0  # check latest version https://github.com/psf/black/tags
@@ -15,12 +21,6 @@ repos:
       - id: ruff
         name: Ruff linter
         args: [--fix]  # autofix simple errors
-
-  - repo: https://github.com/pycqa/isort
-    rev: 7.0.0 # check latest version https://github.com/PyCQA/isort/tags
-    hooks:
-      - id: isort
-        name: isort (python)
 
   # --- SPDX Header Hook (local) ---
   - repo: local

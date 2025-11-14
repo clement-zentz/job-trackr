@@ -1,7 +1,10 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # app/lifespan.py
-from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from app.core.database import init_db, close_db
+
+from fastapi import FastAPI
+
+from app.core.database import close_db, init_db
 
 
 @asynccontextmanager

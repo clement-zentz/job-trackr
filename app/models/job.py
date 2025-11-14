@@ -1,8 +1,10 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # app/models/job.py
-from sqlmodel import SQLModel, Field
-from typing import Optional
 from datetime import datetime
+from typing import Optional
+
+from sqlmodel import Field, SQLModel
+
 
 class JobOffer(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
