@@ -7,6 +7,30 @@ services:
       - "8000:8000"
     env_file:
       - .env
-    volumes:
-      - .:/app
-      - /app/.venv # exclude .venv
+    develop:
+      watch:
+        - action: sync
+          path: .
+          target: /app
+          ignore:
+            - .venv/
+            - __pycache__/
+            - .git/
+  
+        - action: rebuild
+          path: ./uv.lock
+
+  postgres:
+      image: postgres:16-alpine
+      restart: unless-stopped
+      environment:
+        POSTGRES_USER: ${POSTGRES_USER}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        POSTGRES_DB: ${POSTGRES_DB}
+      ports:
+        - "5432:5432"
+      volumes:
+        - pg_data:/var/lib/postgresql/data
+
+volumes:
+  pg_data:
