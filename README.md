@@ -4,27 +4,42 @@
 
 An AI agent applying for job offers.
 
-## 🪶 Database Configuration (SQLite)
+## 🐘 Database Configuration (PostgreSQL)
 
-This project uses SQLite as the default database engine for local development. SQLite is lightweight, file-based, and requires no external service, making it ideal for quick setup and testing.
+The project is configured to use PostgreSQL via Docker for local development. A postgres service is defined in `docker-compose.yml` and persisted with a named volume.
 
-FastAPI + SQLModel handles migrations and table creation automatically during startup.
+### 🔧 Environment Variables
 
-### 🔧 Database URL
-
-The database connection URL is defined in your .env file using the environment variable:
+Set these in your `.env` file (they are consumed by both the app and the postgres container):
 
 ```ini
-DATABASE_URL=sqlite+aiosqlite:///./jobai.db
+POSTGRES_USER=jobai
+POSTGRES_PASSWORD=jobai_password
+POSTGRES_DB=jobai
+DATABASE_URL=postgresql+asyncpg://jobai:jobai_password@postgres:5432/jobai
 ```
 
-### 📄 Explanation:
+Notes:
+- `postgres` in the URL is the Docker service name, enabling internal DNS resolution.
+- The `postgresql+asyncpg` driver enables async usage with SQLModel / FastAPI.
 
-sqlite+aiosqlite → Async SQLite driver for SQLModel
+### 🚀 Running Locally
 
-./jobai.db → The database file created in the project root
+Build and start the stack:
 
-If the file does not exist, it will be created automatically.
+```bash
+docker compose up --build
+```
+
+The API will be available at http://localhost:8000 and PostgreSQL at localhost:5432.
+
+### 📂 Data Persistence
+
+The Postgres data files are stored in the named volume `pg_data` defined in `docker-compose.yml`.
+
+### 🛠️ Schema Initialization
+
+Tables are created automatically on application startup (SQLModel metadata create). No manual migration step is required yet. Introduce Alembic later when evolving schemas.
 
 ## 📜 License
 This project is licensed under the GNU Affero General Public License v3.0 or later (AGPL-3.0-or-later).  
