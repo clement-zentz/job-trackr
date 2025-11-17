@@ -9,9 +9,9 @@ from sqlmodel import Field, SQLModel
 class JobOffer(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     title: str
-    company: str
+    company: Optional[str] = None
     location: Optional[str] = None
     description: Optional[str] = None
-    url: Optional[str] = None
-    platform: Optional[str] = None
+    url: str = Field(index=True, unique=True)
+    platform: str
     date_scraped: datetime = Field(default_factory=datetime.now)
