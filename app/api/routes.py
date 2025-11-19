@@ -1,16 +1,78 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # app/api/routes.py
+import os
+
 from fastapi import APIRouter, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
+from pydantic import BaseModel, Field
+from sqlmodel.ext.asyncio.session import AsyncSession
+
 from app.core.database import get_session
+
+# email data processing
+from app.data_ingestion.job_ingestion import JobIngestionService
+from app.data_ingestion.scraper_ingestion import ingest_scraped_jobs
 from app.scrapers.indeed import IndeedScraper
-from app.services.job_ingestion import ingest_scraped_jobs
 
 router = APIRouter(prefix="/scrape", tags=["scraping"])
 
+
+class EmailProcessingRequest(BaseModel):
+    email_address: str = Field(..., examples=["user@example.com"])
+    # password: str = Field(..., description="IMAP/Email password or app password")
+    folder: str = Field(default="INBOX", examples=["INBOX"])
+    days_back: int = Field(
+        1, ge=1, le=30, description="How many days back to look for alerts"
+    )
+
+
 @router.post("/indeed")
-async def scrape_indeed(query: str, location: str | None = None, 
-                        session: AsyncSession = Depends(get_session)):
+async def scrape_indeed(
+    query: str,
+    location: str | None = None,
+    session: AsyncSession = Depends(get_session),
+):
     scraper = IndeedScraper()
     results = await scraper.search(query=query, location=location)
     inserted = await ingest_scraped_jobs(results, session)
-    return {"found": len(results),"inserted": inserted}
+    return {"found": len(results), "inserted": inserted}
+
+
+@router.post("/email-datas/")
+async def process_email_datas(
+    payload: EmailProcessingRequest,
+    session: AsyncSession = Depends(get_session),
+):
+    """
+    Extract job alerts from email and ingest them into the database.
+    """
+    email_address = os.getenv("EMAIL_ADDRESS")
+    password = os.getenv("EMAIL_PASSWORD")
+
+    if not email_address or not password:
+        raise RuntimeError("email_address or password is not set.")
+
+    service = JobIngestionService(session)
+    new_jobs = await service.ingest_from_email(
+        # email_address=payload.email_address,
+        email_address=email_address,
+        # password=payload.password,
+        password=password,
+        folder=payload.folder,
+        days_back=payload.days_back,
+    )
+
+    return {
+        "created": len(new_jobs),
+        "jobs": [
+            {
+                "id": job.id,
+                "title": job.title,
+                "company": job.company,
+                "location": job.location,
+                "url": job.url,
+                "platform": job.platform,
+                "source_email_id": job.source_email_id,
+            }
+            for job in new_jobs
+        ],
+    }
