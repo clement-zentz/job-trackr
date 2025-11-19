@@ -1,14 +1,19 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # app/extraction/email_alert_parser.py
 
+import os
+import secrets
 from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
-from typing import Iterable, List, Optional
+from pathlib import Path
+from typing import List, Optional
 
 from .imap_client import IMAPClient
 from .parser_base import EmailParser
+from .parsers.indeed import IndeedParser
 from .parsers.linkedin import LinkedInParser
 from .provider import detect_provider
-# from .parsers.indeed import IndeedParser
+
 
 class EmailExtractionService:
     """Fetch job alerts from an IMAP inbox and parse them into job dicts."""
@@ -16,16 +21,16 @@ class EmailExtractionService:
     def __init__(self, email_address: str, password: str, folder: str = "INBOX"):
         provider = detect_provider(email_address)
         self.client = IMAPClient(
-            host=provider.host, 
-            username=email_address, 
-            password=password, 
+            host=provider.host,
+            username=email_address,
+            password=password,
             port=provider.port,
         )
 
         self.folder = folder
         self.parsers: List[EmailParser] = [
             LinkedInParser(),
-            # IndeedParser(),
+            IndeedParser(),
             # WWTTJParser(),
         ]
 
@@ -57,17 +62,21 @@ class EmailExtractionService:
             if not html:
                 continue
 
+            platform = parser.__class__.__name__.replace("Parser", "").lower()
+
+            self.generate_tests_fixtures(platform=platform, html=html)
+
             parsed = parser.parse(html)
             for job in parsed:
-                job.setdefault("platform", parser.__class__.__name__.replace("Parser", "").lower())
+                job.setdefault("platform", platform)
                 job["source_uid"] = uid
                 job["source_subject"] = subject
                 job["source_sender"] = sender
             jobs.extend(parsed)
-    
+
         if self.client.conn is not None:
             self.client.conn.logout()
-            
+
         return jobs
 
     def _match_parser(self, sender: str, subject: str) -> Optional[EmailParser]:
@@ -80,7 +89,7 @@ class EmailExtractionService:
     def _since_query(days_back: int) -> str:
         ref_date = datetime.now() - timedelta(days=days_back)
         return ref_date.strftime("%d-%b-%Y")
-    
+
     @staticmethod
     def _is_recent_enough(message, days_back: int) -> bool:
         header_date = message.get("Date")
@@ -90,10 +99,20 @@ class EmailExtractionService:
             msg_dt = parsedate_to_datetime(header_date)
         except (TypeError, ValueError):
             return True
-        
+
         if msg_dt.tzinfo is None:
             msg_dt = msg_dt.replace(tzinfo=timezone.utc)
 
         cutoff = datetime.now(timezone.utc) - timedelta(days=days_back)
         return msg_dt >= cutoff
-    
+
+    @staticmethod
+    def generate_tests_fixtures(platform: str, html: str):
+        ROOT_DIR = Path(__file__).resolve().parent.parent.parent.parent
+        uid = secrets.token_hex(4)
+        fixture_dir = (
+            ROOT_DIR / "tests" / f"email_fixtures/{platform}_sample_{uid}.html"
+        )
+        os.makedirs(os.path.dirname(fixture_dir), exist_ok=True)
+        with open(fixture_dir, "w", encoding="utf-8") as f:
+            f.write(html)
