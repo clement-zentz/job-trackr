@@ -1,4 +1,5 @@
-from typing import List, Dict
+# SPDX-License-Identifier: AGPL-3.0-or-later
+from typing import Dict, List
 from urllib.parse import urlencode, urljoin
 
 from playwright.async_api import async_playwright
@@ -6,7 +7,8 @@ from playwright_stealth import Stealth
 
 from .base import JobScraper
 
-
+# ⚠️ This scraper is blocked by Indeed's anti-bot protections.
+# Use the email-alert ingestion workflow instead. 🚫
 class IndeedScraper(JobScraper):
     BASE_URL = "https://fr.indeed.com/jobs"
 
@@ -77,7 +79,9 @@ class IndeedScraper(JobScraper):
                     return []
 
                 # Check for cookie wall
-                cookie_wall = await page.query_selector("button#onetrust-accept-btn-handler")
+                cookie_wall = await page.query_selector(
+                    "button#onetrust-accept-btn-handler"
+                )
                 if cookie_wall:
                     print("[Indeed] Cookie consent button detected — clicking it.")
                     try:
@@ -96,9 +100,13 @@ class IndeedScraper(JobScraper):
                 print(f"[Indeed] First card count: {first_count}")
 
                 if first_count == 0:
-                    print("[Indeed] No cards immediately found — trying fallback method")
+                    print(
+                        "[Indeed] No cards immediately found — trying fallback method"
+                    )
                     await page.wait_for_load_state("networkidle", timeout=10000)
-                    await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+                    await page.evaluate(
+                        "window.scrollTo(0, document.body.scrollHeight)"
+                    )
                     await page.wait_for_timeout(1500)
 
                 total_cards = await cards.count()
@@ -123,8 +131,12 @@ class IndeedScraper(JobScraper):
 
                     try:
                         title = await card.locator("h2 span").first.text_content()
-                        company = await card.locator("span.companyName").first.text_content()
-                        location_text = await card.locator("div.companyLocation").first.text_content()
+                        company = await card.locator(
+                            "span.companyName"
+                        ).first.text_content()
+                        location_text = await card.locator(
+                            "div.companyLocation"
+                        ).first.text_content()
                         href = await card.get_attribute("href")
                     except Exception as e:
                         print(f"[Indeed] Error extracting card {i}: {e}")

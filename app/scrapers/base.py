@@ -1,10 +1,11 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # app/scrapers/base.py
-from typing import List, Dict
 from abc import ABC, abstractmethod
+from typing import Dict, List
 
 
 class JobScraper(ABC):
-    
+
     @abstractmethod
     async def search(self, query: str, location: str | None = None) -> List[Dict]:
         """Return a list of raw job offers."""

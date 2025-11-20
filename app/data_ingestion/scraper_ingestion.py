@@ -2,7 +2,9 @@
 # app/services/job_ingestion.py
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
+
 from app.models.job import JobOffer
+
 
 async def ingest_scraped_jobs(jobs: list[dict], session: AsyncSession) -> int:
     inserted = 0
@@ -16,8 +18,7 @@ async def ingest_scraped_jobs(jobs: list[dict], session: AsyncSession) -> int:
 
         offer = JobOffer(**job)
         session.add(offer)
-        inserted +=1
+        inserted += 1
 
     await session.commit()
     return inserted
-

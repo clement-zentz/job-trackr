@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # app/data_ingestion/email_ingestion.py
 
 from typing import Optional
@@ -5,7 +6,9 @@ from typing import Optional
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from app.data_extraction.email_extraction.email_alert_fetcher import EmailExtractionService
+from app.data_extraction.email_extraction.email_alert_fetcher import (
+    EmailExtractionService,
+)
 from app.models.job import JobOffer
 
 
@@ -16,11 +19,11 @@ class JobIngestionService:
         self.session = session
 
     async def ingest_from_email(
-            self,
-            email_address: str,
-            password: str,
-            folder: str = "INBOX",
-            days_back: int = 1
+        self,
+        email_address: str,
+        password: str,
+        folder: str = "INBOX",
+        days_back: int = 1,
     ) -> list[JobOffer]:
         """
         Fetch job alerts from email and save them to database.
@@ -42,8 +45,7 @@ class JobIngestionService:
         for job_data in raw_jobs:
             # check if job already exists by source_uid or unique URL
             existing = await self._find_existing_job(
-                source_uid=job_data.get("source_uid"),
-                url=job_data.get("url")
+                source_uid=job_data.get("source_uid"), url=job_data.get("url")
             )
 
             if existing:
@@ -55,7 +57,7 @@ class JobIngestionService:
                 location=job_data.get("location", ""),
                 url=job_data.get("url", ""),
                 platform=job_data.get("platform", ""),
-                source_email_id=job_data.get("source_uid")
+                source_email_id=job_data.get("source_uid"),
             )
 
             self.session.add(job_offer)
@@ -64,11 +66,8 @@ class JobIngestionService:
         await self.session.commit()
         return new_jobs
 
-
     async def _find_existing_job(
-            self,
-            source_uid: Optional[str] = None,
-            url: Optional[str] = None
+        self, source_uid: Optional[str] = None, url: Optional[str] = None
     ) -> Optional[JobOffer]:
         """Check if a job already exists in the database."""
         if source_uid:
@@ -77,10 +76,10 @@ class JobIngestionService:
             job = result.first()
             if job:
                 return job
-            
+
         if url:
             statement = select(JobOffer).where(JobOffer.url == url)
             result = await self.session.exec(statement)
             return result.first()
-        
+
         return None

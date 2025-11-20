@@ -1,5 +1,8 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # app/extraction/imap_client.py
-import imaplib, email, ssl
+import email
+import imaplib
+import ssl
 from email.header import decode_header
 from email.message import Message
 from typing import List, Optional
@@ -18,7 +21,7 @@ class IMAPClient:
 
         self.conn = imaplib.IMAP4_SSL(self.host, self.port, ssl_context=context)
         self.conn.login(self.username, self.password)
-    
+
     def select_folder(self, folder="INBOX"):
         if self.conn is None:
             raise RuntimeError("Not connected. Call connect() first.")
@@ -31,16 +34,16 @@ class IMAPClient:
         if status != "OK":
             return []
         return data[0].decode().split()
-    
+
     def fetch_email(self, uid: str) -> Optional[Message]:
         if self.conn is None:
             raise RuntimeError("IMAP connection not established")
-        
+
         status, data = self.conn.fetch(uid, "(RFC822)")
 
         if status != "OK" or not data or data[0] is None:
             return None
-        
+
         raw = data[0][1]
         if not isinstance(raw, bytes):
             return None
@@ -54,12 +57,12 @@ class IMAPClient:
         if isinstance(decoded, bytes):
             return decoded.decode(charset or "utf-8", errors="ignore")
         return decoded
-    
+
     @staticmethod
     def extract_html(msg: Message) -> str:
         if msg.is_multipart():
             for part in msg.walk():
-                if part.get_content_type() ==  "text/html":
+                if part.get_content_type() == "text/html":
                     payload = part.get_payload(decode=True)
                     if isinstance(payload, bytes):
                         return payload.decode("utf-8", errors="ignore")
@@ -68,6 +71,5 @@ class IMAPClient:
                 payload = msg.get_payload(decode=True)
                 if isinstance(payload, bytes):
                     return payload.decode("utf-8", errors="ignore")
-            
+
         return ""
-        

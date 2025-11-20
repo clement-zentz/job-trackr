@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # app/extraction/provider.py
 from dataclasses import dataclass
 
@@ -6,6 +7,7 @@ from dataclasses import dataclass
 class EmailProvider:
     host: str
     port: int = 993
+
 
 PROVIDERS = {
     "gmail.com": EmailProvider("imap.gmail.com"),
@@ -17,6 +19,7 @@ PROVIDERS = {
     "yahoo.fr": EmailProvider("imap.mail.yahoo.com"),
     "icloud.com": EmailProvider("imap.mail.me.com"),
 }
+
 
 def detect_provider(email_address: str) -> EmailProvider:
     domain = email_address.split("@")[-1].lower()

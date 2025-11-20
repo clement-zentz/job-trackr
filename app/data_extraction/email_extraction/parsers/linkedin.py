@@ -2,7 +2,7 @@
 # app/extraction/parsers/linkedin.py
 
 from bs4 import BeautifulSoup
-from email_extraction.parser_base import EmailParser
+from app.data_extraction.email_extraction.parser_base import EmailParser
 
 
 class LinkedInParser(EmailParser):
