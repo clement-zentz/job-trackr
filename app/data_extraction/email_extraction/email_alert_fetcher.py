@@ -40,7 +40,7 @@ class EmailExtractionService:
         self.client.select_folder(self.folder)
 
         since_str = self._since_query(days_back)
-        uids = self.client.search(f'(SINCE) "{since_str}"')
+        uids = self.client.search("SINCE", since_str)
 
         jobs: list[dict] = []
         for uid in uids:

@@ -18,20 +18,22 @@ class IMAPClient:
 
     def connect(self):
         context = ssl.create_default_context()
-
         self.conn = imaplib.IMAP4_SSL(self.host, self.port, ssl_context=context)
-        self.conn.login(self.username, self.password)
+        try:
+            self.conn.login(self.username, self.password)
+        except imaplib.IMAP4.error as e:
+            raise RuntimeError(f"IMAP login failed: {e}")
 
     def select_folder(self, folder="INBOX"):
         if self.conn is None:
             raise RuntimeError("Not connected. Call connect() first.")
         self.conn.select(folder)
 
-    def search(self, query: str) -> List[str]:
+    def search(self, *criteria: str) -> List[str]:
         if self.conn is None:
             raise RuntimeError("Not connected. Call connect() first.")
-        status, data = self.conn.search(None, query)
-        if status != "OK":
+        status, data = self.conn.search(None, *criteria)
+        if status != "OK" or not data or not data[0]:
             return []
         return data[0].decode().split()
 
