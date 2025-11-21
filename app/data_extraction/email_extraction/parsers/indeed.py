@@ -44,6 +44,7 @@ class IndeedParser(EmailParser):
             # ----- (3) Company + location -----
             company = ""
             location = ""
+            rating: float | None = None
 
             parent_tr = title_link.find_parent("tr")
             company_row = parent_tr.find_next_sibling("tr") if parent_tr else None
