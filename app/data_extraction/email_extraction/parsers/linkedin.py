@@ -6,9 +6,20 @@ from app.data_extraction.email_extraction.parser_base import EmailParser
 
 
 class LinkedInParser(EmailParser):
+    keywords = ["python", "backend developer", "data engineer"]
 
     def matches(self, sender: str, subject: str) -> bool:
-        return "linkedin" in sender.lower() and "alert" in subject.lower()
+        """
+        Match Linkedin job alerts like:
+        - Alertes LinkedIn Jo. () <jobalerts-noreply@linkedin.com>
+        """
+        s_sender = sender.lower()
+        s_subject = subject.lower()
+
+        return (
+            "linkedin" in s_sender or 
+            "jobalerts-noreply@linkedin.com" in s_sender
+        ) and any (kw in s_subject for kw in self.keywords)
 
     def parse(self, html: str) -> list[dict]:
         soup = BeautifulSoup(html, "html.parser")
@@ -22,32 +33,36 @@ class LinkedInParser(EmailParser):
             and "line-height: 1.25" in s,
         )
 
-        for title_a in title_links:
-            title = title_a.get_text(strip=True)
-            url = title_a.get("href")
+        for a in title_links:
+            title = a.get_text(strip=True)
+            url = a.get("href")
 
-        # 2. Company + location are in the next <p> sibling
-        company = ""
-        location = ""
+            if not title:
+                continue
 
-        # Move to the next p tag after title_a
-        next_p = title_a.find_next("p")
-        if next_p:
-            text = next_p.get_text(" ", strip=True)
-            # "Company name · Location"
-            if "." in text:
-                company, location = [x.strip() for x in text.split("·", 1)]
-            else:
-                company = text
+            # 2. Company + location are in the next <p> sibling
+            company = ""
+            location = ""
 
-        jobs.append(
-            {
-                "title": title,
-                "company": company,
-                "location": location,
-                "url": url,
-                "platform": "linkedin",
-            }
-        )
+            # Move to the next p tag after a
+            next_p = a.find_next("p")
+
+            if next_p:
+                text = next_p.get_text(" ", strip=True)
+                # "Company name · Location"
+                if "." in text:
+                    company, location = [x.strip() for x in text.split("·", 1)]
+                else:
+                    company = text
+
+            jobs.append(
+                {
+                    "title": title,
+                    "company": company,
+                    "location": location,
+                    "url": url,
+                    "platform": "linkedin",
+                }
+            )
 
         return jobs
