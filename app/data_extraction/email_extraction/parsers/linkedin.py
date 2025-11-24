@@ -1,17 +1,24 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # app/extraction/parsers/linkedin.py
+import re
 
 from bs4 import BeautifulSoup
 from app.data_extraction.email_extraction.parser_base import EmailParser
 
 
 class LinkedInParser(EmailParser):
-    keywords = ["python", "backend developer", "data engineer"]
+    """
+    Parser for LinkedIn "Job Alert" digest emails
+    """
+
+    # subject is in lower case
+    keywords = ["python", "backend", "data", "engineer", "developer", "ai"]
 
     def matches(self, sender: str, subject: str) -> bool:
         """
         Match Linkedin job alerts like:
-        - Alertes LinkedIn Jo. () <jobalerts-noreply@linkedin.com>
+        - sender: Alertes LinkedIn Jo. () <jobalerts-noreply@linkedin.com>
+        - subject: often contains keyword + 'emplois' or similar.
         """
         s_sender = sender.lower()
         s_subject = subject.lower()
@@ -23,45 +30,77 @@ class LinkedInParser(EmailParser):
 
     def parse(self, html: str) -> list[dict]:
         soup = BeautifulSoup(html, "html.parser")
-        jobs = []
+        jobs: list[dict] = []
 
-        # 1. Find all job title links on reliable inline styles
-        title_links = soup.find_all(
-            "a",
-            style=lambda s: s is not None
-            and "font-size: 16px" in s
-            and "line-height: 1.25" in s,
+
+        job_cards = soup.find_all(
+            "td",
+            _class="pt-3",
+            attrs={"data-test-id": "job-card"},
         )
 
-        for a in title_links:
-            title = a.get_text(strip=True)
-            url = a.get("href")
+        for card in job_cards:
+            # --- 0. Main job URL ---
+            job_link_tag = card.find(
+                "a", 
+                href=lambda h: h is not None 
+                and "/job/view/" in h
+            )
 
+            if not job_link_tag:
+                continue
+
+            job_url = job_link_tag.get("href")
+
+            # --- 1. Title ---
+            title_a = card.find(
+                "a", 
+                class_=lambda c: c is not None 
+                and "font-bold" in c.split()
+            )
+
+            #  No title, break
+            if not title_a:
+                continue
+
+            title = title_a.get_text(strip=True)
             if not title:
                 continue
 
-            # 2. Company + location are in the next <p> sibling
+            # --- 2. Company & Location ---
             company = ""
             location = ""
 
-            # Move to the next p tag after a
-            next_p = a.find_next("p")
+            company_loc_p = title_a.find_next(
+                "p", 
+                class_=lambda c: c is not None 
+                and "text-system-gray-100" in c.split()
+            )
 
-            if next_p:
-                text = next_p.get_text(" ", strip=True)
-                # "Company name · Location"
-                if "." in text:
+            if company_loc_p:
+                text = company_loc_p.get_text(" ", strip=True)
+                # "Company · Location"
+                if "·" in text:
                     company, location = [x.strip() for x in text.split("·", 1)]
                 else:
                     company = text
+
+            # --- 3. Easy apply / flags (optional) ---
+            easy_apply = False
+
+            easy_apply_p = card.find("p", text=re.compile("Candidature simplifiée"))
+
+            if easy_apply_p:
+                easy_apply = True
 
             jobs.append(
                 {
                     "title": title,
                     "company": company,
                     "location": location,
-                    "url": url,
+                    "url": job_url,
                     "platform": "linkedin",
+                    "easy_apply": easy_apply,
                 }
             )
 
