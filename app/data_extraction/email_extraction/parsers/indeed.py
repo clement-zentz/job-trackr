@@ -6,11 +6,19 @@ from app.data_extraction.email_extraction.parser_base import EmailParser
 
 
 class IndeedParser(EmailParser):
-    keywords = ["python", "backend developer", "data engineer"]
+    """
+    Parser for Indeed "Job Alerts" emails
+    """
+    # subject is in lower case
+    keywords = ["python", "backend", "data", "engineer", "developer", "ai"]
 
     def matches(self, sender: str, subject: str) -> bool:
         """
-        'Indeed <alert@indeed.com>' or regional variations.
+        Match Indeed job alert emails.
+
+        Example:
+        - sender like "Indeed <alert@indeed.com>"
+        - subject like "Licorne Society recherche un/e Data Analyst..."
         """
         s_sender = sender.lower()
         s_subject = subject.lower()
@@ -22,105 +30,127 @@ class IndeedParser(EmailParser):
 
     def parse(self, html: str) -> list[dict]:
         soup = BeautifulSoup(html, "html.parser")
-        jobs = []
+        jobs: list[dict] = []
 
-        # Each job listing is wrapped in <tr><td>...</td></tr>
-        offer_rows = soup.find_all(
-            "td", 
-            style=lambda s: s is not None 
-            and "padding:0px 0px 32px" in s
+        offer_cells = soup.find_all(
+            "td",
+            style=lambda s: s is not None and "padding:0px 0px 32px" in s,
+            class_=lambda c: bool(c and "pb-24" in c.split())
         )
 
-        for row in offer_rows:
-            # ----- 1. Extract job URL -----
-            root_a = row.find("a", href=True)
+        for cell_td in offer_cells:
+            # ----- 0. Extract job URL -----
+            root_a = cell_td.find("a", href=True)
+
+            # TODO: add title_a href fallback
             if not root_a:
-                continue
+                continue 
 
             job_url = root_a.get("href")
 
-            # ----- 2. Extract job title -----
-            title_link = row.find(
-                "a", 
-                style=lambda s: s is not None 
-                and "font-size:16px" in s
-            )
+            # ----- 1. Title -----
+            title_a = cell_td.find("a", class_="strong-text-link")
 
-            if not title_link:
-                title_link = row.find("h2")
+            if not title_a:
+                h2 = cell_td.find("h2")
+                title_text_el = h2 if h2 else None
+            else:
+                title_text_el = title_a
 
-            if not title_link:
+            if not title_text_el:
                 continue # cannot extract job without title
 
-            title = title_link.get_text(strip=True)
+            title = title_text_el.get_text(strip=True)
 
-            # ----- 3. Extract Company + location + Rating (optional) -----
+            # ----- 2. Company & Rating -----
             company = ""
-            location = ""
             rating: float | None = None
 
-            parent_tr = title_link.find_parent("tr")
-            company_row = parent_tr.find_next_sibling("tr") if parent_tr else None
+            title_tr = title_text_el.find_parent("tr")
+            company_tr = title_tr.find_next_sibling("tr") if title_tr else None
 
-            texts = []
-            if company_row:
-                spans = company_row.find_all("span")
+            if company_tr:
+                tds = company_tr.find_all("td")
+                if tds:
+                    # First <td> text is company
+                    company = tds[0].get_text(" ", strip=True)
 
-                texts = [
-                    s.get_text(" ", strip=True) 
-                    for s in spans 
-                    if s.get_text(strip=True)
-                ]
-
-                if texts:
-                    company = texts[0]
-
-                if len(texts) >= 2:
-                    # rating or location
-                    second = texts[1]
+                # strong row can be rating
+                strong = company_tr.find("strong")
+                if strong:
+                    raw_rating = strong.get_text(strip=True).replace(",", ".")
                     try:
-                        rating = float(second.replace(",", "."))
-                        if len(texts) >= 3:
-                            location = texts[2].lstrip("- ").strip()
+                        rating = float(raw_rating)
                     except ValueError:
-                        location = second.lstrip("- ").strip()
+                        rating = None
+                
+            # ----- 3. Location
+            location = ""
+            location_tr = None
 
-            # if len(texts) >= 3 and not location:
-            #     last = texts[-1]
-            #     if "-" in last:
-            #         location = last.lstrip("- ").strip()
+            if company_tr:
+                location_tr = company_tr.find_next_sibling("tr")
 
-            # fallback location extraction
+            if location_tr:
+                location = location_tr.get_text(" ", strip=True)
+
+            # Fallback: search for something like "Paris (75)" within cell
             if not location:
-                for td in row.find_all("td"):
-                    txt = td.get_text(strip=True)
-                    # detect location pattern, like "Paris (75)"
+                for td in cell_td.find_all("td"):
+                    txt = td.get_text(" ", strip=True)
                     if "(" in txt and ")" in txt:
                         location = txt
                         break
 
-            # ----- 4. Extract Salary (optional) -----
+            # ----- 4. Salary -----
             salary = ""
-            salary_row = company_row.find_next_sibling("tr") if company_row else None
-            if salary_row:
-                # Salary is plain text inside the <td>
-                text = salary_row.get_text(" ", strip=True)
-                # Heuristic: contains numbers + € or "$"
-                if "€" in text or "$" in text:
-                    salary = text
+            salary_tr = None
+
+            if location_tr:
+                salary_tr = location_tr.find_next_sibling("tr")
+
+            if salary_tr:
+                salary_text = salary_tr.get_text(" ", strip=True)
+                if "€" in salary_text or "$" in salary_text:
+                    salary = salary_text
+
+            # ----- 4.5 Simplified application process
+            easy_apply = False
+            easy_apply_tr = None
+
+            easy_apply_tr = cell_td.find(
+                "tr", 
+                style=lambda s: s is not None 
+                and "color:#2d2d2d;font-size:14px;line-height:21px" in s
+            )
+
+            if easy_apply_tr:
+                easy_apply = True
 
             # ----- 5. Extract Summary -----
             summary = ""
-            summary_row = salary_row.find_next_sibling("tr") if salary_row else None
-            if summary_row:
-                summary = summary_row.get_text("", strip=True)
+            summary_tr = None
+
+            if easy_apply_tr:
+                summary_tr = easy_apply_tr.find_next_sibling("tr")
+            elif salary_tr:
+                summary_tr = salary_tr.find_next_sibling("tr")
+            elif location_tr:
+                summary_tr = location_tr.find_next_sibling("tr")
+
+            if summary_tr:
+                summary = summary_tr.get_text(" ", strip=True)
 
             if not summary:
-                summary_td = row.find("td", 
+                summary_td = cell_td.find(
+                    "td",
                     style=lambda s: s is not None 
-                    and "color:#767676" in s)
+                    and "padding:0;color:#767676;font-size:14px;line-height:21px" in s
+                )
                 if summary_td:
-                    summary = summary_td.get_text(strip=True)
+                    summary = summary_td.get_text(" ", strip=True)
+
+            # TODO: add published_at
 
             # ----- 6. Build job dict -----
             jobs.append(
@@ -128,10 +158,11 @@ class IndeedParser(EmailParser):
                     "title": title,
                     "company": company,
                     "location": location,
-                    "salary": salary,
-                    "summary": summary,
-                    "rating": rating,
                     "url": job_url,
+                    "summary": summary,
+                    "salary": salary,
+                    "rating": rating,
+                    "easy_apply": easy_apply,
                     "platform": "indeed",
                 }
             )
