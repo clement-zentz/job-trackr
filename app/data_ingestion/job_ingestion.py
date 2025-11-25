@@ -63,17 +63,9 @@ class JobIngestionService:
     async def _find_existing_job(
         self, source_uid: Optional[str] = None, url: Optional[str] = None
     ) -> Optional[JobOffer]:
-        """Check if a job already exists in the database."""
-        if source_uid:
-            statement = select(JobOffer).where(JobOffer.source_email_id == source_uid)
-            result = await self.session.execute(statement)
-            job = result.scalars().first()
-            if job:
-                return job
-
+        """Check if a job already exists in the database with job url."""
         if url:
             statement = select(JobOffer).where(JobOffer.url == url)
             result = await self.session.execute(statement)
             return result.scalars().first()
-
         return None
