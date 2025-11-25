@@ -40,19 +40,7 @@ class LinkedInParser(EmailParser):
         )
 
         for card in job_cards:
-            # --- 0. Main job URL ---
-            job_link_tag = card.find(
-                "a", 
-                href=lambda h: h is not None 
-                and "/job/view/" in h
-            )
-
-            if not job_link_tag:
-                continue
-
-            job_url = job_link_tag.get("href")
-
-            # --- 1. Title ---
+            # --- 1. Title and URL ---
             title_a = card.find(
                 "a", 
                 class_=lambda c: c is not None 
@@ -61,6 +49,10 @@ class LinkedInParser(EmailParser):
 
             #  No title, break
             if not title_a:
+                continue
+
+            job_url = title_a.get("href")
+            if not job_url:
                 continue
 
             title = title_a.get_text(strip=True)
