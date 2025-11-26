@@ -20,6 +20,7 @@ class JobOffer(SQLModel, table=True):
     url: str = Field(nullable=False, index=True)
     platform: str = Field(nullable=False)
     easy_apply: Optional[bool] = Field(default=None)
+    active_hiring: Optional[bool] = Field(default=None)
 
     date_scraped: datetime = Field(
         sa_column=Column(DateTime(timezone=True)),

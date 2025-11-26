@@ -66,6 +66,7 @@ async def process_email_datas(
                 "company": job.company,
                 "location": job.location,
                 "url": job.url,
+                "active_hiring": job.active_hiring,
                 "easy_apply": job.easy_apply,
                 "platform": job.platform,
                 "source_email_id": job.source_email_id,

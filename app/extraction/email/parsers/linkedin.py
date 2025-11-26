@@ -77,6 +77,17 @@ class LinkedInParser(EmailParser):
                 else:
                     company = text
 
+            # --- 3. Active hiring (optional) ---
+            active_hiring = None
+
+            active_hiring_p = card.find(
+                string=re.compile(
+                    r"(Recrutement actif|Actively recruiting)", re.I
+                )
+            )
+
+            if active_hiring_p:
+                active_hiring = True
 
             # --- 4. Easy apply / flags (optional) ---
             easy_apply = None
@@ -97,6 +108,7 @@ class LinkedInParser(EmailParser):
                     "location": location,
                     "url": job_url,
                     "platform": "linkedin",
+                    "active_hiring": active_hiring,
                     "easy_apply": easy_apply,
                 }
             )
