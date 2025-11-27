@@ -37,7 +37,6 @@ class JobIngestionService:
 
             # check if job already exists by source_uid or unique URL
             existing = await self._find_existing_job(
-                source_uid=job_data.get("source_uid"), 
                 url=job_data.get("url")
             )
 
@@ -64,7 +63,7 @@ class JobIngestionService:
         return new_jobs
 
     async def _find_existing_job(
-        self, source_uid: Optional[str] = None, url: Optional[str] = None
+        self, url: Optional[str] = None
     ) -> Optional[JobOffer]:
         """Check if a job already exists in the database with job url."""
         if url:
