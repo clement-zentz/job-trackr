@@ -4,13 +4,13 @@
 from typing import Optional
 
 import logging
-from sqlmodel import select
-from sqlmodel.ext.asyncio.session import AsyncSession
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from app.extraction.email.email_alert_fetcher import (
     EmailExtractionService,
 )
-from app.models.job import JobOffer
+from app.models.job_offer import JobOffer
 
 logger = logging.getLogger(__name__)
 

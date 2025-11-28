@@ -4,7 +4,7 @@ import os
 
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
-from sqlmodel.ext.asyncio.session import AsyncSession
+from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from app.core.database import get_session
 

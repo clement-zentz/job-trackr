@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # app/services/job_ingestion.py
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import select
+from sqlalchemy import select
 
-from app.models.job import JobOffer
+from app.models.job_offer import JobOffer
 
 
 async def ingest_scraped_jobs(jobs: list[dict], session: AsyncSession) -> int:
