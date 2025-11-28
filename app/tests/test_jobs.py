@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # tests/test.py
+
 import pytest
+
 
 @pytest.mark.asyncio
 async def test_root_route(async_client):
@@ -11,7 +13,13 @@ async def test_root_route(async_client):
 
 @pytest.mark.asyncio
 async def test_create_job(async_client):
-    payload = {"title": "Python Developer", "company": "OpenAI"}
+    payload = {
+        "title": "Python Developer", 
+        "company": "OpenAI", 
+        "location": "London",
+        "url": "https://example.com/job/python-dev",
+        "platform": "test"
+    }
     response = await async_client.post("/jobs/", json=payload)
     assert response.status_code == 201
 
@@ -26,8 +34,20 @@ async def test_list_jobs(async_client):
     assert resp.status_code == 200
     assert resp.json() == []
     jobs = [
-        {"title": "SRE", "company": "OpsLtd"},
-        {"title": "Data Engineer", "company": "Pipeline Inc."}
+        {
+            "title": "SRE", 
+            "company": "OpsLtd", 
+            "location": "London",
+            "url": "https://example.com/job/python-dev1",
+            "platform": "test"
+        },
+        {
+            "title": "Data Engineer",
+            "company": "Pipeline Inc.",
+            "location": "London",
+            "url": "https://example.com/job/python-dev2",
+            "platform": "test"
+        }
     ]
     # Create
     for j in jobs:
@@ -45,7 +65,13 @@ async def test_list_jobs(async_client):
 @pytest.mark.asyncio
 async def test_get_job(async_client):
     # Create
-    payload = {"title": "Backend developer", "company": "Nvidia"}
+    payload = {
+        "title": "Backend developer", 
+        "company": "Nvidia", 
+        "location": "London",
+        "url": "https://example.com/job/python-dev",
+        "platform": "test"
+    }
     create_resp = await async_client.post("/jobs/", json=payload)
     assert create_resp.status_code == 201
     job_id = create_resp.json()["id"]
@@ -61,13 +87,19 @@ async def test_get_job(async_client):
 @pytest.mark.asyncio
 async def test_update_job(async_client):
     # Create
-    payload = {"title": "ML Engineer", "company": "DataCorp"}
+    payload = {
+        "title": "Data analyst", 
+        "company": "DataCorp", 
+        "location": "Paris",
+        "url": "https://example.com/job/python-dev",
+        "platform": "test"
+    }
     create_resp = await async_client.post("/jobs/", json=payload)
     assert create_resp.status_code == 201
     job_id = create_resp.json()["id"]
     # Update only title
     update_payload = {"title": "Senior ML Engineer"}
-    update_resp = await async_client.put(f"/jobs/{job_id}", json=update_payload)
+    update_resp = await async_client.patch(f"/jobs/{job_id}", json=update_payload)
     assert update_resp.status_code == 200
     updated = update_resp.json()
     assert updated["id"] == job_id
@@ -79,7 +111,13 @@ async def test_update_job(async_client):
 @pytest.mark.asyncio
 async def test_delete_job(async_client):
     # Create
-    payload = {"title": "Frontend Dev", "company": "WebCo"}
+    payload = {
+        "title": "Frontend Dev", 
+        "company": "WebCo", 
+        "location": "Dublin",
+        "url": "https://example.com/job/python-dev",
+        "platform": "test"
+    }
     create_resp = await async_client.post("/jobs/", json=payload)
     assert create_resp.status_code == 201
     job_id = create_resp.json()["id"]

@@ -1,37 +1,17 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # tests/conftest.py
 import asyncio
-import pytest
-import time
 from typing import AsyncGenerator
-from testcontainers.postgres import PostgresContainer
-from testcontainers.core.waiting_utils import WaitStrategy, WaitStrategyTarget
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
-from sqlmodel import SQLModel
-from httpx import AsyncClient, ASGITransport
 
-from app.main import app
-from app.core.database import get_session
+import pytest
+from httpx import ASGITransport, AsyncClient
 from sqlalchemy.engine.url import make_url
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from testcontainers.postgres import PostgresContainer
+from app.models.job_offer import Base
 
-
-# class LogWaitStrategy(WaitStrategy):
-#     def __init__(self, phrase: str, timeout: int = 30):
-#         self.phrase = phrase
-#         self.timeout = timeout
-
-#     def wait_until_ready(self, target: WaitStrategyTarget):
-#         start = time.time()
-
-#         # Correct API for your Testcontainers version:
-#         for line in target.get_logs():
-#             decoded = line.decode("utf-8", errors="ignore")
-#             if self.phrase in decoded:
-#                 return
-
-#             if time.time() - start > self.timeout:
-#                 raise TimeoutError(
-#                     f"Timeout waiting for log message: {self.phrase}"
-#                 )
+from app.core.database import get_session
+from app.main import app
 
 
 @pytest.fixture()
@@ -47,10 +27,6 @@ async def postgres_container():
     """
     Start a PostgreSQL test container once per test session.
     """
-    # container = (
-    #     PostgresContainer("postgres:16")
-    #     .waiting_for(LogWaitStrategy("database system is ready to accept connections"))
-    # )
     container = PostgresContainer("postgres:16")
     container.start()
     yield container
@@ -72,7 +48,7 @@ async def test_engine(postgres_container):
 
     # Create tables
     async with engine.begin() as conn:
-        await conn.run_sync(SQLModel.metadata.create_all)
+        await conn.run_sync(Base.metadata.create_all)
 
     return engine
 
@@ -83,8 +59,8 @@ async def test_session(test_engine) -> AsyncGenerator[AsyncSession, None]:
     Provide an async session bound to the test engine.
     """
     async_session_maker = async_sessionmaker(
-        test_engine,
-        expire_on_commit=False,
+        test_engine, 
+        expire_on_commit=False, 
         class_=AsyncSession
     )
 
@@ -104,9 +80,9 @@ async def async_client(test_session: AsyncSession):
 
     app.dependency_overrides[get_session] = override_get_session
 
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as ac:
         yield ac
-    
+
     app.dependency_overrides.clear()
-
-
