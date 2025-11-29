@@ -11,7 +11,8 @@ class JobOfferBase(BaseModel):
     location: str | None = None
     url: str
     platform: str
-    rating: str | None = None
+    rating: float | None = None
+    salary: str | None = None
     summary:str | None = None
     description: str | None = None
     easy_apply: bool | None = None
@@ -25,7 +26,8 @@ class JobOfferCreate(JobOfferBase):
 class JobOfferUpdate(BaseModel):
     title: str | None = None
     company: str | None = None
-    rating: str | None = None
+    rating: float | None = None
+    salary: str | None = None
     location: str | None = None
     summary: str | None = None
     description: str | None = None

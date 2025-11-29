@@ -37,76 +37,83 @@ class IndeedParser(EmailParser):
     def parse(self, html: str) -> list[dict]:
         soup = BeautifulSoup(html, "html.parser")
 
-        job_blocks = soup.select("td.pb-24 > a")
+        job_links = soup.select("td.pb-24 > a")
         jobs: list[dict] = []
 
-        for a_tag in job_blocks:
+        for a_tag in job_links:
             container = a_tag.select_one("table")
             if not container:
                 continue
+
+            rows = container.select("tr")
     
-            # --- Title ---
-            title_tag = container.select_one("h2 a")
-            title = title_tag.get_text(strip=True) \
-                if title_tag else None
-            url = title_tag["href"] if title_tag else None
+            # --- Title + URL ---
+            title = None
+            url = None
+
+            if rows:
+                title_tag = rows[0].select_one("h2 a")
+                if title_tag:
+                    title = title_tag.get_text(strip=True)
+                    url = title_tag.get("href")
 
             # --- Company & Rating ---
             company = None
             rating = None
 
-            info_cells = container.select(
-                "tr:nth-of-type(2) table tr td")
+            if len(rows) >= 2:
+                company_row = rows[1]
+                company_cells = company_row.find_all("td")
 
-            if info_cells:
-                company = info_cells[0].get_text(strip=True)
-                if len(info_cells) > 1:
-                    try:
-                        rating = float(info_cells[1].get_text(strip=True))
-                    except ValueError:
-                        rating = None
-                
+                if company_cells:
+                    company = company_cells[0].get_text(strip=True)
+
+                    if len(company_cells) > 1:
+                        for cell in company_cells:
+                            strong = cell.find("strong")
+                            if strong:
+                                try:
+                                    rating = float(strong.get_text(strip=True))
+                                except ValueError:
+                                    pass
+
             # --- Location ---
-            location_tag = container.select_one("tr:nth-of-type(3) td")
-            location = location_tag.get_text(strip=True) \
-                if location_tag else None
+            location = None
+            location_tag = rows[1].find_next_sibling("tr")
+            if location_tag:
+                location = location_tag.get_text(strip=True)
 
             # --- Salary (optional) ---
-            salary_tag = container.select_one("td > table[bgcolor]")
             salary = None
+            salary_tag = container.select_one("table[bgcolor]")
             if salary_tag:
                 salary = salary_tag.get_text(strip=True)
 
-            # --- Simplified apply (optional) ---
-            easy_apply = bool(container.select_one("img[alt=' ']"))
+            # --- Simplified apply & Responsive employer (optional) ---
+            # match <img> tag whose src attrs contains the substring : 'my_example_substring.ext'
+            easy_apply = bool(container.select_one("img[src*='Plane_primary_whitebg.png']"))
+            # Linkedin Actively recruiting <==> Indeed Responsive employer
+            active_hiring = bool(container.select_one("img[src*='ResponsiveEmployer_whitebg.png']"))
 
             # --- Summary ---
             summary = None
 
-            all_rows = container.select("tr")
-
-            summary_tag = None
-            for row in all_rows:  
-                # Can have one or more cells  
-                cells = row.find("td")
-                if not cells:
-                    continue
-
-                # Description line always have no 
-                # nested tables and contains long text
-                if not cells.find("tables") and \
-                    len(cells.get_text(strip=True)) > 40:
-                    summary_tag = cells
-                break
-
-            summary = summary_tag.get_text(strip=True) \
-                if summary_tag else None
+            for tr in rows:
+                txt = tr.get_text(" ", strip=True)
+                if len(txt) > 40:
+                    # skip salary tables
+                    if "€" in txt and "par" in txt:
+                        continue 
+                    # skip posted_at lines
+                    if "il y a" in txt.lower() or "publié" in txt.lower():
+                        continue
+                    summary = txt
+                    break
 
             # --- Date posted ---
             posted_at = None
 
             posted_at_tag = container.select_one("td[style*='font-size:12px']")
-
             if posted_at_tag:
                 posted_at_text = posted_at_tag.get_text("", strip=True)
                 if posted_at_text:
@@ -147,6 +154,7 @@ class IndeedParser(EmailParser):
                     "salary": salary,
                     "rating": rating,
                     "easy_apply": easy_apply,
+                    "active_hiring": active_hiring,
                     "platform": "indeed",
                 }
             )

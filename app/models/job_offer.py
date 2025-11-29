@@ -4,7 +4,7 @@
 from datetime import datetime, timezone
 from typing import Optional
 
-from sqlalchemy import String, Boolean, DateTime
+from sqlalchemy import String, Boolean, DateTime, Float
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -22,8 +22,9 @@ class JobOffer(Base):
     company: Mapped[str] = mapped_column(String, nullable=False)
     location: Mapped[str] = mapped_column(String, nullable=True)
 
-    rating: Mapped[str | None] = mapped_column(String, nullable=True)
+    rating: Mapped[float | None] = mapped_column(Float, nullable=True)
     summary: Mapped[str | None] = mapped_column(String, nullable=True)
+    salary: Mapped[str | None] = mapped_column(String, nullable=True)
     description: Mapped[str | None] = mapped_column(String, nullable=True)
 
     url: Mapped[str] = mapped_column(String, nullable=False, index=True)

@@ -46,6 +46,8 @@ class JobIngestionService:
             job_offer = JobOffer(
                 title=job_data.get("title", ""),
                 company=job_data.get("company", ""),
+                rating = job_data.get("rating", None),
+                salary = job_data.get("salary", None),
                 location=job_data.get("location", ""),
                 active_hiring=job_data.get("active_hiring", None),
                 easy_apply=job_data.get("easy_apply", None),
