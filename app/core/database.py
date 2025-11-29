@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker
 )
 
+from app.models.job_offer import Base
 from .config import get_settings
 
 
@@ -25,6 +26,7 @@ async_session_local = async_sessionmaker(
 async def init_db():
     """Check that the database connection is alive."""
     async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
         await conn.execute(text("SELECT 1"))
 
 async def close_db():
