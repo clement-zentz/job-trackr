@@ -1,8 +1,16 @@
 # app/utils/clean_fixture.py
+import re, secrets
 from bs4 import BeautifulSoup, Comment
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+from slugify import slugify
+from .truncate_string import shorten_text
+from app.core.config import get_settings
 
 
-def clean_fixture(html: str) -> str:
+settings = get_settings()
+
+def clean_raw_fixture(html: str) -> str:
         """
         Clean extracted html from emails into a human readable file.
         """
@@ -43,3 +51,39 @@ def clean_fixture(html: str) -> str:
 
         # --- 7. Pretty-print output
         return soup.prettify()
+
+def generate_tests_fixtures(
+    platform: str, 
+    html: str, 
+    msg_date: datetime | None = None,
+    subject: str | None = None,
+):
+    """
+    Generate fixture with extracted email:
+    - brut fixture for tests
+    - net fixture for human reader
+    """
+    if not settings.debug:
+        return # no fixture generation in production
+
+    subject = subject if subject else secrets.token_hex(4)
+    msg_date = msg_date if msg_date else datetime.now(timezone.utc)
+
+    slug_sbj = slugify(shorten_text(subject))
+    ts = msg_date.astimezone(timezone.utc).strftime("%Y-%m-%d")
+
+    # Raw email fixture
+    raw_fixture_dir = Path(settings.raw_fixture_dir)
+    raw_fixture_dir.mkdir(parents=True, exist_ok=True)
+
+    raw_file_path = raw_fixture_dir / f"{platform}_raw_{slug_sbj}_{ts}.html"
+    raw_file_path.write_text(html, encoding="utf-8")
+    
+    # Net email fixture
+    net_fixture_dir = Path(settings.net_fixture_dir)
+    net_fixture_dir.mkdir(parents=True, exist_ok=True)
+
+    cleaned_html = clean_raw_fixture(html)
+
+    net_file_path = net_fixture_dir / f"{platform}_net_{slug_sbj}_{ts}.html"
+    net_file_path.write_text(cleaned_html, encoding="utf-8")

@@ -1,13 +1,9 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # app/extraction/email_alert_parser.py
 
-import os
-import secrets
 from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
-from pathlib import Path
 from typing import List, Optional
-from slugify import slugify
 
 from .imap_client import IMAPClient
 from .parser_base import EmailParser
@@ -15,9 +11,10 @@ from .parsers.indeed import IndeedParser
 from .parsers.linkedin import LinkedInParser
 from .provider import detect_provider
 
-from app.core.config import settings
-from app.utils.truncate_string import shorten_text
-from app.utils.clean_fixture import clean_fixture
+from app.utils.manage_fixture import (
+    remove_old_fixtures,
+    generate_tests_fixtures
+)
 
 
 import logging
@@ -74,17 +71,10 @@ class EmailExtractionService:
 
             platform = parser.__class__.__name__.replace(
                 "Parser", "").lower()
-            
-            # parse Date header to datetime for fixture naming
-            header_date = msg.get("Date")
-            msg_dt: datetime | None = None
-            if header_date:
-                try:
-                    msg_dt = parsedate_to_datetime(header_date)
-                except (TypeError, ValueError):
-                    msg_dt = None
 
-            self.generate_tests_fixtures(
+            # Generate raw and net fixtures
+            msg_dt = self.parse_msg_date(msg)
+            generate_tests_fixtures(
                 platform=platform, 
                 html=html, 
                 msg_date=msg_dt,
@@ -134,39 +124,64 @@ class EmailExtractionService:
         return msg_dt >= cutoff
 
     @staticmethod
-    def generate_tests_fixtures(
-        platform: str, 
-        html: str, 
-        msg_date: datetime | None = None,
-        subject: str | None = None,
-    ):
-        """
-        Generate fixture with extracted email:
-        - brut fixture for tests
-        - net fixture for human reader
-        """
-        if not settings.debug:
-            return # no fixture generation in production
+    def parse_msg_date(msg):
+        # parse Date header to datetime for fixture naming
+        header_date = msg.get("Date")
+        msg_dt: datetime | None = None
+        if header_date:
+            try:
+                msg_dt = parsedate_to_datetime(header_date)
+            except (TypeError, ValueError):
+                msg_dt = None
+        return msg_dt
 
-        subject = subject if subject else secrets.token_hex(4)
-        msg_date = msg_date if msg_date else datetime.now(timezone.utc)
 
-        slug_sbj = slugify(shorten_text(subject))
-        ts = msg_date.astimezone(timezone.utc).strftime("%Y-%m-%d")
 
-        # Raw email fixture
-        raw_fixture_dir = Path(settings.raw_fixture_dir)
-        raw_fixture_dir.mkdir(parents=True, exist_ok=True)
 
-        raw_file_path = raw_fixture_dir / f"{platform}_raw_{slug_sbj}_{ts}.html"
-        raw_file_path.write_text(html, encoding="utf-8")
-        
-        # Net email fixture
-        net_fixture_dir = Path(settings.net_fixture_dir)
-        net_fixture_dir.mkdir(parents=True, exist_ok=True)
 
-        cleaned_html = clean_fixture(html)
 
-        net_file_path = net_fixture_dir / f"{platform}_net_{slug_sbj}_{ts}.html"
-        net_file_path.write_text(cleaned_html, encoding="utf-8")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
