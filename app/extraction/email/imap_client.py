@@ -65,7 +65,14 @@ class IMAPClient:
             return ""
         decoded, charset = decode_header(value)[0]
         if isinstance(decoded, bytes):
-            return decoded.decode(charset or "utf-8", errors="ignore")
+            # Fallback for problematic charsets
+            try:
+                if not charset or charset.lower() \
+                in ["unknown-8bit", "x-unknown", "unknown"]:
+                    charset = "utf-8"
+                return decoded.decode(charset, errors="ignore")
+            except LookupError:
+                return decoded.decode("utf-8", errors="ignore")
         return decoded
 
     @staticmethod
