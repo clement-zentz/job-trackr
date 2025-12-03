@@ -73,15 +73,6 @@ class EmailExtractionService:
             platform = parser.__class__.__name__.replace(
                 "Parser", "").lower()
 
-            # Generate raw and net fixtures
-            msg_dt = self.parse_msg_date(msg)
-            generate_tests_fixtures(
-                platform=platform, 
-                html=html, 
-                msg_date=msg_dt,
-                subject=subject,
-            )
-
             parsed = parser.parse(html)
 
             for job in parsed:
@@ -145,6 +136,62 @@ class EmailExtractionService:
         except Exception:
             return None
 
+    def extract_tests_fixtures(self, days_back: int = 3):
+        """Search and extract job alert raw html for fixtures"""
+        
+        self.client.connect()
+        self.client.select_folder(self.folder)
+
+        # Only search in recent emails (IMAP optimization)
+        since_str = self._since_query(days_back)
+
+        # Fetch only recent
+        uids = self.client.search("SINCE", since_str)
+
+        generated = 0
+
+        for uid in uids:
+            msg = self.client.fetch_email(uid)
+            if not msg:
+                continue
+
+            sender = IMAPClient.decode(msg.get("From"))
+            subject = IMAPClient.decode(msg.get("Subject"))
+            sender_l = sender.lower()
+
+            # Determine platform
+            if "alert@indeed.com" in sender_l:
+                platform = "indeed"
+            elif "jobalerts-noreply@linkedin.com" in sender_l:
+                platform = "linkedin"
+            else:
+                continue # skip non-job-alert emails
+
+            # Extract HTML
+            html = IMAPClient.extract_html(msg)
+            if not html:
+                continue
+
+            msg_dt = self.parse_msg_date(msg)
+
+            # Generate raw/net fixtures
+            generate_tests_fixtures(
+                platform=platform,
+                html=html,
+                msg_date=msg_dt,
+                subject=subject,
+            )
+
+            generated += 1
+            logger.info(
+                f"[Fixture] Generated for UID {uid} - {platform} - {subject}")
+            
+        if self.client.conn is not None:
+            self.client.conn.logout()
+            
+        return generated
+        
+
     def remove_old_alert_email(self, days_back: int = 3):
         """Remove alert emails and fixtures older than days_back"""
 
@@ -152,6 +199,8 @@ class EmailExtractionService:
         self.client.select_folder(self.folder)
 
         cutoff_date = datetime.now(timezone.utc) - timedelta(days=days_back)
+        
+        # remove fixture files older than cutoff_date
         remove_old_fixtures()
 
         uids_indeed = self.client.search('FROM', '"alert@indeed.com"')
