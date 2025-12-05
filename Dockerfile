@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # Dockerfile
 
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
@@ -24,16 +25,17 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 ENV PATH="/app/.venv/bin:$PATH"
 
 # install system-level dependencies for Chromium (as root)
-RUN playwright install-deps chromium
+# RUN playwright install-deps chromium
 
 ENTRYPOINT []
 
 USER nonroot
-WORKDIR /home/nonroot
+
+# WORKDIR /home/nonroot
 # install playwright browsers (as nonroot)
-RUN playwright install chromium
+# RUN playwright install chromium
 
 # back to app directory
-WORKDIR /app
+# WORKDIR /app
 
 CMD ["fastapi", "dev", "--host", "0.0.0.0", "app/main.py"]
