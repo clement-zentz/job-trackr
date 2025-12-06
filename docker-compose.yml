@@ -4,11 +4,14 @@
 services:
   api:
     user: "${UID}:${GID}"
-    build: .
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"
     env_file:
       - .env
+      - ./backend/.env
     develop:
       watch:
         - action: sync
@@ -19,11 +22,12 @@ services:
             - __pycache__/
             - .git/
             - .pytest_cache/
+            - .env
   
         - action: rebuild
           path: ./uv.lock
     volumes:
-      - ./tests/email_fixtures:/app/tests/email_fixtures
+      - ./backend/tests/email_fixtures:/app/tests/email_fixtures
 
   postgres:
       image: postgres:16-alpine
