@@ -1,5 +1,5 @@
 # Makefile
-.PHONY: up build build-nc restart logs down down-v bash fixture test coverage
+.PHONY: up build build-nc restart logs down down-v bash fixture cov
 
 dc=docker compose
 
@@ -30,9 +30,5 @@ bash:
 fixture:
 	$(dc) exec api python3 -m scripts.python.generate_fixtures
 
-test:
-	$(dc) exec api pytest
-
-coverage:
-	$(dc) exec api pytest --cov=app --cov-report=term-missing
-
+cov:
+	pytest --cov=app --cov-report=term-missing
