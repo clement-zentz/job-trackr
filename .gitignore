@@ -1,0 +1,11 @@
+# .gitignore
+
+.env
+
+ignore
+
+.ruff_cache
+
+# --- pytest - coverage ---
+.pytest_cache
+.coverage
