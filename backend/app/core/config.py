@@ -7,6 +7,8 @@ class Settings(BaseSettings):
     database_url: str
     debug: bool = False
     fixture_dir: str
+    user_first_name: str
+    user_last_name: str
 
     model_config = {
         "env_file": ".env",

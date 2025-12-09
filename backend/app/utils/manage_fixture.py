@@ -53,7 +53,24 @@ def clean_raw_fixture(html: str) -> str:
         for a in soup.find_all("a", href=True):
             a["href"] = clean_job_url(str(a["href"]))
 
-        # --- 8. Pretty-print output
+        # --- 8. Replace first name and last name with [REDACTED]
+        name_pattern = build_name_pattern()
+        if name_pattern:
+            # Remove from text nodes
+            for text in soup.find_all(string=name_pattern):
+                text.replace_with(name_pattern.sub("[REDACTED]", text))
+
+            # Remove from alt attributes
+            for img in soup.find_all("img"):
+                if img.get("alt"):
+                    img["alt"] = name_pattern.sub("[REDACTED]", str(img["alt"]))
+            
+            # Remove from URLs
+            for a in soup.find_all("a", href=True):
+                cleaned = name_pattern.sub("[REDACTED]", str(a["href"]))
+                a["href"] = cleaned
+
+        # --- 9. Pretty-print output
         return soup.prettify()
 
 def clean_job_url(url: str) -> str:
@@ -72,6 +89,22 @@ def clean_job_url(url: str) -> str:
         return "https://www.linkedin.com"
     
     return url
+
+def build_name_pattern():
+    parts = []
+
+    if settings.user_first_name:
+        parts.append(re.escape(settings.user_first_name.strip()))
+
+    if settings.user_last_name:
+        parts.append(re.escape(settings.user_last_name.strip()))
+
+    if not parts:
+        return None
+    
+    # Matches: Foo Bar, any case
+    pattern = r"\b(" + "|".join(parts) + r")\b"
+    return re.compile(pattern, flags=re.IGNORECASE)
 
 def create_fixture(
     platform: str, 
