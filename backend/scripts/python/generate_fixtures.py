@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 from app.extraction.email.imap_client import IMAPClient
 from app.extraction.email.provider import detect_provider
 from app.extraction.email.email_alert_fetcher import EmailExtractionService
-from app.utils.manage_fixture import create_fixture, remove_all_fixtures
+from app.utils.manage_fixture import create_fixture, remove_all_fixtures, parse_msg_date
 
 
 import logging
@@ -53,7 +53,7 @@ def fetch_recent_email_uids(client: IMAPClient, sender_address: str, days_back: 
         if sender_address not in sender:
             continue
 
-        msg_dt = EmailExtractionService.parse_msg_date(msg)
+        msg_dt = parse_msg_date(msg)
         if not msg_dt:
             continue
 
@@ -131,6 +131,7 @@ def generate_recent_fixtures(days_back: int=7, max_per_platform: int=3, folder: 
         for uid, msg, msg_dt in selected:
             subject = IMAPClient.decode(msg.get("Subject"))
             html = IMAPClient.extract_html(msg)
+            metadata = IMAPClient.extract_metadata(msg)
 
             if not html:
                 logger.warning(f"Skipping UID {uid} (no HTML)")
@@ -144,6 +145,7 @@ def generate_recent_fixtures(days_back: int=7, max_per_platform: int=3, folder: 
                 msg_date=msg_dt,
                 subject=subject,
                 uid=uid,
+                headers=metadata,
             )
 
     if client.conn is not None:

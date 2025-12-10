@@ -147,3 +147,17 @@ class IMAPClient:
                     return payload.decode("utf-8", errors="ignore")
 
         return ""
+    
+    @staticmethod
+    def extract_metadata(msg: Message) -> dict:
+        """
+        Extract ALL email metadata (all headers), fully decoded.
+        Returns a dictionary mapping header name → decoded value.
+        """
+        metadata = {}
+
+        for header, value in msg.items():
+            decoded = IMAPClient.decode(value)
+            metadata[header.lower()] = decoded
+
+        return metadata

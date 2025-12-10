@@ -132,6 +132,7 @@ def parse_msg_date(msg):
 def create_fixture(
     platform: str, 
     html: str, 
+    headers: dict,
     uid: int,
     msg_date: datetime | None = None,
     subject: str | None = None,
@@ -157,18 +158,9 @@ def create_fixture(
         html, encoding="utf-8")
     (fixt_dir / f"clean_{uid}.html").write_text(
         clean_raw_fixture(html), encoding="utf-8")
-    
-    meta = {
-        "subject": subject,
-        "received_at": msg_date.isoformat(),
-        "platform": platform,
-        "uid": uid,
-    }
 
-    (fixt_dir / f"meta_{uid}.json").write_text(
-        json.dumps(meta, indent=2))
-  
-
+    (fixt_dir / f"raw_metadata_{uid}.json").write_text(
+        json.dumps(headers, indent=2))
 
 def remove_all_fixtures():
     """Remove all fixture files from fixture directory."""
