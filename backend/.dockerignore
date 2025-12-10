@@ -8,8 +8,11 @@
 ignore
 
 __pycache__/
+*.pyc
 
 .vscode/
+
+tests/
 
 # Logs / dumps
 *.log
