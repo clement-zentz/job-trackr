@@ -149,7 +149,7 @@ class IMAPClient:
         return ""
     
     @staticmethod
-    def extract_metadata(msg: Message) -> dict:
+    def extract_headers(msg: Message) -> dict:
         """
         Extract ALL email metadata (all headers), fully decoded.
         Returns a dictionary mapping header name → decoded value.

@@ -130,7 +130,7 @@ def generate_recent_fixtures(days_back: int=7, max_per_platform: int=3, folder: 
         for uid, msg, msg_dt in selected:
             subject = IMAPClient.decode(msg.get("Subject"))
             html = IMAPClient.extract_html(msg)
-            metadata = IMAPClient.extract_metadata(msg)
+            headers = IMAPClient.extract_headers(msg)
 
             if not html:
                 logger.warning(f"Skipping UID {uid} (no HTML)")
@@ -143,7 +143,7 @@ def generate_recent_fixtures(days_back: int=7, max_per_platform: int=3, folder: 
                 html=html,
                 msg_date=msg_dt,
                 uid=uid,
-                headers=metadata,
+                headers=headers,
             )
 
     if client.conn is not None:
