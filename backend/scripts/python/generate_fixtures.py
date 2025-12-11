@@ -5,9 +5,8 @@ import os
 from datetime import datetime, timedelta, timezone
 from app.extraction.email.imap_client import IMAPClient
 from app.extraction.email.provider import detect_provider
-from app.extraction.email.email_alert_fetcher import EmailExtractionService
-from app.utils.manage_fixture import create_fixture, remove_all_fixtures, parse_msg_date
-
+from app.utils.fixture_tools.writer import create_fixture, remove_all_fixtures
+from app.utils.fixture_tools.naming import parse_msg_date
 
 import logging
 
@@ -143,7 +142,6 @@ def generate_recent_fixtures(days_back: int=7, max_per_platform: int=3, folder: 
                 platform=platform,
                 html=html,
                 msg_date=msg_dt,
-                subject=subject,
                 uid=uid,
                 headers=metadata,
             )
