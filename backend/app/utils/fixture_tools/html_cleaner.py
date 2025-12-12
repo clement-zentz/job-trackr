@@ -76,8 +76,12 @@ def clean_raw_fixture(html: str, name_re=None, email_re=None) -> str:
 
         # Remove from alt attributes
         for img in soup.find_all("img"):
-            if img.get("alt"):
+            alt = img.get("alt")
+            if alt and name_re.search(str(alt)):
                 img["alt"] = name_re.sub("[REDACTED]", str(img["alt"]))
+                # Redact src if alt contained personal info
+                if img.get("src"):
+                    img["src"] = "[REDACTED]"
 
         # Remove from URLs
         for a in soup.find_all("a", href=True):
