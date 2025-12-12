@@ -13,6 +13,7 @@ dependencies = [
     "black==25.9.0",
     "certifi==2025.10.5",
     "click==8.3.0",
+    "debugpy>=1.8.18",
     "dnspython==2.8.0",
     "dotenv==0.9.9",
     "email-validator==2.3.0",

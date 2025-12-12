@@ -9,6 +9,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
+      - "5678:5678"
     env_file:
       - .env
       - ./backend/.env
@@ -28,6 +29,14 @@ services:
           path: ./uv.lock
     volumes:
       - ./backend/tests/email_fixtures:/app/tests/email_fixtures
+    command: >
+      python -Xfrozen_modules=off -m debugpy
+      --listen 0.0.0.0:5678
+      --wait-for-client
+      -m uvicorn app.main:app
+      --host 0.0.0.0
+      --port 8000
+      --reload
 
   postgres:
       image: postgres:16-alpine
