@@ -4,6 +4,7 @@ import re
 
 from bs4 import BeautifulSoup
 from app.extraction.email.parser_base import EmailParser
+from datetime import datetime
 
 
 class LinkedInParser(EmailParser):
@@ -28,7 +29,7 @@ class LinkedInParser(EmailParser):
             "jobalerts-noreply@linkedin.com" in s_sender
         ) and any (kw in s_subject for kw in self.keywords)
 
-    def parse(self, html: str) -> list[dict]:
+    def parse(self, html: str, msg_dt: datetime | None = None) -> list[dict]:
         soup = BeautifulSoup(html, "html.parser")
         jobs: list[dict] = []
 

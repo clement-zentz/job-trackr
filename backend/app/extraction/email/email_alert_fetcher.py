@@ -67,7 +67,8 @@ class EmailExtractionService:
             platform = parser.__class__.__name__.replace(
                 "Parser", "").lower()
 
-            parsed = parser.parse(html)
+            msg_dt = parsedate_to_datetime(msg.get("Date"))
+            parsed = parser.parse(html, msg_dt)
 
             for job in parsed:
                 job.setdefault("platform", platform)

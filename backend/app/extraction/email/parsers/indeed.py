@@ -34,7 +34,7 @@ class IndeedParser(EmailParser):
             "alert@indeed.com" in s_sender
         ) and any (kw in s_subject for kw in self.keywords)
 
-    def parse(self, html: str) -> list[dict]:
+    def parse(self, html: str, msg_dt: datetime) -> list[dict]:
         soup = BeautifulSoup(html, "html.parser")
 
         job_links = soup.select("td.pb-24 > a")
@@ -118,6 +118,7 @@ class IndeedParser(EmailParser):
 
             # --- Date posted ---
             posted_at = None
+            msg_dt = msg_dt
 
             posted_at_tag = container.select_one("td[style*='font-size:12px']")
             if posted_at_tag:
@@ -133,15 +134,14 @@ class IndeedParser(EmailParser):
                     )
 
                     if "publié à l'instant" in normalized:
-                        posted_at = datetime.now(timezone.utc)
+                        posted_at = msg_dt
 
                     else:
                         numbers = re.findall(r'\d+', normalized)
                         if numbers:
                             days_ago_int = int(numbers[0])
-                            # today - days_ago = days_back
-                            today, days_ago = datetime.now(timezone.utc), timedelta(days=days_ago_int)
-                            posted_at = today - days_ago
+                            # msg_dt - days_ago = posted_at 
+                            posted_at = msg_dt - timedelta(days=days_ago_int)
                         else:
                             logger.warning(
                                 "[IndeedParser] Could not parse posted_at text: %r",

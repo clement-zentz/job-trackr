@@ -2,7 +2,7 @@
 # app/extraction/parser_base.py
 
 from abc import ABC, abstractmethod
-
+from datetime import datetime
 
 class EmailParser(ABC):
 
@@ -12,6 +12,6 @@ class EmailParser(ABC):
         pass
 
     @abstractmethod
-    def parse(self, html: str) -> list[dict]:
+    def parse(self, html: str, msg_dt: datetime | None = None) -> list[dict]:
         """Return a list of job dicts with title, company, url, location, platform."""
         pass

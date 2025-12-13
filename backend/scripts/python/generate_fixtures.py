@@ -140,7 +140,7 @@ def generate_recent_fixtures(days_back: int=7, max_per_platform: int=3, folder: 
             headers = IMAPClient.extract_headers(msg)
             
             parser = PARSERS.get(platform)
-            jobs = parser.parse(html) if parser else []
+            jobs = parser.parse(html, msg_dt) if parser else []
 
             if not html:
                 logger.warning(f"Skipping UID {uid} (no HTML)")
