@@ -63,7 +63,10 @@ class IndeedParser(EmailParser):
 
             if len(rows) >= 2:
                 company_row = rows[1]
-                company_cells = company_row.find_all("td")
+                company_nested_tr = company_row.select_one("table tr")
+
+                if company_nested_tr:
+                    company_cells = company_nested_tr.find_all("td")
 
                 if company_cells:
                     company = company_cells[0].get_text(strip=True)
@@ -101,6 +104,9 @@ class IndeedParser(EmailParser):
             for tr in rows:
                 txt = tr.get_text(" ", strip=True)
                 if len(txt) > 40:
+                    # skip title tr
+                    if title and txt.startswith(title):
+                        continue
                     # skip salary tables
                     if "€" in txt and "par" in txt:
                         continue 
