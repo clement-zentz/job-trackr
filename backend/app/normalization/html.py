@@ -1,4 +1,5 @@
-# backend/app/utils/html_cleaner.py
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# backend/app/normalization/html.py
 
 import re
 from bs4 import BeautifulSoup, Comment
@@ -6,23 +7,6 @@ from app.core.config import get_settings
 
 settings = get_settings()
 
-
-def clean_job_url(url: str) -> str:
-    # --- Indeed ---
-    if "indeed.com" in url:
-        match = re.search(r"jk=([\w]+)", url)
-        if match:
-            return f"https://indeed.com/viewjob?jk={match.group(1)}"
-        return "https://indeed.com"
-
-    # --- LinkedIn ---
-    if "linkedin.com" in url:
-        match = re.search(r"/jobs/view/(\d+)", url)
-        if match:
-            return f"https://www.linkedin.com/jobs/view/{match.group(1)}"
-        return "https://www.linkedin.com"
-
-    return url
 
 def clean_raw_fixture(
         html: str,
@@ -66,11 +50,6 @@ def clean_raw_fixture(
     # --- 6. Remove <script> tags (rare in emails)
     for script in soup.find_all("script"):
         script.decompose()
-
-    # --- 7. Remove url trackers and tokens,
-    # replace unnecessary urls too
-    for a in soup.find_all("a", href=True):
-        a["href"] = clean_job_url(str(a["href"]))
 
     # --- 8. Replace first name and last name with [REDACTED]
     if name_re:

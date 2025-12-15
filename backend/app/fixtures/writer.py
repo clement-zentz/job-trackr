@@ -1,13 +1,14 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# app/utils/clean_fixture.py
+# backend/app/fixtures/writer.py
 import json
 import shutil
 from pathlib import Path
 from datetime import datetime, timezone, date
 
 from app.core.config import get_settings
-from .html_cleaner import clean_raw_fixture
-from .headers_cleaner import clean_headers, build_name_pattern, build_email_pattern
+from normalization.html import clean_raw_fixture
+from normalization.headers import clean_headers 
+from normalization.pii import build_name_pattern, build_email_pattern
 from .naming import format_fixture_date
 
 settings = get_settings()

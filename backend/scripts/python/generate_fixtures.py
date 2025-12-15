@@ -5,8 +5,10 @@ import os
 from datetime import datetime, timedelta, timezone
 from app.extraction.email.imap_client import IMAPClient
 from app.extraction.email.provider import detect_provider
-from app.utils.fixture_tools.writer import create_fixture, remove_all_fixtures
-from app.utils.fixture_tools.naming import parse_msg_date
+from app.fixtures.writer import create_fixture, remove_all_fixtures
+from app.fixtures.naming import parse_msg_date
+from app.normalization.html import clean_raw_fixture
+from app.extraction.email.parser_base import EmailParser
 from app.extraction.email.parsers.indeed import IndeedParser
 from app.extraction.email.parsers.linkedin import LinkedInParser
 
