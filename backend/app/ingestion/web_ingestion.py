@@ -11,7 +11,7 @@ async def ingest_scraped_jobs(jobs: list[dict], session: AsyncSession) -> int:
 
     for job in jobs:
         # Avoid duplicate by URL
-        stmt = select(JobOffer).where(JobOffer.url == job["url"])
+        stmt = select(JobOffer).where(JobOffer.raw_url == job["raw_url"])
         result = await session.execute(stmt)
         if result.scalars().first():
             continue

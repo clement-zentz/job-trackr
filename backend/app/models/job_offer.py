@@ -27,7 +27,10 @@ class JobOffer(Base):
     salary: Mapped[str | None] = mapped_column(String, nullable=True)
     description: Mapped[str | None] = mapped_column(String, nullable=True)
 
-    url: Mapped[str] = mapped_column(String, nullable=False, index=True)
+    raw_url: Mapped[str] = mapped_column(String, nullable=False, index=False)
+    canonical_url: Mapped[str | None] = mapped_column(String, nullable=True)
+    job_key: Mapped [str | None] = mapped_column(String, nullable=True)
+    
     platform: Mapped[str] = mapped_column(String, nullable=False)
 
     easy_apply: Mapped[bool | None] = mapped_column(Boolean, nullable=True)

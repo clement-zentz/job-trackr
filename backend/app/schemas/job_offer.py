@@ -9,7 +9,9 @@ class JobOfferBase(BaseModel):
     title: str
     company: str
     location: str | None = None
-    url: str
+    raw_url: str
+    canonical_url: str | None = None
+    job_key: str | None = None
     platform: str
     rating: float | None = None
     salary: str | None = None
@@ -31,7 +33,9 @@ class JobOfferUpdate(BaseModel):
     location: str | None = None
     summary: str | None = None
     description: str | None = None
-    url: str | None = None
+    raw_url: str | None = None
+    canonical_url: str | None = None
+    job_key: str | None = None
     platform: str | None = None
     easy_apply: bool | None = None
     active_hiring: bool | None = None

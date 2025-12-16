@@ -1,10 +1,11 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # app/extraction/parsers/linkedin.py
 import re
+from datetime import datetime
 
 from bs4 import BeautifulSoup
 from app.extraction.email.parser_base import EmailParser
-from datetime import datetime
+from app.normalization.url import normalize_job_url
 
 
 class LinkedInParser(EmailParser):
@@ -52,9 +53,15 @@ class LinkedInParser(EmailParser):
             if not title_a:
                 continue
 
-            job_url = title_a.get("href")
-            if not job_url:
+            raw_url = title_a.get("href")
+            if not raw_url:
                 continue
+            
+            # --- Job Key and Canonical Url 
+            if raw_url:
+                result = normalize_job_url(str(raw_url))
+                if result:
+                    job_key, canonical_url = result
 
             title = title_a.get_text(strip=True)
             if not title:
@@ -107,7 +114,9 @@ class LinkedInParser(EmailParser):
                     "title": title,
                     "company": company,
                     "location": location,
-                    "url": job_url,
+                    "raw_url": raw_url,
+                    "job_key": job_key,
+                    "canonical_url": canonical_url,
                     "platform": "linkedin",
                     "active_hiring": active_hiring,
                     "easy_apply": easy_apply,

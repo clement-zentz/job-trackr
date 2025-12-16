@@ -39,7 +39,7 @@ class JobIngestionService:
 
             # check if job already exists by source_uid or unique URL
             existing = await self._find_existing_job(
-                url=job_data.get("url")
+                raw_url=job_data.get("raw_url")
             )
 
             if existing:
@@ -54,7 +54,9 @@ class JobIngestionService:
                 active_hiring=job_data.get("active_hiring", None),
                 easy_apply=job_data.get("easy_apply", None),
                 posted_at=job_data.get("posted_at", None),
-                url=job_data.get("url", ""),
+                raw_url=job_data.get("raw_url", ""),
+                job_key=job_data.get("job_key", None),
+                canonical_url=job_data.get("canonical_url", None),
                 platform=job_data.get("platform", ""),
                 source_email_id=job_data.get("source_uid"),
             )
@@ -67,11 +69,11 @@ class JobIngestionService:
         return new_jobs
 
     async def _find_existing_job(
-        self, url: Optional[str] = None
+        self, raw_url: Optional[str] = None
     ) -> Optional[JobOffer]:
-        """Check if a job already exists in the database with job url."""
-        if url:
-            statement = select(JobOffer).where(JobOffer.url == url)
+        """Check if a job already exists in the database with job raw_url."""
+        if raw_url:
+            statement = select(JobOffer).where(JobOffer.raw_url == raw_url)
             result = await self.session.execute(statement)
             return result.scalars().first()
         return None

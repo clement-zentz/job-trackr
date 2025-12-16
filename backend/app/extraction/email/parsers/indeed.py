@@ -2,11 +2,11 @@
 # app/data_extraction/email_extraction/parsers/indeed.py
 
 import re, logging
+from datetime import datetime, timedelta
 
 from bs4 import BeautifulSoup
 from app.extraction.email.parser_base import EmailParser
-
-from datetime import datetime, timedelta, timezone
+from app.normalization.url import normalize_job_url
 
 
 logger = logging.getLogger(__name__)
@@ -49,13 +49,21 @@ class IndeedParser(EmailParser):
     
             # --- Title + URL ---
             title = None
-            url = None
+            raw_url = None
 
             if rows:
                 title_tag = rows[0].select_one("h2 a")
                 if title_tag:
                     title = title_tag.get_text(strip=True)
-                    url = title_tag.get("href")
+                    raw_url = title_tag.get("href")
+
+            # --- Job Key and Canonical Url ---
+            if raw_url:
+                result = normalize_job_url(str(raw_url))
+                if result is not None:
+                    job_key, canonical_url = result
+                else:
+                    job_key, canonical_url = None, None
 
             # --- Company & Rating ---
             company = None
@@ -154,7 +162,9 @@ class IndeedParser(EmailParser):
                     "title": title,
                     "company": company,
                     "location": location,
-                    "url": url,
+                    "raw_url": raw_url,
+                    "job_key": job_key,
+                    "canonical_url": canonical_url,
                     "summary": summary,
                     "posted_at": posted_at,
                     "salary": salary,
