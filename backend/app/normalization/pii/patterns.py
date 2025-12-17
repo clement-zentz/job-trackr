@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# backend/app/normalization/pii.py
+# backend/app/normalization/pii/patterns.py
 
 import re
 from app.core.config import get_settings

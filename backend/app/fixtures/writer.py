@@ -6,9 +6,11 @@ from pathlib import Path
 from datetime import datetime, timezone, date
 
 from app.core.config import get_settings
-from normalization.html import clean_raw_fixture
-from normalization.headers import clean_headers 
-from normalization.pii import build_name_pattern, build_email_pattern
+from app.normalization.html.structural import strip_structure
+from app.normalization.html.pii import redact_pii
+from app.normalization.headers.pii import redact_headers
+from app.normalization.headers.whitelist import whitelist_headers
+from app.normalization.pii.patterns import build_name_pattern, build_email_pattern
 from .naming import format_fixture_date
 
 settings = get_settings()
@@ -42,13 +44,15 @@ def create_fixture(
 
     (fixt_dir / f"raw_{uid}.html").write_text(
         html, encoding="utf-8")
-    (fixt_dir / f"clean_{uid}.html").write_text(
-        clean_raw_fixture(html, name_re, email_re), encoding="utf-8")
+    
+    sanitized_html_soup = strip_structure(html)
+    redact_pii(sanitized_html_soup, name_re, email_re)
+    (fixt_dir / f"clean_{uid}.html").write_text(sanitized_html_soup.prettify(), encoding="utf-8")
 
-    (fixt_dir / f"raw_headers_{uid}.json").write_text(
-        json.dumps(headers, indent=2))
-    (fixt_dir / f"net_headers_{uid}.json").write_text(
-        json.dumps(clean_headers(headers, name_re, email_re), indent=2))
+    (fixt_dir / f"raw_headers_{uid}.json").write_text(json.dumps(headers, indent=2))
+    
+    sanitized_headers = redact_headers(whitelist_headers(headers), name_re, email_re)
+    (fixt_dir / f"net_headers_{uid}.json").write_text(json.dumps(sanitized_headers, indent=2))
     
     def _json_safe(obj):
         if isinstance(obj, (datetime, date)):
