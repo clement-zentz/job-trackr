@@ -9,7 +9,8 @@ class Settings(BaseSettings):
     fixture_dir: str
     user_first_name: str
     user_last_name: str
-    user_email: str
+    email_address: str
+    email_password: str
 
     model_config = {
         "env_file": ".env",

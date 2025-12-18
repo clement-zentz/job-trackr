@@ -24,10 +24,10 @@ def build_name_pattern() -> re.Pattern[str] | None:
     return re.compile(pattern, flags=re.IGNORECASE)
 
 def build_email_pattern() -> re.Pattern[str] | None:
-    if not settings.user_email:
+    if not settings.email_address:
         return None
     
-    raw_email = settings.user_email.strip()
+    raw_email = settings.email_address.strip()
     escaped_email = re.escape(raw_email)
     encoded_email = re.escape(raw_email.replace("@", "%40"))
 

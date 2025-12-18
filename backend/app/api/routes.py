@@ -1,17 +1,16 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # app/api/routes.py
-import os
 
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio.session import AsyncSession
-
 from app.core.database import get_session
-
-# email data processing
 from app.ingestion.email_ingestion import JobIngestionService
 from app.ingestion.web_ingestion import ingest_scraped_jobs
 from app.scrapers.indeed import IndeedScraper
+from app.core.config import get_settings
+
+settings = get_settings()
 
 router = APIRouter(prefix="/scrape", tags=["scraping"])
 
@@ -43,8 +42,8 @@ async def process_email_datas(
     """
     Extract job alerts from email and ingest them into the database.
     """
-    email_address = os.getenv("EMAIL_ADDRESS")
-    password = os.getenv("EMAIL_PASSWORD")
+    email_address = settings.email_address
+    password = settings.email_password
     
     if not email_address or not password:
         raise RuntimeError("email_address or password is not set.")
