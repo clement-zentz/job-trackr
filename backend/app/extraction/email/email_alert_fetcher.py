@@ -51,10 +51,12 @@ class EmailAlertFetcher:
             password=password,
             port=provider.port,
         )
-
         self.folder = folder
 
-    def fetch_recent(self, days_back: int = 1) -> list[FetchedEmail]:
+    def fetch_recent(
+            self, days_back: int = 1, 
+            sender_filter: str | None = None
+    ) -> list[FetchedEmail]:
         """
         Fetch emails from the last N days.
         
@@ -67,8 +69,12 @@ class EmailAlertFetcher:
         self.client.connect()
         self.client.select_folder(self.folder)
 
+        # Build IMAP search criteria (filter emails)
         since_str = self._since_query(days_back)
-        uids = self.client.search("SINCE", since_str)
+        criteria = ["SINCE", since_str]
+        if sender_filter:
+            criteria += ["FROM", sender_filter]
+        uids = self.client.search(*criteria)
 
         emails: list[FetchedEmail] = []
         for uid_str in uids:
@@ -147,4 +153,3 @@ class EmailAlertFetcher:
 
         cutoff = datetime.now(timezone.utc) - timedelta(days=days_back)
         return msg_dt >= cutoff
-    

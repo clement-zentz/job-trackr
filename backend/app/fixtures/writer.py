@@ -41,18 +41,18 @@ def create_fixture(
     # Raw email fixture
     fixt_dir = Path(settings.fixture_dir) / platform / f"{date_str}_{uid}"
     fixt_dir.mkdir(parents=True, exist_ok=True)
-
-    (fixt_dir / f"raw_{uid}.html").write_text(
-        html, encoding="utf-8")
     
     sanitized_html_soup = strip_structure(html)
     redact_pii(sanitized_html_soup, name_re, email_re)
-    (fixt_dir / f"clean_{uid}.html").write_text(sanitized_html_soup.prettify(), encoding="utf-8")
-
-    (fixt_dir / f"raw_headers_{uid}.json").write_text(json.dumps(headers, indent=2))
+    clean_body_path = fixt_dir / f"clean_{uid}.html"
+    clean_body_path.write_text(
+        sanitized_html_soup.prettify(), encoding="utf-8")
     
-    sanitized_headers = redact_headers(whitelist_headers(headers), name_re, email_re)
-    (fixt_dir / f"net_headers_{uid}.json").write_text(json.dumps(sanitized_headers, indent=2))
+    sanitized_headers = redact_headers(
+        whitelist_headers(headers), name_re, email_re)
+    net_headers_path = fixt_dir / f"net_headers_{uid}.json"
+    net_headers_path.write_text(
+        json.dumps(sanitized_headers, indent=2))
     
     def _json_safe(obj):
         if isinstance(obj, (datetime, date)):
@@ -62,7 +62,8 @@ def create_fixture(
         return obj
 
     if jobs is not None:
-        (fixt_dir / f"response_{uid}.json").write_text(
+        response_path = fixt_dir / f"response_{uid}.json"
+        response_path.write_text(
             json.dumps(
                 {
                     "platform": platform,
