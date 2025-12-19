@@ -28,3 +28,6 @@ uv.lock
 
 # fixtures
 tests/email_fixtures
+
+# samples
+email_samples/

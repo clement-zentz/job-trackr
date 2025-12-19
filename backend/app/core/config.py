@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     database_url: str
     debug: bool = False
     fixture_dir: str
+    sample_dir: str
     user_first_name: str
     user_last_name: str
     email_address: str
