@@ -10,8 +10,10 @@ def redact_headers(
     cleaned = {}
     for k, v in headers.items():
         if name_re:
-            v = name_re.sub("", v)
+            v = name_re.sub("[REDACTED]", v)
         if email_re:
-            v = email_re.sub("", v)
+            v = email_re.sub("[REDACTED]", v)
+        if k == "message_id":
+            v = "[REDACTED]"
         cleaned[k] = v
     return cleaned
