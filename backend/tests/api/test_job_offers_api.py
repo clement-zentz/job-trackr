@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# tests/test.py
+# backend/tests/api/test_job_offers_api.py
 
 import pytest
 
@@ -12,7 +12,7 @@ async def test_root_route(async_client):
 
 
 @pytest.mark.asyncio
-async def test_create_job(async_client):
+async def test_create_job_offer(async_client):
     payload = {
         "title": "Python Developer", 
         "company": "OpenAI", 
@@ -29,7 +29,7 @@ async def test_create_job(async_client):
 
 
 @pytest.mark.asyncio
-async def test_list_jobs(async_client):
+async def test_list_job_offers(async_client):
     resp = await async_client.get("/job-offers/")
     assert resp.status_code == 200
     assert resp.json() == []
@@ -63,7 +63,7 @@ async def test_list_jobs(async_client):
 
 
 @pytest.mark.asyncio
-async def test_get_job(async_client):
+async def test_get_job_offer(async_client):
     # Create
     payload = {
         "title": "Backend developer", 
@@ -85,7 +85,7 @@ async def test_get_job(async_client):
 
 
 @pytest.mark.asyncio
-async def test_update_job(async_client):
+async def test_update_job_offer(async_client):
     # Create
     payload = {
         "title": "Data analyst", 
@@ -109,7 +109,7 @@ async def test_update_job(async_client):
 
 
 @pytest.mark.asyncio
-async def test_delete_job(async_client):
+async def test_delete_job_offer(async_client):
     # Create
     payload = {
         "title": "Frontend Dev", 

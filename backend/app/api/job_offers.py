@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# app/api/jobs.py
+# backend/app/api/job_offers.py
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -20,7 +20,7 @@ router = APIRouter(prefix="/job-offers", tags=["Job Offers"])
         response_model=JobOfferRead, 
         status_code=status.HTTP_201_CREATED,
 )
-async def create_job(
+async def create_job_offer(
     job: JobOfferCreate, 
     session: AsyncSession = Depends(get_session)
 ):
@@ -33,7 +33,7 @@ async def create_job(
 
 # 🔵 READ ALL
 @router.get("/", response_model=List[JobOfferRead], status_code=status.HTTP_200_OK)
-async def list_jobs(session: AsyncSession = Depends(get_session)):
+async def list_job_offers(session: AsyncSession = Depends(get_session)):
     results = await session.execute(select(JobOffer))
     jobs = results.scalars().all()
     return jobs
@@ -45,7 +45,7 @@ async def list_jobs(session: AsyncSession = Depends(get_session)):
         response_model=JobOfferRead, 
         status_code=status.HTTP_200_OK,
 )
-async def get_job(
+async def get_job_offer(
     job_id: int, 
     session: AsyncSession = Depends(get_session),
 ):
@@ -61,7 +61,7 @@ async def get_job(
         response_model=JobOfferRead, 
         status_code=status.HTTP_200_OK
 )
-async def update_job(
+async def update_job_offer(
     job_id: int, 
     updated_job: JobOfferUpdate, 
     session: AsyncSession = Depends(get_session)
@@ -86,7 +86,7 @@ async def update_job(
         "/{job_id}", 
         status_code=status.HTTP_204_NO_CONTENT
 )
-async def delete_job(
+async def delete_job_offer(
     job_id: int, 
     session: AsyncSession = Depends(get_session)
 ):
