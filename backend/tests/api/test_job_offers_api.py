@@ -29,6 +29,14 @@ async def test_create_job_offer(async_client):
     assert data["company"] == payload["company"]
 
 
+@pytest.mark.asyncio
+async def test_create_job_offer_missing_required_fields(async_client):
+    """Test creating a job offer without required fields"""
+    payload = {"title": "Incomplete Job"}
+    resp = await async_client.post("/job-offers/", json=payload)
+    assert resp.status_code == 422
+
+
 # --- LIST Job Offers ---
 @pytest.mark.asyncio
 async def test_list_job_offers(async_client):
@@ -64,6 +72,58 @@ async def test_list_job_offers(async_client):
     assert "Data Engineer" in titles
 
 
+@pytest.mark.asyncio
+async def test_list_job_offers_with_filters(async_client):
+    """Test listing job offers with query filters"""
+    jobs = [
+        {
+            "title": "Dev1",
+            "company": "CompanyA",
+            "location": "London",
+            "raw_url": "https://a.com/1",
+            "platform": "linkedin",
+        },
+        {
+            "title": "Dev2",
+            "company": "CompanyB",
+            "location": "London",
+            "raw_url": "https://b.com/2",
+            "platform": "indeed",
+        },
+        {
+            "title": "Dev3",
+            "company": "CompanyC",
+            "location": "Paris",
+            "raw_url": "https://b.com/3",
+            "platform": "wttj",
+        },
+        {
+            "title": "Dev4",
+            "company": "CompanyA",
+            "location": "Dublin",
+            "raw_url": "https://a.com/4",
+            "platform": "linkedin",
+        },
+    ]
+
+    # Create
+    for job in jobs:
+        resp = await async_client.post("/job-offers/", json=job)
+        assert resp.status_code == 201
+
+    # Filter by platform
+    resp = await async_client.get("/job-offers/?platform=linkedin")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert len(data) == 2
+
+    # Filter by platform
+    resp = await async_client.get("/job-offers/?company=CompanyA")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert len(data) == 2
+
+
 # --- GET Job Offer ---
 @pytest.mark.asyncio
 async def test_get_job_offer(async_client):
@@ -85,6 +145,14 @@ async def test_get_job_offer(async_client):
     assert data["id"] == job_offer_id
     assert data["title"] == payload["title"]
     assert data["company"] == payload["company"]
+
+
+@pytest.mark.asyncio
+async def test_get_nonexistent_job_offer(async_client):
+    """Test retrieving a job offer that doesn't exist"""
+    resp = await async_client.get("/job-offers/99999")
+    assert resp.status_code == 404
+    assert resp.json() == {"detail": "Job offer not found"}
 
 
 # --- UPDATE Job Offer ---
@@ -112,3 +180,12 @@ async def test_update_job_offer(async_client):
     assert updated["title"] == "Senior ML Engineer"
     # company remains unchanged
     assert updated["company"] == "DataCorp"
+
+
+@pytest.mark.asyncio
+async def test_update_nonexistent_job_offer(async_client):
+    """Test updating a job offer that doesn't exist"""
+    update_payload = {"title": "Updated Title"}
+    resp = await async_client.patch("/job-offers/99999", json=update_payload)
+    assert resp.status_code == 404
+    assert resp.json() == {"detail": "Job offer not found"}
