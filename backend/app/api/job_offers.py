@@ -76,7 +76,7 @@ async def get_job_offer(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Job offer not found",
-        )
+        ) from None
 
 
 # 🟠 UPDATE (partial - PATCH)
@@ -99,4 +99,4 @@ async def update_job_offer(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Job offer not found",
-        )
+        ) from None

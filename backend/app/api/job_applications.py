@@ -48,4 +48,7 @@ async def update_job_application(
             session, job_application_id, data
         )
     except ValueError:
-        raise HTTPException(status_code=404, detail="Application not found")
+        raise HTTPException(
+            status_code=404,
+            detail="Application not found"
+        ) from None

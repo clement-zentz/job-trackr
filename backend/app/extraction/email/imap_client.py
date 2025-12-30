@@ -25,7 +25,7 @@ class IMAPClient:
         try:
             self.conn.login(self.username, self.password)
         except imaplib.IMAP4.error as e:
-            raise RuntimeError(f"IMAP login failed: {e}")
+            raise RuntimeError("IMAP login failed") from e
 
     def select_folder(self, folder="INBOX"):
         if self.conn is None:
