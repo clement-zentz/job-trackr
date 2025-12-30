@@ -3,6 +3,7 @@
 
 import re, logging
 from datetime import datetime, timedelta
+from contextlib import suppress
 
 from bs4 import BeautifulSoup
 from app.extraction.email.parser_base import EmailParser
@@ -82,10 +83,8 @@ class IndeedParser(EmailParser):
                     for cell in company_cells:
                         strong = cell.find("strong")
                         if strong:
-                            try:
+                            with suppress(ValueError):
                                 rating = float(strong.get_text(strip=True))
-                            except ValueError:
-                                pass
 
             # --- Location ---
             location = None
