@@ -2,13 +2,12 @@
 # app/main.py
 from fastapi import FastAPI
 
-from app.api import job_offers, routes, job_applications
+import app.models  # noqa
+from app.api import job_applications, job_offers
 from app.lifespan import lifespan
-import app.models # noqa
 
 app = FastAPI(title="JobAI Agent", lifespan=lifespan)
 
 # Include routes
 app.include_router(job_applications.router)
 app.include_router(job_offers.router)
-app.include_router(routes.router)
