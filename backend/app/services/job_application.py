@@ -41,7 +41,6 @@ class JobApplicationService:
             setattr(job_application, field, value)
 
         await session.commit()
-        await session.refresh(job_application)
         return job_application
     
 def get_job_application_service() -> JobApplicationService:
