@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# backend/app/fixtures/naming.py
+# File: backend/app/fixtures/naming.py
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from email.utils import parsedate_to_datetime
+
 from dateutil import parser as dateutil_parser
 
 
@@ -27,6 +28,7 @@ def parse_msg_date(msg):
     except Exception:
         return None
 
+
 def format_fixture_date(dt: datetime):
-    dt = dt.astimezone(timezone.utc)
+    dt = dt.astimezone(UTC)
     return dt.strftime("%Y-%m-%d")

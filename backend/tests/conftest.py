@@ -1,17 +1,17 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# tests/conftest.py
+# File: backend/tests/conftest.py
 import asyncio
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 
 import pytest
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.engine.url import make_url
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from testcontainers.postgres import PostgresContainer
-from app.models.job_offer import Base
 
 from app.core.database import get_session
 from app.main import app
+from app.models.job_offer import Base
 
 
 @pytest.fixture()
@@ -59,9 +59,7 @@ async def test_session(test_engine) -> AsyncGenerator[AsyncSession, None]:
     Provide an async session bound to the test engine.
     """
     async_session_maker = async_sessionmaker(
-        test_engine, 
-        expire_on_commit=False, 
-        class_=AsyncSession
+        test_engine, expire_on_commit=False, class_=AsyncSession
     )
 
     async with async_session_maker() as session:

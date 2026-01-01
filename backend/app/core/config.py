@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# app/core/config.py
+# File: backend/app/core/config.py
 from pydantic_settings import BaseSettings
 
 
@@ -18,7 +18,9 @@ class Settings(BaseSettings):
         "extra": "ignore",
     }
 
+
 def get_settings() -> Settings:
-    return Settings() # type: ignore[call-arg]
+    return Settings()  # type: ignore[call-arg]
+
 
 settings = get_settings()

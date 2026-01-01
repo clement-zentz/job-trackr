@@ -1,21 +1,22 @@
-# backend/app/generators/fixtures.py
-
-from app.fixtures.writer import remove_all_fixtures, create_fixture
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# File: backend/app/generators/fixtures.py
 from app.extraction.email.email_alert_fetcher import EmailAlertFetcher, FetchedEmail
 from app.extraction.email.parser_base import EmailParser
+from app.fixtures.writer import create_fixture, remove_all_fixtures
 
 PLATFORMS: dict[str, str] = {
     "indeed": "alert@indeed.com",
-    "linkedin": "jobalerts-noreply@linkedin.com"
+    "linkedin": "jobalerts-noreply@linkedin.com",
 }
+
 
 class FixtureGenerator:
     def __init__(
-            self, 
-            fetcher: EmailAlertFetcher,
-            parsers: dict[str, EmailParser],
-            max_per_platform: int = 3,):
-        
+        self,
+        fetcher: EmailAlertFetcher,
+        parsers: dict[str, EmailParser],
+        max_per_platform: int = 3,
+    ):
         self.fetcher: EmailAlertFetcher = fetcher
         self.parsers = parsers
         self.max_per_platform = max_per_platform

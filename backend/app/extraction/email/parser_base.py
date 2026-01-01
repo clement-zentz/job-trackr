@@ -1,11 +1,11 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# app/extraction/parser_base.py
+# File: backend/app/extraction/email/parser_base.py
 
 from abc import ABC, abstractmethod
 from datetime import datetime
 
-class EmailParser(ABC):
 
+class EmailParser(ABC):
     @abstractmethod
     def matches(self, sender: str, subject: str) -> bool:
         """Return True if this parser can handle the email."""

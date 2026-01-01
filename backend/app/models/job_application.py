@@ -1,12 +1,13 @@
-# backend/app/models/job_application.py
-
-from datetime import datetime, date, timezone
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# File: backend/app/models/job_application.py
+from datetime import UTC, date, datetime
 from enum import Enum
 
 from sqlalchemy import Date, DateTime, Enum as SAEnum, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
+
 
 class ApplicationStatus(str, Enum):
     APPLIED = "applied"
@@ -39,17 +40,11 @@ class JobApplication(Base):
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        default=datetime.now(timezone.utc),
-        onupdate=datetime.now(timezone.utc),
+        default=datetime.now(UTC),
+        onupdate=datetime.now(UTC),
     )
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        default=datetime.now(timezone.utc),
-        onupdate=datetime.now(timezone.utc)
+        DateTime(timezone=True), default=datetime.now(UTC), onupdate=datetime.now(UTC)
     )
 
-    job_offer = relationship(
-        "JobOffer",
-        back_populates="applications",
-        lazy="raise"
-    )
+    job_offer = relationship("JobOffer", back_populates="applications", lazy="raise")

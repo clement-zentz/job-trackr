@@ -1,15 +1,10 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# backend/app/api/job_offers.py
+# File: backend/app/api/job_offers.py
 
-from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.schemas.job_offer import (
-    JobOfferCreate, 
-    JobOfferRead, 
-    JobOfferUpdate
-)
+from app.schemas.job_offer import JobOfferCreate, JobOfferRead, JobOfferUpdate
 from app.services.job_offer import JobOfferService, get_job_offer_service
 
 router = APIRouter(prefix="/job-offers", tags=["Job Offers"])
@@ -22,8 +17,7 @@ router = APIRouter(prefix="/job-offers", tags=["Job Offers"])
     status_code=status.HTTP_201_CREATED,
 )
 async def create_job_offer(
-    data: JobOfferCreate,
-    service: JobOfferService = Depends(get_job_offer_service) 
+    data: JobOfferCreate, service: JobOfferService = Depends(get_job_offer_service)
 ):
     """
     Create a job offer manually.
@@ -32,11 +26,7 @@ async def create_job_offer(
 
 
 # 🔵 READ ALL
-@router.get(
-    "/",
-    response_model=List[JobOfferRead],
-    status_code=status.HTTP_200_OK
-)
+@router.get("/", response_model=list[JobOfferRead], status_code=status.HTTP_200_OK)
 async def list_job_offers(
     platform: str | None = None,
     company: str | None = None,
@@ -81,14 +71,12 @@ async def get_job_offer(
 
 # 🟠 UPDATE (partial - PATCH)
 @router.patch(
-    "/{job_offer_id}",
-    response_model=JobOfferRead,
-    status_code=status.HTTP_200_OK
+    "/{job_offer_id}", response_model=JobOfferRead, status_code=status.HTTP_200_OK
 )
 async def update_job_offer(
     job_offer_id: int,
     data: JobOfferUpdate,
-    service: JobOfferService = Depends(get_job_offer_service)
+    service: JobOfferService = Depends(get_job_offer_service),
 ):
     """
     Correct or Enrich a Job offer manually.

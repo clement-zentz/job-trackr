@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# backend/tests/api/test_job_offers_api.py
+# File: backend/tests/api/test_job_offers_api.py
 
 import pytest
 

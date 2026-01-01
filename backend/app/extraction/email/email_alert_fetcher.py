@@ -1,17 +1,19 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# backend/app/extraction/email/email_alert_fetcher.py
+# File: backend/app/extraction/email/email_alert_fetcher.py
 
-from datetime import datetime, timedelta, timezone
-from email.utils import parsedate_to_datetime
 from dataclasses import dataclass
+from datetime import UTC, datetime, timedelta
+from email.utils import parsedate_to_datetime
+
 from .imap_client import IMAPClient
 from .provider import detect_provider
+
 
 @dataclass
 class FetchedEmail:
     """
     Container for parsed email data.
-    
+
     Attributes:
         uid: Unique email identifier from IMAP server
         sender: Email sender address
@@ -20,6 +22,7 @@ class FetchedEmail:
         html: HTML content of the email body
         headers: Dictionary of email headers
     """
+
     uid: int
     sender: str
     subject: str
@@ -27,10 +30,11 @@ class FetchedEmail:
     html: str
     headers: dict[str, str]
 
+
 class EmailAlertFetcher:
     """
     Fetches and parses recent emails from an IMAP mailbox.
-    
+
     Connects to an IMAP server, retrieves emails from a specified folder,
     and extracts relevant information including HTML content and headers.
     """
@@ -54,15 +58,14 @@ class EmailAlertFetcher:
         self.folder = folder
 
     def fetch_recent(
-            self, days_back: int = 1, 
-            sender_filter: str | None = None
+        self, days_back: int = 1, sender_filter: str | None = None
     ) -> list[FetchedEmail]:
         """
         Fetch emails from the last N days.
-        
+
         Args:
             days_back: Number of days to look back for emails
-            
+
         Returns:
             List of FetchedEmail objects containing parsed email data
         """
@@ -118,10 +121,10 @@ class EmailAlertFetcher:
     def _since_query(days_back: int) -> str:
         """
         Generate IMAP SINCE query date string.
-        
+
         Args:
             days_back: Number of days to subtract from current date
-            
+
         Returns:
             Date string in IMAP format (DD-Mon-YYYY)
         """
@@ -132,11 +135,11 @@ class EmailAlertFetcher:
     def _is_recent_enough(message, days_back: int) -> bool:
         """
         Check if email date falls within the lookback period.
-        
+
         Args:
             message: Email message object
             days_back: Number of days to look back
-            
+
         Returns:
             True if email is recent enough, False otherwise
         """
@@ -149,7 +152,7 @@ class EmailAlertFetcher:
             return True
 
         if msg_dt.tzinfo is None:
-            msg_dt = msg_dt.replace(tzinfo=timezone.utc)
+            msg_dt = msg_dt.replace(tzinfo=UTC)
 
-        cutoff = datetime.now(timezone.utc) - timedelta(days=days_back)
+        cutoff = datetime.now(UTC) - timedelta(days=days_back)
         return msg_dt >= cutoff

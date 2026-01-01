@@ -1,5 +1,5 @@
-# backend/app/repositories/job_offer.py
-
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# File: backend/app/repositories/job_offer.py
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -18,21 +18,15 @@ class JobOfferRepository:
         self,
         job_offer_id: int,
     ) -> JobOffer | None:
-        stmt = (
-            select(JobOffer)
-            .where(JobOffer.id == job_offer_id)
-        )
+        stmt = select(JobOffer).where(JobOffer.id == job_offer_id)
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
-    
+
     async def get_by_raw_url(
         self,
         raw_url: str,
     ) -> JobOffer | None:
-        stmt = (
-            select(JobOffer)
-            .where(JobOffer.raw_url == raw_url)
-        )
+        stmt = select(JobOffer).where(JobOffer.raw_url == raw_url)
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
@@ -42,16 +36,13 @@ class JobOfferRepository:
         platform: str,
         job_key: str,
     ) -> JobOffer | None:
-        stmt = (
-            select(JobOffer)
-            .where(
-                JobOffer.platform == platform,
-                JobOffer.job_key == job_key,
-            )
+        stmt = select(JobOffer).where(
+            JobOffer.platform == platform,
+            JobOffer.job_key == job_key,
         )
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
-    
+
     async def list(
         self,
         *,
@@ -78,17 +69,12 @@ class JobOfferRepository:
                 stmt = stmt.where(JobOffer.applications.any())
             else:
                 stmt = stmt.where(~JobOffer.applications.any())
-        
-        stmt = (
-            stmt
-            .order_by(JobOffer.date_scraped.desc())
-            .limit(limit)
-            .offset(offset)
-        )
+
+        stmt = stmt.order_by(JobOffer.date_scraped.desc()).limit(limit).offset(offset)
 
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
-    
+
     async def get_with_applications(
         self,
         job_offer_id: int,

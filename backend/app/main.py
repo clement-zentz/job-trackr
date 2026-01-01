@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# app/main.py
+# File: backend/app/main.py
 from fastapi import FastAPI
 
 import app.models  # noqa

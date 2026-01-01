@@ -1,11 +1,12 @@
-# backend/app/normalization/headers/pii.py
-
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# File: backend/app/normalization/headers/pii.py
 import re
 
+
 def redact_headers(
-        headers: dict[str, str],
-        name_re: re.Pattern[str] | None,
-        email_re: re.Pattern[str] | None,
+    headers: dict[str, str],
+    name_re: re.Pattern[str] | None,
+    email_re: re.Pattern[str] | None,
 ) -> dict[str, str]:
     cleaned = {}
     for k, v in headers.items():

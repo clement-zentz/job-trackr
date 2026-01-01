@@ -1,21 +1,24 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# app/data_extraction/email_extraction/parsers/indeed.py
+# File: backend/app/extraction/email/parsers/indeed.py
 
-import re, logging
-from datetime import datetime, timedelta
+import logging
+import re
 from contextlib import suppress
+from datetime import datetime, timedelta
 
 from bs4 import BeautifulSoup
+
 from app.extraction.email.parser_base import EmailParser
 from app.normalization.url.sanitize import normalize_job_url
 
-
 logger = logging.getLogger(__name__)
+
 
 class IndeedParser(EmailParser):
     """
     Parser for Indeed "Job Alerts" emails
     """
+
     # subject is in lower case
     keywords = ["python", "backend", "data", "engineer", "developer", "ai"]
 
@@ -30,10 +33,9 @@ class IndeedParser(EmailParser):
         s_sender = sender.lower()
         s_subject = subject.lower()
 
-        return (
-            "indeed" in s_sender or
-            "alert@indeed.com" in s_sender
-        ) and any (kw in s_subject for kw in self.keywords)
+        return ("indeed" in s_sender or "alert@indeed.com" in s_sender) and any(
+            kw in s_subject for kw in self.keywords
+        )
 
     def parse(self, html: str, msg_dt: datetime) -> list[dict]:
         soup = BeautifulSoup(html, "html.parser")
@@ -47,7 +49,7 @@ class IndeedParser(EmailParser):
                 continue
 
             rows = container.find_all("tr", recursive=False)
-    
+
             # --- Title + URL ---
             title = None
             raw_url = None
@@ -101,9 +103,13 @@ class IndeedParser(EmailParser):
 
             # --- Simplified apply & Responsive employer (optional) ---
             # match <img> tag whose src attrs contains the substring : 'my_example_substring.ext'
-            easy_apply = bool(container.select_one("img[src*='Plane_primary_whitebg.png']"))
+            easy_apply = bool(
+                container.select_one("img[src*='Plane_primary_whitebg.png']")
+            )
             # Linkedin Actively recruiting <==> Indeed Responsive employer
-            active_hiring = bool(container.select_one("img[src*='ResponsiveEmployer_whitebg.png']"))
+            active_hiring = bool(
+                container.select_one("img[src*='ResponsiveEmployer_whitebg.png']")
+            )
 
             # --- Summary ---
             summary = None
@@ -116,7 +122,7 @@ class IndeedParser(EmailParser):
                         continue
                     # skip salary tables
                     if "€" in txt and "par" in txt:
-                        continue 
+                        continue
                     # skip posted_at lines
                     if "il y a" in txt.lower() or "publié" in txt.lower():
                         continue
@@ -131,12 +137,10 @@ class IndeedParser(EmailParser):
             if posted_at_tag:
                 posted_at_text = posted_at_tag.get_text("", strip=True)
                 if posted_at_text:
-
                     # Normalize non-breaking spaces and unicode apostrophes
                     normalized = (
-                        posted_at_text
-                        .replace("\u00A0", " ") # NBSP --> normal space
-                        .replace("’", "'") # curly apostrophe --> straight
+                        posted_at_text.replace("\u00a0", " ")  # NBSP --> normal space
+                        .replace("’", "'")  # curly apostrophe --> straight
                         .lower()
                     )
 
@@ -144,15 +148,15 @@ class IndeedParser(EmailParser):
                         posted_at = msg_dt
 
                     else:
-                        numbers = re.findall(r'\d+', normalized)
+                        numbers = re.findall(r"\d+", normalized)
                         if numbers:
                             days_ago_int = int(numbers[0])
-                            # msg_dt - days_ago = posted_at 
+                            # msg_dt - days_ago = posted_at
                             posted_at = msg_dt - timedelta(days=days_ago_int)
                         else:
                             logger.warning(
                                 "[IndeedParser] Could not parse posted_at text: %r",
-                                posted_at_text
+                                posted_at_text,
                             )
 
             # --- Build job dict ---

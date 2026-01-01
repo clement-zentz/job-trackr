@@ -1,6 +1,7 @@
-# backend/app/normalization/html/structural.py
-
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# File: backend/app/normalization/html/structural.py
 from bs4 import BeautifulSoup, Comment
+
 from app.core.config import get_settings
 
 settings = get_settings()

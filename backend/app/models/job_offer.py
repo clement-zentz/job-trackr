@@ -1,10 +1,11 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# app/models/job_offer.py
+# File: backend/app/models/job_offer.py
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
-from sqlalchemy import String, Boolean, DateTime, Float
+from sqlalchemy import Boolean, DateTime, Float, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from app.db.base import Base
 
 
@@ -30,13 +31,11 @@ class JobOffer(Base):
 
     raw_url: Mapped[str] = mapped_column(String, nullable=False, index=False)
     canonical_url: Mapped[str | None] = mapped_column(String, nullable=True)
-    job_key: Mapped [str | None] = mapped_column(String, nullable=True)
-    
+    job_key: Mapped[str | None] = mapped_column(String, nullable=True)
+
     platform: Mapped[str] = mapped_column(String, nullable=False)
     ingestion_source: Mapped[str] = mapped_column(
-        String,
-        nullable=False,
-        default="email"
+        String, nullable=False, default="email"
     )
 
     easy_apply: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
@@ -49,7 +48,7 @@ class JobOffer(Base):
 
     date_scraped: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
         nullable=False,
     )
 

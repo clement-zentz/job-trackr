@@ -1,8 +1,11 @@
-# backend/app/normalization/html/pii.py
-
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# File: backend/app/normalization/html/pii.py
 import re
+
 from bs4 import BeautifulSoup
+
 from app.normalization.url.sanitize import sanitize_job_url
+
 
 def redact_pii(
     soup: BeautifulSoup,
@@ -50,4 +53,4 @@ def redact_pii(
         if any(marker in href for marker in JOB_URL_MARKERS):
             a["href"] = sanitized
         else:
-            a["href"] = "[REDACTED]" 
+            a["href"] = "[REDACTED]"

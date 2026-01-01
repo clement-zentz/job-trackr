@@ -46,6 +46,5 @@ The Postgres data files are stored in the named volume `pg_data` defined in `doc
 Tables are created automatically on application startup (SQLModel metadata create). No manual migration step is required yet. Introduce Alembic later when evolving schemas.
 
 ## 📜 License
-This project is licensed under the GNU Affero General Public License v3.0 or later (AGPL-3.0-or-later).  
+This project is licensed under the GNU Affero General Public License v3.0 or later (AGPL-3.0-or-later).
 See the [LICENSE](./LICENSE) file for details.
-

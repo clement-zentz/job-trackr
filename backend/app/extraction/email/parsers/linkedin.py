@@ -1,9 +1,10 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# app/extraction/parsers/linkedin.py
+# File: backend/app/extraction/email/parsers/linkedin.py
 import re
 from datetime import datetime
 
 from bs4 import BeautifulSoup
+
 from app.extraction.email.parser_base import EmailParser
 from app.normalization.url.sanitize import normalize_job_url
 
@@ -26,14 +27,12 @@ class LinkedInParser(EmailParser):
         s_subject = subject.lower()
 
         return (
-            "linkedin" in s_sender or 
-            "jobalerts-noreply@linkedin.com" in s_sender
-        ) and any (kw in s_subject for kw in self.keywords)
+            "linkedin" in s_sender or "jobalerts-noreply@linkedin.com" in s_sender
+        ) and any(kw in s_subject for kw in self.keywords)
 
     def parse(self, html: str, msg_dt: datetime | None = None) -> list[dict]:
         soup = BeautifulSoup(html, "html.parser")
         jobs: list[dict] = []
-
 
         job_cards = soup.find_all(
             "td",
@@ -44,9 +43,7 @@ class LinkedInParser(EmailParser):
         for card in job_cards:
             # --- 1. Title and URL ---
             title_a = card.find(
-                "a", 
-                class_=lambda c: c is not None 
-                and "font-bold" in c.split()
+                "a", class_=lambda c: c is not None and "font-bold" in c.split()
             )
 
             #  No title, break
@@ -56,8 +53,8 @@ class LinkedInParser(EmailParser):
             raw_url = title_a.get("href")
             if not raw_url:
                 continue
-            
-            # --- Job Key and Canonical Url 
+
+            # --- Job Key and Canonical Url
             if raw_url:
                 result = normalize_job_url(str(raw_url))
                 if result:
@@ -72,9 +69,8 @@ class LinkedInParser(EmailParser):
             location = ""
 
             company_loc_p = title_a.find_next(
-                "p", 
-                class_=lambda c: c is not None 
-                and "text-system-gray-100" in c.split()
+                "p",
+                class_=lambda c: c is not None and "text-system-gray-100" in c.split(),
             )
 
             if company_loc_p:
@@ -89,9 +85,7 @@ class LinkedInParser(EmailParser):
             active_hiring = None
 
             active_hiring_p = card.find(
-                string=re.compile(
-                    r"(Recrutement actif|Actively recruiting)", re.I
-                )
+                string=re.compile(r"(Recrutement actif|Actively recruiting)", re.I)
             )
 
             if active_hiring_p:
@@ -101,9 +95,7 @@ class LinkedInParser(EmailParser):
             easy_apply = None
 
             easy_apply_p = card.find(
-                string=re.compile(
-                    r"(Candidature simplifiée|Easy Apply)", re.I
-                )
+                string=re.compile(r"(Candidature simplifiée|Easy Apply)", re.I)
             )
 
             if easy_apply_p:

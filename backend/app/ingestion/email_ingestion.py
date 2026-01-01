@@ -1,17 +1,17 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# app/data_ingestion/email_ingestion.py
-
-from typing import Optional
+# File: backend/app/ingestion/email_ingestion.py
 
 import logging
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
-from app.extraction.email.job_extraction_service import JobExtractionService
 from app.extraction.email.email_alert_fetcher import EmailAlertFetcher
+from app.extraction.email.job_extraction_service import JobExtractionService
 from app.models.job_offer import JobOffer
 
 logger = logging.getLogger(__name__)
+
 
 class JobIngestionService:
     """Service to ingest job offers from various sources into the database"""
@@ -36,11 +36,8 @@ class JobIngestionService:
         new_jobs: list[JobOffer] = []
 
         for job_data in raw_jobs:
-
             # check if job already exists by source_uid or unique URL
-            existing = await self._find_existing_job(
-                raw_url=job_data.get("raw_url")
-            )
+            existing = await self._find_existing_job(raw_url=job_data.get("raw_url"))
 
             if existing:
                 continue
@@ -48,8 +45,8 @@ class JobIngestionService:
             job_offer = JobOffer(
                 title=job_data.get("title", ""),
                 company=job_data.get("company", ""),
-                rating = job_data.get("rating", None),
-                salary = job_data.get("salary", None),
+                rating=job_data.get("rating", None),
+                salary=job_data.get("salary", None),
                 location=job_data.get("location", ""),
                 active_hiring=job_data.get("active_hiring", None),
                 easy_apply=job_data.get("easy_apply", None),
@@ -68,9 +65,7 @@ class JobIngestionService:
 
         return new_jobs
 
-    async def _find_existing_job(
-        self, raw_url: Optional[str] = None
-    ) -> Optional[JobOffer]:
+    async def _find_existing_job(self, raw_url: str | None = None) -> JobOffer | None:
         """Check if a job already exists in the database with job raw_url."""
         if raw_url:
             statement = select(JobOffer).where(JobOffer.raw_url == raw_url)

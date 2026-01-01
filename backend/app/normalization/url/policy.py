@@ -1,24 +1,43 @@
-# backend/app/samples/constants.py
-
-from typing import FrozenSet
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# File: backend/app/normalization/url/policy.py
 from urllib.parse import urlparse
 
-LINKEDIN_JOBSVIEW_REDACT_KEYS = frozenset({
-    "trackingId", "refId", "lipi", "midToken", 
-    "midSig", "trk", "trkEmail", "eid", "otpToken",
-    "utm_source", "utm_medium", "utm_campaign",
-    "utm_term", "utm_content",
-})
+LINKEDIN_JOBSVIEW_REDACT_KEYS = frozenset(
+    {
+        "trackingId",
+        "refId",
+        "lipi",
+        "midToken",
+        "midSig",
+        "trk",
+        "trkEmail",
+        "eid",
+        "otpToken",
+        "utm_source",
+        "utm_medium",
+        "utm_campaign",
+        "utm_term",
+        "utm_content",
+    }
+)
 
-INDEED_PAGEAD_REDACT_KEYS = frozenset({
-    "tmtk", "xkcb", "camk", "alid", "sid", "tk"
-})
+INDEED_PAGEAD_REDACT_KEYS = frozenset({"tmtk", "xkcb", "camk", "alid", "sid", "tk"})
 
-INDEED_RK_REDACT_KEYS = frozenset ({
-    "tk", "alid", "qd", "rd", "bb", "sid", "session", "user",
-})
+INDEED_RK_REDACT_KEYS = frozenset(
+    {
+        "tk",
+        "alid",
+        "qd",
+        "rd",
+        "bb",
+        "sid",
+        "session",
+        "user",
+    }
+)
 
-def get_job_url_policy(url: str) -> FrozenSet[str] | None:
+
+def get_job_url_policy(url: str) -> frozenset[str] | None:
     parsed = urlparse(url)
     path = parsed.path
 
@@ -34,5 +53,5 @@ def get_job_url_policy(url: str) -> FrozenSet[str] | None:
         if "/jobs/view/" in path:
             return LINKEDIN_JOBSVIEW_REDACT_KEYS
         return None
-    
+
     return None
