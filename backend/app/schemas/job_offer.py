@@ -55,7 +55,7 @@ class JobOfferRead(JobOfferBase):
     model_config = ConfigDict(from_attributes=True)
 
 
-class JobOfferSummary(BaseModel):
+class JobOfferListItem(BaseModel):
     id: int
     title: str
     company: str
