@@ -35,6 +35,7 @@ class JobOfferService:
         platform = data.get("platform")
         job_key = data.get("job_key")
         raw_url = data.get("raw_url")
+        uid = data.get("source", {}).get("uid")
 
         # 1. Strong de-duplication: platform + job_key
         if platform and job_key:
@@ -63,7 +64,7 @@ class JobOfferService:
             platform=platform or "unknown",
             raw_url=raw_url,
             canonical_url=data.get("canonical_url"),
-            source_email_id=data.get("source", {}).get("uid"),
+            source_email_id=str(uid) if uid is not None else None,
             posted_at=data.get("posted_at"),
             easy_apply=data.get("easy_apply"),
             active_hiring=data.get("active_hiring"),
