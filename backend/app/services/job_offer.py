@@ -10,9 +10,14 @@ from app.schemas.job_offer import JobOfferCreate, JobOfferUpdate
 
 
 class JobOfferService:
-    def __init__(self, session: AsyncSession) -> None:
+    def __init__(
+        self,
+        *,
+        session: AsyncSession,
+        repo: JobOfferRepository | None = None,
+    ) -> None:
         self.session = session
-        self.repo = JobOfferRepository(session)
+        self.repo = repo if repo is not None else JobOfferRepository(session)
 
     async def create_manual(
         self,
@@ -119,4 +124,4 @@ class JobOfferService:
 def get_job_offer_service(
     session: AsyncSession = Depends(get_session),
 ) -> JobOfferService:
-    return JobOfferService(session)
+    return JobOfferService(session=session)
