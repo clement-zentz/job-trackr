@@ -18,7 +18,7 @@ class JobIngestionService:
 
     def __init__(self, session: AsyncSession):
         self.session = session
-        self.job_offer_service = JobOfferService(session)
+        self.job_offer_service = JobOfferService(session=session)
 
     async def ingest_from_email(
         self,
