@@ -30,26 +30,33 @@ services:
           path: ./uv.lock
     volumes:
       - ./backend/tests/email_fixtures:/app/tests/email_fixtures
-    command: >
-      python -Xfrozen_modules=off -m debugpy
-      --listen 0.0.0.0:5678
-      --wait-for-client
-      -m uvicorn app.main:app
-      --host 0.0.0.0
-      --port 8000
-      --reload
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: jobai-frontend
+    ports:
+      - "5173:5173"
+    env_file:
+      - frontend/.env.development
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - api
 
   postgres:
-      image: postgres:16-alpine
-      restart: unless-stopped
-      environment:
-        POSTGRES_USER: ${POSTGRES_USER}
-        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-        POSTGRES_DB: ${POSTGRES_DB}
-      ports:
-        - "5432:5432"
-      volumes:
-        - pg_data:/var/lib/postgresql/data
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
 
 volumes:
   pg_data:

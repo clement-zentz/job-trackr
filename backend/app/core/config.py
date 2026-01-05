@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     user_last_name: str
     email_address: str
     email_password: str
+    CORS_ORIGINS: list[str] = ["http://localhost:5173"]
 
     model_config = {
         "env_file": ".env",

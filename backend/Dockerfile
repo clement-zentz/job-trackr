@@ -38,4 +38,4 @@ USER nonroot
 # back to app directory
 # WORKDIR /app
 
-CMD ["fastapi", "dev", "--host", "0.0.0.0", "app/main.py"]
+CMD ["fastapi", "dev", "app/main.py", "--host", "0.0.0.0", "--port", "8000"]
