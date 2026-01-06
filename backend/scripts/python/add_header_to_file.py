@@ -48,14 +48,21 @@ def main(paths: list[str]) -> int:
             else:
                 new_lines.append(DEFAULT_SHEBANG)
 
+        # --- Normalize leading blank lines (after shebang) ---
+        while idx < len(lines) and lines[idx] == "\n":
+            idx += 1
+
         # --- Header ---
         header = [spdx, file_line]
 
         if lines[idx : idx + 2] == header:
+            # Header already present
             new_lines.extend(lines[idx:])
         else:
+            # Insert header + blank line, keep ALL original content
             new_lines.extend(header)
-            new_lines.extend(lines[idx + 2 :])
+            new_lines.append("\n")
+            new_lines.extend(lines[idx:])
 
         if new_lines != lines:
             path.write_text("".join(new_lines))
