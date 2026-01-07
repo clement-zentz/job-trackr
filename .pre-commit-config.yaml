@@ -8,11 +8,11 @@ repos:
   - repo: local
     hooks:
       - id: add-spdx-header
-        name: Add SPDX license header to Python files
+        name: Add SPDX license header to files
         entry: python backend/scripts/python/add_header_to_file.py
         language: system
-        types: [python]
         pass_filenames: true
+        files: \.(py|ts|tsx|js|jsx)$
 
   # --- Core hygiene checks ---
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -26,12 +26,32 @@ repos:
       - id: detect-private-key
       - id: check-merge-conflict
 
-# --- Ruff (lint + format) ---
+  # --- Ruff (lint + format) ---
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.14.10
     hooks:
       - id: ruff
         name: Ruff linter
-        args: [--fix]  # autofix simple errors
+        args: [--fix] # autofix simple errors
       - id: ruff-format
         name: Ruff formatter
+
+  # --- Frontend lint & format via ESLint ---
+  - repo: local
+    hooks:
+      - id: eslint
+        name: ESLint (frontend)
+        entry: npm --prefix frontend run lint -- --fix
+        language: system
+        pass_filenames: false
+        files: ^frontend/.*\.(ts|tsx|js|jsx)$
+
+  # --- Frontend formatting using npm script calling Prettier ---
+  - repo: local
+    hooks:
+      - id: prettier
+        name: Prettier format (frontend, staged)
+        entry: npm --prefix frontend run prettier
+        language: system
+        pass_filenames: false
+        files: ^frontend/.*\.(ts|tsx|js|jsx|css|md|json|html)$
