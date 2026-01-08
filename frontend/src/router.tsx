@@ -2,12 +2,12 @@
 // File: frontend/src/router.tsx
 
 import { createBrowserRouter } from "react-router-dom";
-import { JobOffers } from "./pages/JobOffers";
 import { AppLayout } from "@/app";
+import { jobOfferRoutes } from "@/features/job_offers/routes";
 
 export const router = createBrowserRouter([
   {
     element: <AppLayout />,
-    children: [{ path: "/", element: <JobOffers /> }],
+    children: [...jobOfferRoutes],
   },
 ]);
