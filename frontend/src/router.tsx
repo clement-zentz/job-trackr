@@ -3,7 +3,11 @@
 
 import { createBrowserRouter } from "react-router-dom";
 import { JobOffers } from "./pages/JobOffers";
+import { AppLayout } from "@/app";
 
 export const router = createBrowserRouter([
-  { path: "/", element: <JobOffers /> },
+  {
+    element: <AppLayout />,
+    children: [{ path: "/", element: <JobOffers /> }],
+  },
 ]);
