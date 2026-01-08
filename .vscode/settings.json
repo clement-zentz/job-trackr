@@ -1,4 +1,11 @@
 {
-    "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv/bin/python",
-    "python.terminal.activateEnvironment": true
+  "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv/bin/python",
+  "python.terminal.activateEnvironment": true,
+
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+  "editor.tabSize": 2,
+
+  "[python]": { "editor.tabSize": 4 },
+  "[ini]": { "editor.tabSize": 4 },
 }
