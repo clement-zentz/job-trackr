@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/mocks/jobOffers.ts
 
-import type { JobOffer } from "../types/jobOffer";
+import type { JobOffer } from "@/features/job_offers";
 
 export const jobOffers: JobOffer[] = [
   {
