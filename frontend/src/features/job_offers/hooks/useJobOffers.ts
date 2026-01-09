@@ -3,15 +3,16 @@
 
 import { useEffect, useState } from "react";
 import type { JobOffer } from "../type";
-import { fetchJobOffers } from "@/api/jobOffer";
+import { listJobOffers } from "@/api/jobOffer";
 
 export function useJobOffers() {
   const [offers, setOffers] = useState<JobOffer[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchJobOffers()
+    listJobOffers()
       .then(setOffers)
+      .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
 

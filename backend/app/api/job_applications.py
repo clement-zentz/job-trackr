@@ -16,7 +16,7 @@ from app.services.job_application import (
 router = APIRouter(prefix="/job-applications", tags=["Job Applications"])
 
 
-@router.post("/", response_model=JobApplicationRead, status_code=201)
+@router.post("", response_model=JobApplicationRead, status_code=201)
 async def create_job_application(
     data: JobApplicationCreate,
     service: JobApplicationService = Depends(get_job_application_service),
@@ -24,7 +24,7 @@ async def create_job_application(
     return await service.create_application(data)
 
 
-@router.get("/", response_model=list[JobApplicationReadWithOffer])
+@router.get("", response_model=list[JobApplicationReadWithOffer])
 async def list_job_applications(
     service: JobApplicationService = Depends(get_job_application_service),
 ):

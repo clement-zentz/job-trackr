@@ -12,7 +12,7 @@ router = APIRouter(prefix="/job-offers", tags=["Job Offers"])
 
 # 🟢 CREATE
 @router.post(
-    "/",
+    "",
     response_model=JobOfferRead,
     status_code=status.HTTP_201_CREATED,
 )
@@ -26,7 +26,7 @@ async def create_job_offer(
 
 
 # 🔵 READ ALL
-@router.get("/", response_model=list[JobOfferRead], status_code=status.HTTP_200_OK)
+@router.get("", response_model=list[JobOfferRead], status_code=status.HTTP_200_OK)
 async def list_job_offers(
     platform: str | None = None,
     company: str | None = None,
