@@ -2,11 +2,11 @@
 // File: frontend/src/features/job_offers/hooks/useJobOffers.ts
 
 import { useEffect, useState } from "react";
-import type { JobOffer } from "../type";
+import type { JobOfferRead } from "../type";
 import { listJobOffers } from "@/api/jobOffer";
 
 export function useJobOffers() {
-  const [offers, setOffers] = useState<JobOffer[]>([]);
+  const [offers, setOffers] = useState<JobOfferRead[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

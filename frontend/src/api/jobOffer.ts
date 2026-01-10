@@ -2,9 +2,9 @@
 // File: frontend/src/api/jobOffer.ts
 
 import { api } from "./client";
-import type { JobOffer } from "@/features/job_offers/type";
+import type { JobOfferRead } from "@/features/job_offers/type";
 
-export async function listJobOffers(): Promise<JobOffer[]> {
-  const res = await api.get<JobOffer[]>("/job-offers");
+export async function listJobOffers(): Promise<JobOfferRead[]> {
+  const res = await api.get<JobOfferRead[]>("/job-offers");
   return res.data;
 }
