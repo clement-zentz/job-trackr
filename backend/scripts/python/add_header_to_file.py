@@ -32,9 +32,9 @@ def main(paths: list[str]) -> int:
         prefix = COMMENT[path.suffix]
         spdx = f"{prefix} SPDX-License-Identifier: {LICENSE}\n"
         file_line = f"{prefix} File: {path.as_posix()}\n"
+        header = [spdx, file_line]
 
         lines = path.read_text().splitlines(keepends=True)
-
         new_lines: list[str] = []
         idx = 0
 
@@ -48,21 +48,30 @@ def main(paths: list[str]) -> int:
             else:
                 new_lines.append(DEFAULT_SHEBANG)
 
-        # --- Normalize leading blank lines (after shebang) ---
+        # --- Skip blank lines after shebang ---
         while idx < len(lines) and lines[idx] == "\n":
             idx += 1
 
-        # --- Header ---
-        header = [spdx, file_line]
+        # --- Remove existing SPDX header (idempotent core) ---
+        def is_spdx(line: str) -> bool:
+            return "SPDX-License-Identifier:" in line
 
-        if lines[idx : idx + 2] == header:
-            # Header already present
-            new_lines.extend(lines[idx:])
-        else:
-            # Insert header + blank line, keep ALL original content
-            new_lines.extend(header)
-            new_lines.append("\n")
-            new_lines.extend(lines[idx:])
+        def is_file_line(line: str, *, prefix: str = prefix) -> bool:
+            return line.lstrip().startswith(f"{prefix} File:")
+
+        if idx < len(lines) and is_spdx(lines[idx]):
+            idx += 1
+            if idx < len(lines) and is_file_line(lines[idx]):
+                idx += 1
+
+            # Skip blank lines after old header
+            while idx < len(lines) and lines[idx] == "\n":
+                idx += 1
+
+        # --- Insert canonical header ---
+        new_lines.extend(header)
+        new_lines.append("\n")
+        new_lines.extend(lines[idx:])
 
         if new_lines != lines:
             path.write_text("".join(new_lines))
