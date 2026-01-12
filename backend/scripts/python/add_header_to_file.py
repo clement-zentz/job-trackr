@@ -17,8 +17,36 @@ COMMENT = {
 }
 
 
-def is_script(path: Path) -> bool:
-    return "scripts" in path.parts
+def is_under_backend_scripts(path: Path) -> bool:
+    parts = path.parts
+    return any(
+        parts[i] == "backend" and parts[i + 1] == "scripts"
+        for i in range(len(parts) - 1)
+    )
+
+
+def is_under_backend_tests(path: Path) -> bool:
+    parts = path.parts
+    return any(
+        parts[i] == "backend" and parts[i + 1] == "tests" for i in range(len(parts) - 1)
+    )
+
+
+def is_executable_script(path: Path, *, has_shebang: bool) -> bool:
+    """Return True if the file should be treated as a runnable script.
+
+    Rules:
+    - never for backend/tests/**
+    - yes if it already has a shebang
+    - yes if it is executable
+    - yes if it lives under backend/scripts/**
+    """
+    is_executable = (path.stat().st_mode & 0o111) != 0
+
+    if is_under_backend_tests(path):
+        return False
+
+    return has_shebang or is_executable or is_under_backend_scripts(path)
 
 
 def main(paths: list[str]) -> int:
@@ -39,14 +67,19 @@ def main(paths: list[str]) -> int:
         idx = 0
 
         # --- Shebang handling
-        has_shebang = lines and lines[0].startswith("#!")
+        has_shebang = bool(lines and lines[0].startswith("#!"))
 
-        if is_script(path):
+        if is_under_backend_tests(path):
+            # Strip shebangs entirely in tests
             if has_shebang:
-                new_lines.append(lines[0])
                 idx = 1
-            else:
-                new_lines.append(DEFAULT_SHEBANG)
+        else:
+            if is_executable_script(path=path, has_shebang=has_shebang):
+                if has_shebang:
+                    new_lines.append(lines[0])
+                    idx = 1
+                else:
+                    new_lines.append(DEFAULT_SHEBANG)
 
         # --- Skip blank lines after shebang ---
         while idx < len(lines) and lines[idx] == "\n":
