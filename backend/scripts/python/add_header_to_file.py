@@ -49,6 +49,13 @@ def is_executable_script(path: Path, *, has_shebang: bool) -> bool:
     return has_shebang or is_executable or is_under_backend_scripts(path)
 
 
+def skip_blank_lines(lines: list[str], idx: int) -> int:
+    """Return the next index after consecutive blank lines."""
+    while idx < len(lines) and lines[idx] == "\n":
+        idx += 1
+    return idx
+
+
 def main(paths: list[str]) -> int:
     changed = False
 
@@ -82,8 +89,7 @@ def main(paths: list[str]) -> int:
                     new_lines.append(DEFAULT_SHEBANG)
 
         # --- Skip blank lines after shebang ---
-        while idx < len(lines) and lines[idx] == "\n":
-            idx += 1
+        idx = skip_blank_lines(lines, idx)
 
         # --- Remove existing SPDX header (idempotent core) ---
         def is_spdx(line: str) -> bool:
@@ -104,6 +110,10 @@ def main(paths: list[str]) -> int:
         # --- Insert canonical header ---
         new_lines.extend(header)
         new_lines.append("\n")
+
+        # Skip existing blank lines before code
+        idx = skip_blank_lines(lines, idx)
+
         new_lines.extend(lines[idx:])
 
         # --- Normalize EOF: exactly one trailing newline ---
