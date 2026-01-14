@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/app/schemas/job_application.py
+
 from datetime import date, datetime
 
 from pydantic import BaseModel, ConfigDict

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/scripts/python/ingest_emails.py
+
 import asyncio
 
 from app.core.config import get_settings

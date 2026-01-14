@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/tests/unit/services/test_job_posting_service.py
+
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest

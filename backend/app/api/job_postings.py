@@ -1,7 +1,6 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/app/api/job_postings.py
 
-
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.schemas.job_posting import JobPostingCreate, JobPostingRead, JobPostingUpdate

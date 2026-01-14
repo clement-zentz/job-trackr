@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/app/models/job_application.py
+
 from datetime import UTC, date, datetime
 from enum import Enum
 

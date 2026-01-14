@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/app/services/job_posting.py
+
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
