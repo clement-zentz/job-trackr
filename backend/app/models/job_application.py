@@ -42,7 +42,6 @@ class JobApplication(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=datetime.now(UTC),
-        onupdate=datetime.now(UTC),
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=datetime.now(UTC), onupdate=datetime.now(UTC)
