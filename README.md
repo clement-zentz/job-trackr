@@ -1,50 +1,55 @@
 <!-- README.md -->
 
-# 🤖 JobAI Agent
+# 📊 JobTrackr Platform
 
-An AI agent that helps you find and filter job opportunities.
+JobTrackr is a personal job-tracking platform designed to help collect, organize, and analyze job opportunities from multiple sources.
 
-Due to Terms of Service restrictions and bot-detection policies on major job platforms, this project currently focuses on data collection, parsing, and intelligent filtering of job offers.
+The project focuses on **reliable data ingestion**, **clean domain modeling**, and a **clear separation of concerns** between data pipelines and product logic.
 
-A fully automated application flow may be added in the future, but a semi-automated application process is sufficient for now and avoids violating platform rules.
+---
 
-## 🐘 Database Configuration (PostgreSQL)
+## 🎯 Project Goals
 
-The project is configured to use PostgreSQL via Docker for local development. A postgres service is defined in `docker-compose.yml` and persisted with a named volume.
+- Collect job opportunities from external sources (email alerts, platforms, feeds)
+- Normalize and deduplicate job data
+- Track job opportunities and applications over time
+- Provide a clean dashboard for reviewing and managing job searches
 
-### 🔧 Environment Variables
+The platform deliberately avoids full automation that would violate job platform Terms of Service.
+Human-in-the-loop workflows are preferred.
 
-Set these in your `.env` file (they are consumed by both the app and the postgres container):
+---
 
-```ini
-POSTGRES_USER=jobai
-POSTGRES_PASSWORD=jobai_password
-POSTGRES_DB=jobai
-DATABASE_URL=postgresql+asyncpg://jobai:jobai_password@postgres:5432/jobai
-```
+## 🧱 High-Level Architecture
 
-Notes:
-- `postgres` in the URL is the Docker service name, enabling internal DNS resolution.
-- The `postgresql+asyncpg` driver enables async usage with SQLModel / FastAPI.
+The system is split into two main components:
 
-### 🚀 Running Locally
+### 1️⃣ Ingestion Pipeline
+- Responsible for fetching and parsing external job data (e.g. email alerts)
+- Stateless, async, and retry-friendly
+- Produces normalized job data
 
-Build and start the stack:
+### 2️⃣ Product Dashboard
+- Owns users, permissions, and business rules
+- Stores canonical job data
+- Enforces deduplication and consistency
+- Provides admin and dashboard functionality
 
-```bash
-docker compose up --build --watch
-```
+This separation allows each part to evolve independently while keeping a single source of truth.
 
-The API will be available at http://localhost:8000 and PostgreSQL at localhost:5432.
+---
 
-### 📂 Data Persistence
+## 🚧 Project Status
 
-The Postgres data files are stored in the named volume `pg_data` defined in `docker-compose.yml`.
+This project is under active development.
 
-### 🛠️ Schema Initialization
+The architecture has evolved from a single service to a **Django-based product core** with a **FastAPI-based ingestion pipeline**, reflecting real-world constraints discovered during development.
 
-Tables are created automatically on application startup (SQLModel metadata create). No manual migration step is required yet. Introduce Alembic later when evolving schemas.
+Details may change as the system matures.
+
+---
 
 ## 📜 License
-This project is licensed under the GNU Affero General Public License v3.0 or later (AGPL-3.0-or-later).
+
+This project is licensed under the **GNU Affero General Public License v3.0 or later (AGPL-3.0-or-later)**.
 See the [LICENSE](./LICENSE) file for details.
