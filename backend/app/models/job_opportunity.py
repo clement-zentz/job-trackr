@@ -8,13 +8,14 @@ from uuid import UUID
 
 from sqlalchemy import Boolean, DateTime, Enum as SAEnum, String
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from uuid6 import uuid7
 
 from app.db.base import Base
 
 if TYPE_CHECKING:
-    pass
+    from app.models.job_application import JobApplication
+    from app.models.job_posting import JobPosting
 
 
 class JobOpportunityPriority(str, Enum):
@@ -32,16 +33,24 @@ class JobOpportunity(Base):
         default=uuid7,
     )
 
-    # job_postings: Mapped[list["JobPosting"]] = relationship(
-    #     "JobPosting",
-    #     back_populates="job_opportunity",
-    #     cascade="all, delete orphans",
-    #     lazy="raise",
-    # )
+    job_postings: Mapped[list["JobPosting"]] = relationship(
+        "JobPosting",
+        back_populates="job_opportunity",
+        cascade="all, delete-orphan",
+        lazy="raise",
+    )
+
+    job_applications: Mapped[list["JobApplication"]] = relationship(
+        "JobApplication",
+        back_populates="job_opportunity",
+        cascade="all, delete-orphan",
+        lazy="raise",
+    )
 
     title: Mapped[str] = mapped_column(String, nullable=False)
     company: Mapped[str] = mapped_column(String, nullable=False)
     location: Mapped[str | None] = mapped_column(String, nullable=True)
+    url: Mapped[str | None] = mapped_column(String, nullable=True)
 
     is_active: Mapped[bool] = mapped_column(
         Boolean,
@@ -63,6 +72,6 @@ class JobOpportunity(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(UTC),
-        onupdate=datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
         nullable=False,
     )

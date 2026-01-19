@@ -1,10 +1,8 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/app/schemas/job_posting.py
 
-# SPDX-License-Identifier: AGPL-3.0-or-later
-# File: backend/app/schemas/job_offer.py
-
 from datetime import datetime
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
 
@@ -52,14 +50,14 @@ class JobPostingUpdate(BaseModel):
 
 
 class JobPostingRead(JobPostingBase):
-    id: int
+    id: UUID
     date_scraped: datetime
 
     model_config = ConfigDict(from_attributes=True)
 
 
 class JobPostingListItem(BaseModel):
-    id: int
+    id: UUID
     title: str
     company: str
     location: str | None = None
@@ -69,7 +67,7 @@ class JobPostingListItem(BaseModel):
 
 
 class JobPostingReadDetail(BaseModel):
-    id: int
+    id: UUID
     title: str
     company: str
     location: str | None

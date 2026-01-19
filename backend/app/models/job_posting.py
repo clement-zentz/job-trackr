@@ -2,15 +2,22 @@
 # File: backend/app/models/job_posting.py
 
 from datetime import UTC, datetime
+from typing import TYPE_CHECKING
+from uuid import UUID
 
-from sqlalchemy import Boolean, DateTime, Float, String, UniqueConstraint
+from sqlalchemy import Boolean, DateTime, Float, ForeignKey, String, UniqueConstraint
+from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from uuid6 import uuid7
 
 from app.db.base import Base
 
+if TYPE_CHECKING:
+    from app.models.job_opportunity import JobOpportunity
+
 
 class JobPosting(Base):
-    __tablename__ = "jobposting"
+    __tablename__ = "job_posting"
 
     __table_args__ = (
         UniqueConstraint(
@@ -24,24 +31,39 @@ class JobPosting(Base):
         ),
     )
 
-    id: Mapped[int | None] = mapped_column(primary_key=True, autoincrement=True)
+    id: Mapped[UUID] = mapped_column(
+        PG_UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid7,
+    )
 
-    job_applications = relationship(
-        "JobApplication",
-        back_populates="job_posting",
-        cascade="all, delete-orphan",
+    job_opportunity_id: Mapped[UUID] = mapped_column(
+        PG_UUID(as_uuid=True),
+        ForeignKey(
+            "job_opportunity.id",
+            ondelete="CASCADE",
+            name="fk_job_posting_job_opportunity",
+        ),
+        nullable=False,
+        index=True,
+    )
+
+    job_opportunity: Mapped["JobOpportunity"] = relationship(
+        "JobOpportunity",
+        back_populates="job_postings",
+        lazy="raise",
     )
 
     title: Mapped[str] = mapped_column(String, nullable=False)
     company: Mapped[str] = mapped_column(String, nullable=False)
-    location: Mapped[str] = mapped_column(String, nullable=True)
+    location: Mapped[str | None] = mapped_column(String, nullable=True)
 
     rating: Mapped[float | None] = mapped_column(Float, nullable=True)
     summary: Mapped[str | None] = mapped_column(String, nullable=True)
     salary: Mapped[str | None] = mapped_column(String, nullable=True)
     description: Mapped[str | None] = mapped_column(String, nullable=True)
 
-    raw_url: Mapped[str] = mapped_column(String, nullable=False, index=False)
+    raw_url: Mapped[str] = mapped_column(String, nullable=False)
     canonical_url: Mapped[str | None] = mapped_column(String, nullable=True)
     job_key: Mapped[str | None] = mapped_column(String, nullable=True)
 

@@ -37,3 +37,8 @@ class JobOpportunityRead(JobOpportunityBase):
     updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class JobOpportunityListItem(JobOpportunityRead):
+    job_posting_count: int
+    job_application_count: int

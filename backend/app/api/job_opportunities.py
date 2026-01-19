@@ -57,7 +57,7 @@ async def update_job_opportunity(
     response_model=JobOpportunityRead,
     status_code=status.HTTP_200_OK,
 )
-async def deactivate(
+async def deactivate_job_opportunity(
     job_opportunity_id: UUID,
     service: JobOpportunityService = Depends(get_job_opportunity_service),
 ):

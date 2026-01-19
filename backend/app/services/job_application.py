@@ -1,13 +1,15 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/app/services/job_application.py
 
+from uuid import UUID
+
 from fastapi import Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_session
 from app.models.job_application import JobApplication
-from app.models.job_posting import JobPosting
+from app.models.job_opportunity import JobOpportunity
 from app.repositories.job_application import JobApplicationRepository
 from app.schemas.job_application import (
     JobApplicationCreate,
@@ -31,7 +33,9 @@ class JobApplicationService:
     ) -> JobApplication:
         # ✅ Validate FK explicitly
         result = await self.session.execute(
-            select(JobPosting.id).where(JobPosting.id == data.job_posting_id)
+            select(JobOpportunity.id).where(
+                JobOpportunity.id == data.job_opportunity_id
+            )
         )
         if result.scalar_one_or_none() is None:
             raise HTTPException(
@@ -45,14 +49,16 @@ class JobApplicationService:
     async def list_applications(
         self,
     ) -> list[JobApplication]:
-        return await self.repo.list_with_job_posting()
+        return await self.repo.list_with_job_opportunity()
 
     async def update_application_by_id(
         self,
-        job_application_id: int,
+        job_application_id: UUID,
         data: JobApplicationUpdate,
     ) -> JobApplication:
-        job_application = await self.repo.get_by_id_with_job_posting(job_application_id)
+        job_application = await self.repo.get_by_id_with_job_opportunity(
+            job_application_id
+        )
         if not job_application:
             raise ValueError("Job application not found")
 

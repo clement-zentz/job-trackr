@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/app/api/job_postings.py
 
+from uuid import UUID
+
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.schemas.job_posting import JobPostingCreate, JobPostingRead, JobPostingUpdate
@@ -30,7 +32,6 @@ async def create_job_posting(
 async def list_job_postings(
     platform: str | None = None,
     company: str | None = None,
-    has_application: bool | None = None,
     limit: int = 50,
     offset: int = 0,
     service: JobPostingService = Depends(get_job_posting_service),
@@ -41,7 +42,6 @@ async def list_job_postings(
     return await service.list_job_postings(
         platform=platform,
         company=company,
-        has_application=has_application,
         limit=limit,
         offset=offset,
     )
@@ -54,7 +54,7 @@ async def list_job_postings(
     status_code=status.HTTP_200_OK,
 )
 async def get_job_posting(
-    job_posting_id: int,
+    job_posting_id: UUID,
     service: JobPostingService = Depends(get_job_posting_service),
 ):
     """
@@ -74,7 +74,7 @@ async def get_job_posting(
     "/{job_posting_id}", response_model=JobPostingRead, status_code=status.HTTP_200_OK
 )
 async def update_job_posting(
-    job_posting_id: int,
+    job_posting_id: UUID,
     data: JobPostingUpdate,
     service: JobPostingService = Depends(get_job_posting_service),
 ):

@@ -2,12 +2,13 @@
 # File: backend/app/schemas/job_application.py
 
 from datetime import date, datetime
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
 
 from app.models.job_application import JobApplicationStatus
 
-from .job_posting import JobPostingListItem
+from .job_opportunity import JobOpportunityRead
 
 
 class JobApplicationBase(BaseModel):
@@ -16,7 +17,7 @@ class JobApplicationBase(BaseModel):
 
 
 class JobApplicationCreate(JobApplicationBase):
-    job_posting_id: int
+    job_opportunity_id: UUID
 
 
 class JobApplicationUpdate(BaseModel):
@@ -25,7 +26,7 @@ class JobApplicationUpdate(BaseModel):
 
 
 class JobApplicationRead(JobApplicationBase):
-    id: int
+    id: UUID
     status: JobApplicationStatus
     created_at: datetime
     updated_at: datetime
@@ -33,5 +34,5 @@ class JobApplicationRead(JobApplicationBase):
     model_config = ConfigDict(from_attributes=True)
 
 
-class JobApplicationReadWithOffer(JobApplicationRead):
-    job_posting: JobPostingListItem
+class JobApplicationReadWithOpportunity(JobApplicationRead):
+    job_opportunity: JobOpportunityRead

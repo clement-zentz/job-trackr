@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/app/services/job_posting.py
 
+from uuid import UUID
+
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -81,7 +83,7 @@ class JobPostingService:
 
     async def get_job_posting(
         self,
-        job_posting_id: int,
+        job_posting_id: UUID,
     ) -> JobPosting:
         job_posting = await self.repo.get_by_id(job_posting_id)
         if not job_posting:
@@ -93,21 +95,21 @@ class JobPostingService:
         *,
         platform: str | None = None,
         company: str | None = None,
-        has_application: bool | None = None,
+        has_job_opportunity: bool | None = None,
         limit: int = 50,
         offset: int = 0,
     ) -> list[JobPosting]:
         return await self.repo.list(
             platform=platform,
             company=company,
-            has_application=has_application,
+            has_job_opportunity=has_job_opportunity,
             limit=limit,
             offset=offset,
         )
 
     async def update_job_posting(
         self,
-        job_posting_id: int,
+        job_posting_id: UUID,
         data: JobPostingUpdate,
     ) -> JobPosting:
         job_posting = await self.repo.get_by_id(job_posting_id)

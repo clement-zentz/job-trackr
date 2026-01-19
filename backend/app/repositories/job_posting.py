@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/app/repositories/job_posting.py
 
+from uuid import UUID
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -17,7 +19,7 @@ class JobPostingRepository:
 
     async def get_by_id(
         self,
-        job_posting_id: int,
+        job_posting_id: UUID,
     ) -> JobPosting | None:
         stmt = select(JobPosting).where(JobPosting.id == job_posting_id)
         result = await self.session.execute(stmt)
@@ -49,12 +51,12 @@ class JobPostingRepository:
         *,
         platform: str | None = None,
         company: str | None = None,
-        has_application: bool | None = None,
+        has_job_opportunity: bool | None = None,
         limit: int = 50,
         offset: int = 0,
     ) -> list[JobPosting]:
         """
-        List job offers with optional filters.
+        List job_postings with optional filters.
         Intended for dashboards and browsing.
         """
         stmt = select(JobPosting)
@@ -65,11 +67,11 @@ class JobPostingRepository:
         if company is not None:
             stmt = stmt.where(JobPosting.company == company)
 
-        if has_application is not None:
-            if has_application:
-                stmt = stmt.where(JobPosting.job_applications.any())
+        if has_job_opportunity is not None:
+            if has_job_opportunity:
+                stmt = stmt.where(JobPosting.job_opportunity.any())
             else:
-                stmt = stmt.where(~JobPosting.job_applications.any())
+                stmt = stmt.where(~JobPosting.job_opportunity.any())
 
         stmt = stmt.order_by(JobPosting.date_scraped.desc()).limit(limit).offset(offset)
 
@@ -78,7 +80,7 @@ class JobPostingRepository:
 
     async def get_with_applications(
         self,
-        job_posting_id: int,
+        job_posting_id: UUID,
     ) -> JobPosting | None:
         """
         Load a JobPosting with its applications eagerly.
@@ -87,7 +89,7 @@ class JobPostingRepository:
         stmt = (
             select(JobPosting)
             .where(JobPosting.id == job_posting_id)
-            .options(selectinload(JobPosting.job_applications))
+            .options(selectinload(JobPosting.job_opportunity))
         )
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
