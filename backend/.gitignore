@@ -1,6 +1,8 @@
 # .gitignore
 
 .env
+.env.*
+*.env
 
 ignore
 
@@ -8,6 +10,9 @@ __pycache__/
 *.pyc
 *.log
 logs
+*.py[cod]
+*.pyo
+*.pyd
 
 # pytest
 .pytest_cache
@@ -21,10 +26,16 @@ logs
 uv.lock
 .uv/
 
-# .vscode
-
 # sqlite3
 *.db
+db.sqlite3
+
+# Django static & media
+/staticfiles/
+/media/
+
+# Django cache
+*.cache
 
 # fixtures
 tests/email_fixtures
