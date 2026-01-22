@@ -1,10 +1,10 @@
 # Makefile
 .PHONY: up build build-nc restart logs down down-v bash ingest fixture cov
 
-dc=docker compose
+dc=docker compose -f docker-compose.dev.yml
 
 up:
-	$(dc) up --watch
+	$(dc) up
 
 build:
 	$(dc) build
