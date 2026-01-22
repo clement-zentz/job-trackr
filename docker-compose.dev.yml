@@ -1,0 +1,18 @@
+# docker-compose.dev.yml
+
+services:
+  job-extraction:
+    container_name: job-extraction-dev
+    build:
+      context: ./backend
+      dockerfile: docker/job-extraction/Dockerfile.dev
+    ports:
+      - "8000:8000"
+      - "5678:5678"
+      - "5679:5679"
+    env_file:
+      - backend/.env
+    volumes:
+      # hot reload: edit locally, container sees changes
+      - ./backend/job_extraction:/app/job_extraction
+    # restart: unless-stopped

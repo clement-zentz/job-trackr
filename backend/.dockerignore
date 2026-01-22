@@ -12,17 +12,25 @@ __pycache__/
 
 .vscode/
 
+# --- pytest ---
+.pytest_cache/
 tests/
+.coverage
+htmlcov
 
-# Logs / dumps
+# --- Logs / dumps ---
 *.log
 logs/
 *.sqlite3
 
-# Local env / config
+# --- Local env / config ---
 .env
 .env.*
 *.env
 
-# except
+# --- except ---
 !.env.example
+
+# cache
+.mypy_cache
+.ruff_cache
