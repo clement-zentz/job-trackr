@@ -11,8 +11,37 @@ services:
       - "5678:5678"
       - "5679:5679"
     env_file:
-      - backend/.env
+      - backend/env/job-extraction/.env
     volumes:
       # hot reload: edit locally, container sees changes
       - ./backend/job_extraction:/app/job_extraction
-    # restart: unless-stopped
+    restart: unless-stopped
+
+  job-trackr:
+    container_name: job-trackr-dev
+    build:
+      context: ./backend
+      dockerfile: docker/job-trackr/Dockerfile.dev
+    ports:
+      - "8001:8000"
+      - "5680:5678"
+    env_file:
+      - backend/env/job-trackr/.env
+    volumes:
+      - ./backend/job_trackr/:/app/job_trackr
+    depends_on:
+      - postgres
+    # command: tail -f /dev/null
+
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    env_file:
+      - backend/env/postgres/.env
+    volumes:
+      - pg_dev_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  pg_dev_data:
