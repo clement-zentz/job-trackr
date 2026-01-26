@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# File: backend/tests/conftest.py
+# File: backend/tests/integration/fastapi_old/conftest.py
 
 import asyncio
 from collections.abc import AsyncGenerator

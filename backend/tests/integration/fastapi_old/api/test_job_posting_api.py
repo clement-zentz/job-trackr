@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# File: backend/tests/api/test_job_posting_api.py
+# File: backend/tests/integration/fastapi_old/api/test_job_posting_api.py
 
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/tests/api/test_job_postings_api.py
