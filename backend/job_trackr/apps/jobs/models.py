@@ -1,10 +1,18 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/job_trackr/apps/jobs/models.py
 
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 from django.db import models
 from uuid6 import uuid7
+
+if TYPE_CHECKING:
+    from django.db.models.manager import RelatedManager
+
+    from apps.job_applications.models import JobApplication
+
+    from .models import JobPosting
 
 
 def uuid7_default() -> UUID:
@@ -41,6 +49,9 @@ class JobOpportunity(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    if TYPE_CHECKING:
+        job_postings: "RelatedManager[JobPosting]"
 
     class Meta:
         db_table = "job_opportunity"
@@ -86,6 +97,9 @@ class JobPosting(models.Model):
     date_scraped = models.DateTimeField(auto_now_add=True)
 
     source_email_id = models.CharField(max_length=255, null=True, blank=True)
+
+    if TYPE_CHECKING:
+        job_applications: "RelatedManager[JobApplication]"
 
     class Meta:
         db_table = "job_posting"
