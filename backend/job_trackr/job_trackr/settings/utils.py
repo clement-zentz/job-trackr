@@ -4,6 +4,8 @@
 import os
 from collections.abc import Sequence
 
+from django.core.exceptions import ImproperlyConfigured
+
 
 def env_list(
     name: str,
@@ -17,4 +19,15 @@ def env_list(
 
 
 def env_bool(name: str, default: bool = False) -> bool:
-    return os.environ.get(name, str(int(default))) in {"1", "true", "True"}
+    return (
+        os.environ.get(name, str(int(default))) in {"1", "true", "True", "yes", "on"}
+        if name in os.environ
+        else default
+    )
+
+
+def env(name: str) -> str:
+    value = os.environ.get(name)
+    if value is None:
+        raise ImproperlyConfigured(f"Missing required env var: {name}")
+    return value
