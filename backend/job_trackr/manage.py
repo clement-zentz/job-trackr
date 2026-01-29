@@ -8,11 +8,15 @@ import os
 import sys
 from pathlib import Path
 
-from dotenv import load_dotenv
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-load_dotenv(BASE_DIR / "env" / "job-trackr" / ".env")
+# Only load .env file when explicitly requested via USE_DOTENV=1
+# This prevents surprising config precedence in CI/prod and preserves
+# strict env validation for production deployments.
+if os.environ.get("USE_DOTENV") == "1":
+    from dotenv import load_dotenv
+
+    load_dotenv(BASE_DIR / "env" / "job-trackr" / ".env")
 
 
 def main():
