@@ -16,7 +16,6 @@ dependencies = [
     "debugpy>=1.8.18",
     "django>=6.0.1",
     "dnspython==2.8.0",
-    "dotenv==0.9.9",
     "email-validator==2.3.0",
     "fastapi==0.121.0",
     "fastapi-cli==0.0.14",
