@@ -1,10 +1,7 @@
 # Makefile
 .PHONY: up build build-nc restart logs down down-v bash psql \
-migrations migrate superuser django-check \
-ingest fixture sample cov
+migrations migrate superuser django-check cov
 
-# Convert DC variable to uppercase DC when the user will select env.
-# Example: dev, prod, stage, etc.
 DC=docker compose -f docker-compose.dev.yml
 
 up:
@@ -50,15 +47,13 @@ superuser:
 django-check:
 	$(DC) exec job-trackr $(DJANGO_VENV) -c "import django; print(django.get_version())"
 
-# --- Script ---
-ingest:
-	$(DC) exec job-trackr python3 -m job_trackr.scripts.ingest_emails
+# --- Scripts ---
 
-fixture:
-	$(DC) exec job-extraction python3 -m job_extraction.scripts.generate_fixtures
+# Ingestion targets are temporarily removed while the ingestion
+# pipeline is being migrated to Django.
 
-sample:
-	$(DC) exec job-extraction python3 -m job_extraction.scripts.generate_samples
+# Fixture and sample targets will be reintroduced once the new
+# FastAPI-based scripts are implemented.
 
 cov:
 	pytest --cov=app --cov-report=term-missing
