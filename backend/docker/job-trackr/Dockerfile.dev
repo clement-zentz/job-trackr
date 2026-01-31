@@ -19,6 +19,9 @@ RUN pip install --upgrade pip \
     && pip install uv \
     && uv sync --no-cache
 
+ENV VIRTUAL_ENV=/app/.venv
+ENV PATH="/app/.venv/bin:$PATH"
+
 COPY job_trackr ./job_trackr
 COPY docker/job-trackr/entrypoint.sh /entrypoint.sh
 

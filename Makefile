@@ -1,47 +1,59 @@
 # Makefile
-.PHONY: up build build-nc restart logs down down-v bash psql ingest fixture cov
+.PHONY: up build build-nc restart logs down down-v bash psql \
+migrations migrate superuser django-check cov
 
-# Convert dc variable to uppercase DC when the user will select env.
-# Example: dev, prod, stage, etc.
-dc=docker compose -f docker-compose.dev.yml
+DC=docker compose -f docker-compose.dev.yml
 
 up:
-	$(dc) up
+	$(DC) up
 
 build:
-	$(dc) build
+	$(DC) build
 
 build-nc:
-	$(dc) build --no-cache
+	$(DC) build --no-cache
 
 restart:
-	$(dc) restart
+	$(DC) restart
 
 logs:
-	$(dc) logs
+	$(DC) logs
 
 down:
-	$(dc) down
+	$(DC) down
 
 down-v:
-	$(dc) down -v --remove-orphans
+	$(DC) down -v --remove-orphans
 
 bash:
-	$(dc) exec job-trackr bash
+	$(DC) exec job-trackr bash
 
 USER_DB ?= job_trackr
 DATABASE ?= job_trackr
 psql:
-	$(dc) exec postgres psql -U $(USER_DB) -d $(DATABASE)
+	$(DC) exec postgres psql -U $(USER_DB) -d $(DATABASE)
 
-ingest:
-	$(dc) exec job-extraction python3 -m scripts.python.ingest_emails
+# --- Django ---
+DJANGO_VENV := /app/.venv/bin/python
+migrations:
+	$(DC) exec job-trackr $(DJANGO_VENV) job_trackr/manage.py makemigrations
 
-fixture:
-	$(dc) exec job-extraction python3 -m scripts.python.generate_fixtures
+migrate:
+	$(DC) exec job-trackr $(DJANGO_VENV) job_trackr/manage.py migrate
 
-sample:
-	$(dc) exec job-extraction python3 -m scripts.python.generate_samples
+superuser:
+	$(DC) exec job-trackr $(DJANGO_VENV) job_trackr/manage.py createsuperuser
+
+django-check:
+	$(DC) exec job-trackr $(DJANGO_VENV) -c "import django; print(django.get_version())"
+
+# --- Scripts ---
+
+# Ingestion targets are temporarily removed while the ingestion
+# pipeline is being migrated to Django.
+
+# Fixture and sample targets will be reintroduced once the new
+# FastAPI-based scripts are implemented.
 
 cov:
 	pytest --cov=app --cov-report=term-missing
