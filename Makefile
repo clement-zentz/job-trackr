@@ -2,6 +2,10 @@
 .PHONY: up build build-nc restart logs down down-v bash psql \
 migrations migrate superuser django-check cov
 
+# Ignore unknown target
+%:
+	@:
+
 DC=docker compose -f docker-compose.dev.yml
 
 up:
@@ -33,24 +37,30 @@ DATABASE ?= job_trackr
 psql:
 	$(DC) exec postgres psql -U $(USER_DB) -d $(DATABASE)
 
-# --- Django ---
+# --- job-trackr (Django) ---
 DJANGO_VENV := /app/.venv/bin/python
+MANAGE := job_trackr/manage.py
+
+# make manage <command>
+manage:
+	$(DC) exec job-trackr $(DJANGO_VENV) $(MANAGE) $(filter-out $@,$(MAKECMDGOALS))
+
 migrations:
-	$(DC) exec job-trackr $(DJANGO_VENV) job_trackr/manage.py makemigrations
+	$(DC) exec job-trackr $(DJANGO_VENV) $(MANAGE) makemigrations
 
 migrate:
-	$(DC) exec job-trackr $(DJANGO_VENV) job_trackr/manage.py migrate
+	$(DC) exec job-trackr $(DJANGO_VENV) $(MANAGE) migrate
 
 superuser:
-	$(DC) exec job-trackr $(DJANGO_VENV) job_trackr/manage.py createsuperuser
+	$(DC) exec job-trackr $(DJANGO_VENV) $(MANAGE) createsuperuser
 
 django-check:
 	$(DC) exec job-trackr $(DJANGO_VENV) -c "import django; print(django.get_version())"
 
-# --- Scripts ---
+# Ingest jobs target will be reintroduced
+# once django management command is implemented.
 
-# Ingestion targets are temporarily removed while the ingestion
-# pipeline is being migrated to Django.
+# --- job-extraction (FastAPI) ---
 
 # Fixture and sample targets will be reintroduced once the new
 # FastAPI-based scripts are implemented.
