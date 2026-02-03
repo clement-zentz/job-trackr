@@ -1,14 +1,9 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/job_trackr/apps/ingestion/models.py
 
-from uuid import UUID
-
 from django.db import models
-from uuid6 import uuid7
 
-
-def uuid7_default() -> UUID:
-    return uuid7()
+from apps.common.uuid import uuid7_default
 
 
 class IngestionStatus(models.TextChoices):

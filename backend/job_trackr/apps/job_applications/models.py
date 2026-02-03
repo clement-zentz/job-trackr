@@ -1,16 +1,10 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/job_trackr/apps/job_applications/models.py
 
-from uuid import UUID
-
 from django.db import models
-from uuid6 import uuid7
 
+from apps.common.uuid import uuid7_default
 from apps.jobs.models import JobOpportunity, JobPosting
-
-
-def uuid7_default() -> UUID:
-    return uuid7()
 
 
 class JobApplicationStatus(models.TextChoices):

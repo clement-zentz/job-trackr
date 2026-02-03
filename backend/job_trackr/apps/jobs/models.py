@@ -2,10 +2,10 @@
 # File: backend/job_trackr/apps/jobs/models.py
 
 from typing import TYPE_CHECKING
-from uuid import UUID
 
 from django.db import models
-from uuid6 import uuid7
+
+from apps.common.uuid import uuid7_default
 
 if TYPE_CHECKING:
     from django.db.models.manager import RelatedManager
@@ -13,10 +13,6 @@ if TYPE_CHECKING:
     from apps.job_applications.models import JobApplication
 
     from .models import JobPosting
-
-
-def uuid7_default() -> UUID:
-    return uuid7()
 
 
 class JobOpportunityPriority(models.TextChoices):
