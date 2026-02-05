@@ -26,7 +26,36 @@ class Migration(migrations.Migration):
                         serialize=False,
                     ),
                 ),
-                ("source", models.CharField(max_length=50)),
+                ("title", models.CharField(max_length=255)),
+                ("company", models.CharField(max_length=255)),
+                ("platform", models.CharField(max_length=50)),
+                ("raw_url", models.URLField(max_length=2000)),
+                ("location", models.CharField(blank=True, max_length=255, null=True)),
+                (
+                    "canonical_url",
+                    models.URLField(blank=True, max_length=2000, null=True),
+                ),
+                ("job_key", models.CharField(blank=True, max_length=255, null=True)),
+                ("description", models.TextField(blank=True, null=True)),
+                ("summary", models.TextField(blank=True, null=True)),
+                ("salary", models.CharField(blank=True, max_length=255, null=True)),
+                ("rating", models.FloatField(blank=True, null=True)),
+                ("posted_at", models.DateTimeField(blank=True, null=True)),
+                ("easy_apply", models.BooleanField(blank=True, null=True)),
+                ("active_hiring", models.BooleanField(blank=True, null=True)),
+                (
+                    "ingestion_source",
+                    models.CharField(
+                        choices=[
+                            ("email", "Email"),
+                            ("api", "API"),
+                            ("webhook", "Webhook"),
+                        ],
+                        default="email",
+                        help_text="How the job entered the system, example: email, api, ...",
+                        max_length=50,
+                    ),
+                ),
                 (
                     "source_event_id",
                     models.CharField(
@@ -36,7 +65,12 @@ class Migration(migrations.Migration):
                         null=True,
                     ),
                 ),
-                ("ingested_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "fingerprint",
+                    models.CharField(
+                        help_text="Hash used for deduplication", max_length=64
+                    ),
+                ),
                 (
                     "status",
                     models.CharField(
@@ -51,23 +85,8 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 ("error_message", models.TextField(blank=True, null=True)),
-                ("title", models.CharField(max_length=255)),
-                ("company", models.CharField(max_length=255)),
-                ("location", models.CharField(blank=True, max_length=255, null=True)),
-                ("raw_url", models.URLField()),
-                ("canonical_url", models.URLField(blank=True, null=True)),
-                ("job_key", models.CharField(blank=True, max_length=255, null=True)),
-                ("platform", models.CharField(max_length=50)),
-                ("description", models.TextField(blank=True, null=True)),
-                ("summary", models.TextField(blank=True, null=True)),
-                ("salary", models.CharField(blank=True, max_length=255, null=True)),
-                ("posted_at", models.DateTimeField(blank=True, null=True)),
-                (
-                    "fingerprint",
-                    models.CharField(
-                        help_text="Hash used for deduplication", max_length=64
-                    ),
-                ),
+                ("ingested_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
                 "db_table": "ingested_job_posting",

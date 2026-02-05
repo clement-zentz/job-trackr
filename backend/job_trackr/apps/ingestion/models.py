@@ -13,6 +13,12 @@ class IngestionStatus(models.TextChoices):
     FAILED = "failed", "Failed"
 
 
+class IngestionSource(models.TextChoices):
+    EMAIL = "email", "Email"
+    API = "api", "API"
+    WEBHOOK = "webhook", "Webhook"
+
+
 class IngestedJobPosting(models.Model):
     """
     Raw / semi-normalized job posting received from FastAPI ingestion service.
@@ -24,46 +30,51 @@ class IngestedJobPosting(models.Model):
         editable=False,
     )
 
-    # --- Source metadata ---
-    source = models.CharField(max_length=50)
+    # --- Job Required fields ----
+    title = models.CharField(max_length=255)
+    company = models.CharField(max_length=255)
+    platform = models.CharField(max_length=50)
+    raw_url = models.URLField(max_length=2000)
+
+    # --- Job Optional fields  ---
+    location = models.CharField(max_length=255, null=True, blank=True)
+    canonical_url = models.URLField(max_length=2000, null=True, blank=True)
+    job_key = models.CharField(max_length=255, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    summary = models.TextField(null=True, blank=True)
+    salary = models.CharField(max_length=255, null=True, blank=True)
+    rating = models.FloatField(null=True, blank=True)
+    posted_at = models.DateTimeField(null=True, blank=True)
+    easy_apply = models.BooleanField(null=True, blank=True)
+    active_hiring = models.BooleanField(null=True, blank=True)
+
+    # --- Ingestion metadata ---
+    ingestion_source = models.CharField(
+        max_length=50,
+        choices=IngestionSource.choices,
+        default=IngestionSource.EMAIL,
+        help_text="How the job entered the system, example: email, api, ...",
+    )
     source_event_id = models.CharField(
         max_length=255,
         null=True,
         blank=True,
         help_text="Message ID, webhook ID, or batch ID",
     )
+    fingerprint = models.CharField(
+        max_length=64,
+        help_text="Hash used for deduplication",
+    )
 
-    ingested_at = models.DateTimeField(auto_now_add=True)
-
+    # --- Workflow / system fields ---
     status = models.CharField(
         max_length=20,
         choices=IngestionStatus.choices,
         default=IngestionStatus.RECEIVED,
     )
-
     error_message = models.TextField(null=True, blank=True)
-
-    # --- Job data (semi-normalized) ---
-    title = models.CharField(max_length=255)
-    company = models.CharField(max_length=255)
-    location = models.CharField(max_length=255, null=True, blank=True)
-
-    raw_url = models.URLField()
-    canonical_url = models.URLField(null=True, blank=True)
-    job_key = models.CharField(max_length=255, null=True, blank=True)
-    platform = models.CharField(max_length=50)
-
-    description = models.TextField(null=True, blank=True)
-    summary = models.TextField(null=True, blank=True)
-    salary = models.CharField(max_length=255, null=True, blank=True)
-
-    posted_at = models.DateTimeField(null=True, blank=True)
-
-    # --- Dedup helpers ---
-    fingerprint = models.CharField(
-        max_length=64,
-        help_text="Hash used for deduplication",
-    )
+    ingested_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "ingested_job_posting"
