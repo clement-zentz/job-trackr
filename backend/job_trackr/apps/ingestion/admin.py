@@ -15,7 +15,7 @@ class IngestedJobPostingAdmin(admin.ModelAdmin):
         "status",
         "ingested_at",
     )
-    list_filter = ("platform", "status", "source")
+    list_filter = ("platform", "status", "ingestion_source")
     search_fields = ("title", "company", "raw_url", "job_key")
     ordering = ("-ingested_at",)
 
