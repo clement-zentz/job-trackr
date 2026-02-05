@@ -4,7 +4,7 @@
 import datetime
 
 import pytest
-from apps.job_applications.models import JobApplication
+from apps.job_applications.models import JobApplication, JobApplicationStatus
 from apps.jobs.models import JobOpportunity, JobPosting
 
 
@@ -21,14 +21,14 @@ def test_create_job_application_without_posting():
 
     assert job_application.id is not None
     assert job_application.job_posting is None
-    assert job_application.status == "applied"
+    assert job_application.status == JobApplicationStatus.APPLIED
 
 
 @pytest.mark.django_db
 def test_create_job_application_with_posting():
     job_opportunity = JobOpportunity.objects.create(
         title="Frontend Engineer",
-        company="Examlple Ltd",
+        company="Example Ltd",
     )
 
     job_posting = JobPosting.objects.create(
