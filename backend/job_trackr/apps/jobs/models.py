@@ -12,8 +12,6 @@ if TYPE_CHECKING:
 
     from apps.job_applications.models import JobApplication
 
-    from .models import JobPosting
-
 
 class JobOpportunityPriority(models.TextChoices):
     HIGH = "high", "High"
@@ -27,22 +25,22 @@ class JobOpportunity(models.Model):
         default=uuid7_default,
         editable=False,
     )
-
+    # --- Job Required Fields ---
     title = models.CharField(max_length=255)
     company = models.CharField(max_length=255)
-    location = models.CharField(max_length=255, null=True, blank=True)
-    url = models.URLField(null=True, blank=True)
 
-    is_active = models.BooleanField(default=True)
-
+    # --- Job Optional Fields ---
+    location = models.CharField(max_length=255, blank=True)
+    url = models.URLField(max_length=2000, blank=True)
+    notes = models.TextField(blank=True)
     priority = models.CharField(
         max_length=10,
         choices=JobOpportunityPriority.choices,
         default=JobOpportunityPriority.LOW,
     )
 
-    notes = models.TextField(null=True, blank=True)
-
+    # --- Metadata ---
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -69,30 +67,28 @@ class JobPosting(models.Model):
         related_name="job_postings",
         on_delete=models.CASCADE,
     )
-
+    # --- Job Required Fields ---
     title = models.CharField(max_length=255)
     company = models.CharField(max_length=255)
-    location = models.CharField(max_length=255, null=True, blank=True)
-
-    rating = models.FloatField(null=True, blank=True)
-    summary = models.TextField(null=True, blank=True)
-    salary = models.CharField(max_length=255, null=True, blank=True)
-    description = models.TextField(null=True, blank=True)
-
-    raw_url = models.URLField()
-    canonical_url = models.URLField(null=True, blank=True)
-    job_key = models.CharField(max_length=255, null=True, blank=True)
-
+    raw_url = models.URLField(max_length=2000)
     platform = models.CharField(max_length=50)
-    ingestion_source = models.CharField(max_length=50, default="email")
 
-    easy_apply = models.BooleanField(null=True, blank=True)
-    active_hiring = models.BooleanField(null=True, blank=True)
-
+    # --- Job Optional String Fields ---
+    location = models.CharField(max_length=255, blank=True)
+    summary = models.TextField(blank=True)
+    salary = models.CharField(max_length=255, blank=True)
+    description = models.TextField(blank=True)
+    canonical_url = models.URLField(max_length=2000, blank=True)
+    job_key = models.CharField(max_length=255, blank=True)
+    # --- Job Other type Fields ---
+    rating = models.FloatField(null=True, blank=True)
+    easy_apply = models.BooleanField(default=False, blank=True)
+    active_hiring = models.BooleanField(default=False, blank=True)
     posted_at = models.DateTimeField(null=True, blank=True)
-    date_scraped = models.DateTimeField(auto_now_add=True)
 
-    source_email_id = models.CharField(max_length=255, null=True, blank=True)
+    # --- Metadata ---
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     if TYPE_CHECKING:
         job_applications: "RelatedManager[JobApplication]"
@@ -102,6 +98,7 @@ class JobPosting(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=["platform", "job_key"],
+                condition=~models.Q(job_key=""),
                 name="uq_job_posting_platform_job_key",
             )
         ]
