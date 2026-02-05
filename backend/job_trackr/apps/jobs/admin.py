@@ -35,10 +35,10 @@ class JobPostingAdmin(admin.ModelAdmin):
         "location",
         "job_opportunity",
         "posted_at",
-        "date_scraped",
+        "created_at",
     )
-    list_filter = ("platform", "ingestion_source")
+    list_filter = ("platform",)
     search_fields = ("title", "company", "location", "raw_url", "job_key")
-    ordering = ("-date_scraped",)
+    ordering = ("-created_at",)
 
-    readonly_fields = ("date_scraped",)
+    readonly_fields = ("created_at",)
