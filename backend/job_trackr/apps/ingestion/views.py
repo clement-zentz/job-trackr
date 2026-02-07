@@ -1,10 +1,15 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/job_trackr/apps/ingestion/views.py
 
+from typing import Any, cast
+
+from django.db import IntegrityError, transaction
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from .auth import IngestionApiKeyAuthentication
 from .models import IngestedJobPosting, IngestionStatus
 from .serializers import IngestedJobPostingInputSerializer
 from .services.fingerprint import compute_fingerprint
@@ -15,6 +20,9 @@ class IngestJobPostingsView(APIView):
     Receives extracted job postings from FastAPI
     """
 
+    authentication_classes = [IngestionApiKeyAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
         serializer = IngestedJobPostingInputSerializer(
             data=request.data,
@@ -22,9 +30,7 @@ class IngestJobPostingsView(APIView):
         )
         serializer.is_valid(raise_exception=True)
 
-        validated = serializer.validated_data
-        if not isinstance(validated, list):
-            raise TypeError("Expected list payload")
+        validated = cast(list[dict[str, Any]], serializer.validated_data)
 
         created = 0
         duplicates = 0
@@ -38,13 +44,20 @@ class IngestJobPostingsView(APIView):
                 company=job["company"],
             )
 
-            _, created_flag = IngestedJobPosting.objects.get_or_create(
-                fingerprint=fingerprint,
-                defaults={
-                    **job,
-                    "status": IngestionStatus.RECEIVED,
-                },
-            )
+            try:
+                with transaction.atomic():
+                    # NOTE: Using per-row get_or_create for correctness and clear deduplication
+                    # semantics. Can be optimized to bulk ingestion if batch sizes grow.
+                    _, created_flag = IngestedJobPosting.objects.get_or_create(
+                        fingerprint=fingerprint,
+                        defaults={
+                            **job,
+                            "status": IngestionStatus.RECEIVED,
+                        },
+                    )
+            except IntegrityError:
+                # A concurrent request inserted the same fingerprint
+                created_flag = False
 
             if created_flag:
                 created += 1

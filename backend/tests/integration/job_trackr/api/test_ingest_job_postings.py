@@ -4,6 +4,8 @@
 import pytest
 from apps.ingestion.models import IngestedJobPosting, IngestionSource, IngestionStatus
 
+EMAIL_SOURCE = IngestionSource.EMAIL.value
+
 
 @pytest.mark.django_db
 def test_ingest_job_postings_creates_records(api_client):
@@ -13,7 +15,7 @@ def test_ingest_job_postings_creates_records(api_client):
             "company": "ACME Corp",
             "raw_url": "https://indeed.com/viewjob?jk=123",
             "platform": "indeed",
-            "ingestion_source": IngestionSource.EMAIL,
+            "ingestion_source": EMAIL_SOURCE,
         }
     ]
 
@@ -42,7 +44,7 @@ def test_ingest_job_postings_is_idempotent(api_client):
             "company": "ACME Corp",
             "raw_url": "https://linkedin.com/viewjob?jk=123",
             "platform": "linkedin",
-            "ingestion_source": IngestionSource.EMAIL,
+            "ingestion_source": EMAIL_SOURCE,
         }
     ]
 
@@ -67,7 +69,7 @@ def test_ingest_job_postings_partial_duplicate(api_client):
             "company": "ACME Corp",
             "raw_url": "https://indeed.com/viewjob?jk=123",
             "platform": "indeed",
-            "ingestion_source": IngestionSource.EMAIL,
+            "ingestion_source": EMAIL_SOURCE,
         }
     ]
 
@@ -77,7 +79,7 @@ def test_ingest_job_postings_partial_duplicate(api_client):
             "company": "Globex",
             "raw_url": "https://indeed.com/viewjob?jk=456",
             "platform": "indeed",
-            "ingestion_source": IngestionSource.EMAIL,
+            "ingestion_source": EMAIL_SOURCE,
         }
     ]
 
@@ -103,7 +105,7 @@ def test_ingest_job_postings_validation_error(api_client):
             "company": "ACME Corp",
             "raw_url": "https://indeed.com/viewjob?jk=123",
             "platform": "indeed",
-            "ingestion_source": IngestionSource.EMAIL,
+            "ingestion_source": EMAIL_SOURCE,
         }
     ]
 

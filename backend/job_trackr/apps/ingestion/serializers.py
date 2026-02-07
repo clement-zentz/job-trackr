@@ -57,6 +57,26 @@ class IngestedJobPostingInputSerializer(serializers.Serializer):
     active_hiring = serializers.BooleanField(required=False, allow_null=True)
     posted_at = serializers.DateTimeField(required=False, allow_null=True)
 
+    def validate(self, attrs):
+        """
+        Normalize optional text fields so that blank strings are stored as None.
+
+        This keeps a single internal representation for "no value" while still
+        allowing both null and blank input at the API boundary.
+        """
+        for field in (
+            "location",
+            "job_key",
+            "salary",
+            "summary",
+            "description",
+            "source_event_id",
+            "canonical_url",
+        ):
+            if attrs.get(field) == "":
+                attrs[field] = None
+        return attrs
+
     # --- Ingestion metadata ---
     ingestion_source = serializers.ChoiceField(
         choices=IngestionSource.choices,

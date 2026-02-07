@@ -78,9 +78,21 @@ class IngestedJobPosting(models.Model):
 
     class Meta:
         db_table = "ingested_job_posting"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["fingerprint"],
+                name="uniq_ing_job_fp",
+            ),
+        ]
         indexes = [
-            models.Index(fields=["fingerprint"]),
-            models.Index(fields=["platform", "job_key"]),
+            models.Index(
+                fields=["platform", "job_key"],
+                name="idx_ing_job_plat_key",
+            ),
+            models.Index(
+                fields=["status", "ingested_at"],
+                name="idx_ing_job_status_ts",
+            ),
         ]
 
     def __str__(self) -> str:

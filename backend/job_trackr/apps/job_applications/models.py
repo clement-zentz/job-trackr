@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/job_trackr/apps/job_applications/models.py
 
+from datetime import date
+
 from django.db import models
-from django.utils import timezone
 
 from apps.common.uuid import uuid7_default
 from apps.jobs.models import JobOpportunity, JobPosting
@@ -40,7 +41,7 @@ class JobApplication(models.Model):
     )
 
     # --- Job Application Fields ---
-    job_application_date = models.DateField(default=timezone.now)
+    job_application_date = models.DateField(default=date.today)
     notes = models.TextField(blank=True)
     status = models.CharField(
         max_length=20,
