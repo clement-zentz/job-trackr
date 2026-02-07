@@ -82,8 +82,8 @@ class JobPosting(models.Model):
     job_key = models.CharField(max_length=255, blank=True)
     # --- Job Other type Fields ---
     rating = models.FloatField(null=True, blank=True)
-    easy_apply = models.BooleanField(default=False, blank=True)
-    active_hiring = models.BooleanField(default=False, blank=True)
+    easy_apply = models.BooleanField(default=False)
+    active_hiring = models.BooleanField(default=False)
     posted_at = models.DateTimeField(null=True, blank=True)
 
     # --- Metadata ---

@@ -9,6 +9,8 @@ from .base import *  # noqa: F403,F401
 
 DEBUG = False
 
+INGESTION_API_KEY = env("INGESTION_API_KEY")
+
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 
 ALLOWED_HOSTS = [
