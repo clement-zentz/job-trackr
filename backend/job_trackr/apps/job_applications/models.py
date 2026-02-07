@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/job_trackr/apps/job_applications/models.py
 
+from datetime import date
+
 from django.db import models
 
 from apps.common.uuid import uuid7_default
@@ -23,6 +25,7 @@ class JobApplication(models.Model):
         editable=False,
     )
 
+    # --- Job Application FK Fields ---
     job_opportunity = models.ForeignKey(
         JobOpportunity,
         related_name="job_applications",
@@ -37,16 +40,16 @@ class JobApplication(models.Model):
         on_delete=models.SET_NULL,
     )
 
+    # --- Job Application Fields ---
+    job_application_date = models.DateField(default=date.today)
+    notes = models.TextField(blank=True)
     status = models.CharField(
         max_length=20,
         choices=JobApplicationStatus.choices,
         default=JobApplicationStatus.APPLIED,
     )
 
-    job_application_date = models.DateField()
-
-    notes = models.TextField(null=True, blank=True)
-
+    # --- Metadata ---
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -54,4 +57,4 @@ class JobApplication(models.Model):
         db_table = "job_application"
 
     def __str__(self) -> str:
-        return f"{self.job_opportunity} - {self.status}"
+        return f"{self.job_opportunity} ({self.status})"

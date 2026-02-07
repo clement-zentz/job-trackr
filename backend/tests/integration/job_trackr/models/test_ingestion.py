@@ -2,13 +2,13 @@
 # File: backend/tests/integration/job_trackr/models/test_ingestion.py
 
 import pytest
-from apps.ingestion.models import IngestedJobPosting, IngestionStatus
+from apps.ingestion.models import IngestedJobPosting, IngestionSource, IngestionStatus
 
 
 @pytest.mark.django_db
 def test_create_ingested_job_posting():
     ingested = IngestedJobPosting.objects.create(
-        source="email",
+        ingestion_source=IngestionSource.EMAIL,
         title="DevOps Engineer",
         company="Infra Corp",
         platform="email",

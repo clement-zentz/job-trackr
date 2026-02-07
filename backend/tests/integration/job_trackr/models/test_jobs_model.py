@@ -2,7 +2,7 @@
 # File: backend/tests/integration/job_trackr/models/test_jobs_model.py
 
 import pytest
-from apps.jobs.models import JobOpportunity, JobPosting
+from apps.jobs.models import JobOpportunity, JobOpportunityPriority, JobPosting
 
 
 @pytest.mark.django_db
@@ -14,7 +14,7 @@ def test_create_job_opportunity():
     )
 
     assert job_opportunity.id is not None
-    assert job_opportunity.priority == "low"
+    assert job_opportunity.priority == JobOpportunityPriority.LOW
     assert job_opportunity.is_active is True
 
 
