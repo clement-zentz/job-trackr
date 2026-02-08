@@ -17,7 +17,7 @@ def compute_fingerprint(
     Compute a stable, deterministic fingerprint for job deduplication.
 
     - Case-insensitive for title and company
-    - `None` values are excluded
+    - `None` values are preserved (serialized as `null`) and affect the fingerprint
     - Empty strings are preserved and affect fingerprint
     - Uses unambiguous JSON encoding to avoid delimiter collisions
     """
