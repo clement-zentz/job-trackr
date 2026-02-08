@@ -61,19 +61,22 @@ class IngestedJobPostingInputSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         """
-        Normalize optional text fields so that blank strings are stored as None.
+        Normalize optional non-identity text fields so that blank strings are stored
+        as None.
 
-        This keeps a single internal representation for "no value" while still
-        allowing both null and blank input at the API boundary.
+        This keeps a single internal representation for "no value" for descriptive
+        fields, while still allowing both null and blank input at the API boundary.
+
+        Fields that participate in fingerprinting (e.g. job_key, canonical_url) are
+        intentionally excluded from this normalization to preserve the distinction
+        between None and empty string for deduplication semantics.
         """
         for field in (
             "location",
-            "job_key",
             "salary",
             "summary",
             "description",
             "source_event_id",
-            "canonical_url",
         ):
             if attrs.get(field) == "":
                 attrs[field] = None
