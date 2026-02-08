@@ -31,11 +31,13 @@ class IngestedJobPostingInputSerializer(serializers.Serializer):
         allow_blank=True,
     )
     job_key = serializers.CharField(
+        max_length=255,
         required=False,
         allow_null=True,
         allow_blank=True,
     )
     salary = serializers.CharField(
+        max_length=255,
         required=False,
         allow_null=True,
         allow_blank=True,
