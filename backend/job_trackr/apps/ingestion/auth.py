@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import secrets
 from dataclasses import dataclass
 
 from django.conf import settings
@@ -34,7 +35,7 @@ class IngestionApiKeyAuthentication(authentication.BaseAuthentication):
     def authenticate(self, request):
         expected = getattr(settings, "INGESTION_API_KEY", None)
         if not expected:
-            # Misconfiguration: better to fail closed than accept unauthenticated writes.
+            # Misconfiguration: fail closed
             raise exceptions.AuthenticationFailed(
                 "Server misconfigured: missing INGESTION_API_KEY"
             )
@@ -43,7 +44,8 @@ class IngestionApiKeyAuthentication(authentication.BaseAuthentication):
         if not provided:
             raise exceptions.AuthenticationFailed("Missing X-Ingestion-Api-Key header")
 
-        if provided != expected:
+        # Constant-time comparison to avoid timing side-channels
+        if not secrets.compare_digest(str(provided), str(expected)):
             raise exceptions.AuthenticationFailed("Invalid API key")
 
         return ServiceUser(), None

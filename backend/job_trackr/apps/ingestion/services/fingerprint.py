@@ -2,6 +2,7 @@
 # File: backend/job_trackr/apps/ingestion/services/fingerprint.py
 
 import hashlib
+import json
 
 
 def compute_fingerprint(
@@ -18,8 +19,9 @@ def compute_fingerprint(
     - Case-insensitive for title and company
     - `None` values are excluded
     - Empty strings are preserved and affect fingerprint
+    - Uses unambiguous JSON encoding to avoid delimiter collisions
     """
-    parts = [
+    payload = [
         platform,
         job_key,
         canonical_url,
@@ -27,6 +29,10 @@ def compute_fingerprint(
         company.lower(),
     ]
 
-    base = "|".join(part for part in parts if part is not None)
+    base = json.dumps(
+        payload,
+        separators=(",", ":"),
+        ensure_ascii=False,
+    )
 
     return hashlib.sha256(base.encode("utf-8")).hexdigest()
