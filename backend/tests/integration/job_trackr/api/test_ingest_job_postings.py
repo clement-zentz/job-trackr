@@ -150,7 +150,10 @@ def test_ingest_job_postings_requires_api_key():
             format="json",
         ),
     )
-
+    # NOTE:
+    # Although AuthenticationFailed can map to 401, this view also uses
+    # IsAuthenticated. Unauthenticated requests are ultimately rejected at the
+    # permission layer, which returns HTTP 403.
     assert response.status_code == 403
 
 
@@ -163,5 +166,5 @@ def test_ingest_job_postings_rejects_invalid_api_key(api_client):
         [],
         format="json",
     )
-
+    # Rejected by IsAuthenticated, which returns 403 for unauthenticated requests
     assert response.status_code == 403
