@@ -7,6 +7,7 @@ import secrets
 from dataclasses import dataclass
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from rest_framework import authentication, exceptions
 
 
@@ -35,9 +36,10 @@ class IngestionApiKeyAuthentication(authentication.BaseAuthentication):
     def authenticate(self, request):
         expected = getattr(settings, "INGESTION_API_KEY", None)
         if not expected:
-            # Misconfiguration: fail closed
-            raise exceptions.AuthenticationFailed(
-                "Server misconfigured: missing INGESTION_API_KEY"
+            # Server misconfiguration: fail fast at startup rather than returning
+            # misleading authentication errors (401/403) at request time.
+            raise ImproperlyConfigured(
+                "INGESTION_API_KEY must be set to enable ingestion authentication"
             )
 
         provided = request.META.get(self.header_name)
