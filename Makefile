@@ -1,6 +1,7 @@
 # Makefile
 .PHONY: up build build-nc restart logs down down-v bash psql \
-migrations migrate superuser django-check cov
+migrations migrate superuser django-check ingest-jobs \
+cov
 
 # Ignore unknown target
 %:
@@ -57,8 +58,8 @@ superuser:
 django-check:
 	$(DC) exec job-trackr $(DJANGO_VENV) -c "import django; print(django.get_version())"
 
-# Ingest jobs target will be reintroduced
-# once django management command is implemented.
+ingest-jobs:
+	$(DC) exec job-trackr $(DJANGO_VENV) $(MANAGE) ingest_jobs
 
 # --- job-extraction (FastAPI) ---
 
