@@ -3,15 +3,20 @@
 
 import pytest
 
-from job_extraction.config import get_settings
+from job_extraction.config import _build_settings
 
 
 @pytest.fixture(autouse=True)
 def clear_settings_cache():
     """
-    Ensure unit tests do NOT load values from .env files.
-    Tests must rely only on explicitly set environment variables.
+    Clear the _build_settings() cache before and after each test so that
+    configuration is reloaded for every test run.
+
+    Tests are expected to rely on explicitly set environment variables
+    rather than cached settings.
     """
-    get_settings.cache_clear()
+    # Clear cache before test
+    _build_settings.cache_clear()
     yield
-    get_settings.cache_clear()
+    # Clear cache after test
+    _build_settings.cache_clear()
