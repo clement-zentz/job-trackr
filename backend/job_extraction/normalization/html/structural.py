@@ -3,13 +3,16 @@
 
 from bs4 import BeautifulSoup, Comment
 
-from app.core.config import get_settings
-
-settings = get_settings()
-
 
 def strip_structure(html: str) -> BeautifulSoup:
-    """"""
+    """
+    Normalize HTML email content by removing non-structural and non-readable
+    elements such as styles, comments, hidden preview text, tracking pixels,
+    meta tags, and script tags.
+
+    Returns a cleaned BeautifulSoup tree preserving meaningful content.
+    """
+
     soup = BeautifulSoup(html, "html.parser")
 
     # # --- 1. Remove all <style> blocks (media queries + hacks)

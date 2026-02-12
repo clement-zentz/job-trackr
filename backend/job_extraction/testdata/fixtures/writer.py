@@ -6,7 +6,7 @@ import shutil
 from datetime import UTC, date, datetime
 from pathlib import Path
 
-from app.core.config import get_settings
+from job_extraction.config import Settings
 from job_extraction.normalization.headers.pii import redact_headers
 from job_extraction.normalization.headers.whitelist import whitelist_headers
 from job_extraction.normalization.html.pii import redact_pii
@@ -18,8 +18,6 @@ from job_extraction.normalization.pii.patterns import (
 
 from .naming import format_fixture_date
 
-settings = get_settings()
-
 
 def create_fixture(
     platform: str,
@@ -27,6 +25,7 @@ def create_fixture(
     headers: dict,
     jobs: list[dict],
     uid: int,
+    settings: Settings,
     msg_date: datetime | None = None,
 ):
     """
@@ -34,26 +33,31 @@ def create_fixture(
     - brut fixture for tests
     - net fixture for human reader
     """
-    if not settings.debug:
+    if not settings.DEBUG:
         return  # no fixture generation in production
 
-    name_re = build_name_pattern()
-    email_re = build_email_pattern()
+    name_re = build_name_pattern(settings=settings)
+    email_re = build_email_pattern(settings=settings)
 
     msg_date = msg_date or datetime.now(UTC)
     date_str = format_fixture_date(msg_date)
 
+    fixture_dir = settings.FIXTURE_DIR
+
+    if not fixture_dir:
+        raise ValueError("FIXTURE_DIR must be provided")
+
     # Raw email fixture
-    fixt_dir = Path(settings.fixture_dir) / platform / f"{date_str}_{uid}"
-    fixt_dir.mkdir(parents=True, exist_ok=True)
+    fixture_path = Path(fixture_dir) / platform / f"{date_str}_{uid}"
+    fixture_path.mkdir(parents=True, exist_ok=True)
 
     sanitized_html_soup = strip_structure(html)
     redact_pii(sanitized_html_soup, name_re, email_re)
-    clean_body_path = fixt_dir / f"clean_{uid}.html"
+    clean_body_path = fixture_path / f"clean_{uid}.html"
     clean_body_path.write_text(sanitized_html_soup.prettify(), encoding="utf-8")
 
     sanitized_headers = redact_headers(whitelist_headers(headers), name_re, email_re)
-    net_headers_path = fixt_dir / f"net_headers_{uid}.json"
+    net_headers_path = fixture_path / f"net_headers_{uid}.json"
     net_headers_path.write_text(json.dumps(sanitized_headers, indent=2))
 
     def _json_safe(obj):
@@ -64,7 +68,7 @@ def create_fixture(
         return obj
 
     if jobs is not None:
-        response_path = fixt_dir / f"response_{uid}.json"
+        response_path = fixture_path / f"response_{uid}.json"
         response_path.write_text(
             json.dumps(
                 {
@@ -80,13 +84,20 @@ def create_fixture(
         )
 
 
-def remove_all_fixtures():
+def remove_all_fixtures(settings: Settings):
     """Remove all fixture files from fixture directory."""
-    fixt_dir = Path(settings.fixture_dir)
+    fixture_dir = settings.FIXTURE_DIR
+
+    if not fixture_dir:
+        raise ValueError("FIXTURE_DIR must be provided")
+
+    fixture_path = Path(fixture_dir)
+
+    fixture_path.mkdir(parents=True, exist_ok=True)
 
     # Remove recursively all files
     # in fixture dir and subdirs
-    for item in fixt_dir.iterdir():
+    for item in fixture_path.iterdir():
         if item.is_file():
             item.unlink()
         elif item.is_dir():

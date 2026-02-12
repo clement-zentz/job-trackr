@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/job_extraction/testdata/generators/samples.py
 
+from job_extraction.config import Settings
 from job_extraction.extraction.email.email_alert_fetcher import (
     EmailAlertFetcher,
     FetchedEmail,
@@ -19,14 +20,16 @@ class SampleGenerator:
         self,
         fetcher: EmailAlertFetcher,
         parsers: dict[str, EmailParser],
+        settings: Settings,
         max_per_platform: int = 3,
     ):
         self.fetcher = fetcher
         self.parsers = parsers
+        self.settings = settings
         self.max_per_platform = max_per_platform
 
     def generate(self, days_back: int = 7):
-        remove_all_samples()
+        remove_all_samples(settings=self.settings)
 
         for platform, sender in PLATFORMS.items():
             emails: list[FetchedEmail] = self.fetcher.fetch_recent(
@@ -43,5 +46,6 @@ class SampleGenerator:
                     headers=email.headers,
                     jobs=jobs,
                     uid=email.uid,
+                    settings=self.settings,
                     msg_date=email.msg_dt,
                 )
