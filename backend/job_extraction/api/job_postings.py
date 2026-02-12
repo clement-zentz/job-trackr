@@ -13,32 +13,29 @@ from job_extraction.services.django_client import DjangoIngestionClient
 router = APIRouter(prefix="/job-postings", tags=["Job Postings"])
 
 
-def get_settings_dep() -> Settings:
-    settings = get_settings()
-
-    if not settings.EMAIL_ADDRESS or not settings.EMAIL_PASSWORD:
-        raise HTTPException(
-            status_code=422,
-            detail="Email credentials must be provided",
-        )
-
-    return settings
-
-
 @router.post("", response_model=IngestResponse)
 async def ingest_from_email(
-    settings: Annotated[Settings, Depends(get_settings_dep)],
+    settings: Annotated[Settings, Depends(get_settings)],
 ) -> IngestResponse:
-    """Fetch and extract job postings from email alerts."""
-    email = settings.EMAIL_ADDRESS
-    pwd = settings.EMAIL_PASSWORD
+    """Fetch and extract job postings from email_address alerts."""
+    email_address = settings.EMAIL_ADDRESS
+    email_password = settings.EMAIL_PASSWORD
+
+    if not email_address or not email_password:
+        raise HTTPException(
+            status_code=422,
+            detail="EMAIL_ADDRESS and EMAIL_PASSWORD must be provided",
+        )
 
     service = JobIngestionService()
-    jobs = await service.ingest_from_email(email, pwd)
+    jobs = await service.ingest_from_email(email_address, email_password)
+
+    ingestion_api_key = settings.INGESTION_API_KEY
+    job_trackr_url = settings.JOB_TRACKR_URL
 
     django_client = DjangoIngestionClient(
-        base_url=settings.JOB_TRACKR_URL,
-        api_key=settings.INGESTION_API_KEY,
+        base_url=job_trackr_url,
+        api_key=ingestion_api_key,
     )
 
     await django_client.ingest_job_postings(jobs)
