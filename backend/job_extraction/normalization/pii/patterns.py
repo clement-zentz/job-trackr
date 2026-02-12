@@ -3,33 +3,29 @@
 
 import re
 
-from job_extraction.config import get_settings
-
-settings = get_settings()
+from job_extraction.config import Settings
 
 
-def build_name_pattern() -> re.Pattern[str] | None:
+def build_name_pattern(settings: Settings) -> re.Pattern[str]:
     parts: list[str] = []
 
-    if settings.user_first_name:
-        parts.append(re.escape(settings.user_first_name.strip()))
+    if not settings.USER_FIRST_NAME or not settings.USER_LAST_NAME:
+        raise ValueError("USER_FIRST_NAME and USER_LAST_NAME must be provided")
 
-    if settings.user_last_name:
-        parts.append(re.escape(settings.user_last_name.strip()))
+    parts.append(re.escape(settings.USER_FIRST_NAME.strip()))
+    parts.append(re.escape(settings.USER_LAST_NAME.strip()))
 
-    if not parts:
-        return None
-
-    # Matches first and/or last name, case insentitive
+    # Matches first and/or last name, case insensitive
     pattern = rf"\b({'|'.join(parts)})\b"
     return re.compile(pattern, flags=re.IGNORECASE)
 
 
-def build_email_pattern() -> re.Pattern[str] | None:
-    if not settings.email_address:
-        return None
+def build_email_pattern(settings: Settings) -> re.Pattern[str]:
+    email_address = settings.EMAIL_ADDRESS
+    if not email_address:
+        raise ValueError("EMAIL_ADDRESS must be provided")
 
-    raw_email = settings.email_address.strip()
+    raw_email = email_address.strip()
     escaped_email = re.escape(raw_email)
     encoded_email = re.escape(raw_email.replace("@", "%40"))
 
