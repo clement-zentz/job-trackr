@@ -11,104 +11,43 @@ BASE_DIR = Path(__file__).resolve().parents[2]
 ENV_FILE = BASE_DIR / "backend" / "env" / "job-extraction" / ".env"
 
 
+def _deprecated(attr: str):
+    def getter(self: "Settings"):
+        warnings.warn(
+            f"`settings.{attr.lower()}` is deprecated, use `settings.{attr}` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return getattr(self, attr)
+
+    return property(getter)
+
+
 class Settings(BaseSettings):
+    # --- Core process config ---
     DEBUG: bool = False
-    FIXTURE_DIR: str
-    SAMPLE_DIR: str
-    USER_FIRST_NAME: str
-    USER_LAST_NAME: str
-    EMAIL_ADDRESS: str
-    EMAIL_PASSWORD: str
-    JOB_TRACKR_URL: str = "http://job-trackr:8000"
     INGESTION_API_KEY: str
+    JOB_TRACKR_URL: str = "http://job-trackr:8000"
+    # --- Optional feature config ---
+    EMAIL_ADDRESS: str | None = None
+    EMAIL_PASSWORD: str | None = None
+
+    FIXTURE_DIR: str | None = None
+    SAMPLE_DIR: str | None = None
+
+    USER_FIRST_NAME: str | None = None
+    USER_LAST_NAME: str | None = None
 
     # --- Backward compatibility layer ---
-    @property
-    def debug(self) -> bool:
-        warnings.warn(
-            "`settings.debug` is deprecated, use `settings.DEBUG` instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return self.DEBUG
-
-    @property
-    def fixture_dir(self) -> str:
-        warnings.warn(
-            "`settings.fixture_dir` is deprecated, use `settings.FIXTURE_DIR` instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return self.FIXTURE_DIR
-
-    @property
-    def sample_dir(self) -> str:
-        warnings.warn(
-            "`settings.sample_dir` is deprecated, use `settings.SAMPLE_DIR` instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return self.SAMPLE_DIR
-
-    @property
-    def user_first_name(self) -> str:
-        warnings.warn(
-            "`settings.user_first_name` is deprecated, "
-            "use `settings.USER_FIRST_NAME` instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return self.USER_FIRST_NAME
-
-    @property
-    def user_last_name(self) -> str:
-        warnings.warn(
-            "`settings.user_last_name` is deprecated, "
-            "use `settings.USER_LAST_NAME` instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return self.USER_LAST_NAME
-
-    @property
-    def email_address(self) -> str:
-        warnings.warn(
-            "`settings.email_address` is deprecated, "
-            "use `settings.EMAIL_ADDRESS` instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return self.EMAIL_ADDRESS
-
-    @property
-    def email_password(self) -> str:
-        warnings.warn(
-            "`settings.email_password` is deprecated, "
-            "use `settings.EMAIL_PASSWORD` instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return self.EMAIL_PASSWORD
-
-    @property
-    def job_trackr_url(self) -> str:
-        warnings.warn(
-            "`settings.job_trackr_url` is deprecated, "
-            "use `settings.JOB_TRACKR_URL` instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return self.JOB_TRACKR_URL
-
-    @property
-    def ingestion_api_key(self) -> str:
-        warnings.warn(
-            "`settings.ingestion_api_key` is deprecated, "
-            "use `settings.INGESTION_API_KEY` instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return self.INGESTION_API_KEY
+    debug = _deprecated("DEBUG")
+    fixture_dir = _deprecated("FIXTURE_DIR")
+    sample_dir = _deprecated("SAMPLE_DIR")
+    user_first_name = _deprecated("USER_FIRST_NAME")
+    user_last_name = _deprecated("USER_LAST_NAME")
+    email_address = _deprecated("EMAIL_ADDRESS")
+    email_password = _deprecated("EMAIL_PASSWORD")
+    job_trackr_url = _deprecated("JOB_TRACKR_URL")
+    ingestion_api_key = _deprecated("INGESTION_API_KEY")
 
     # --- Model Config ---
     model_config = SettingsConfigDict(
@@ -120,8 +59,9 @@ class Settings(BaseSettings):
 
 
 @lru_cache
-def get_settings(*, _env_file=ENV_FILE) -> Settings:
+def _build_settings(*, _env_file=ENV_FILE) -> Settings:
     return Settings(_env_file=_env_file)  # type: ignore[call-arg]
 
 
-# settings = get_settings()
+def get_settings() -> Settings:
+    return _build_settings()
