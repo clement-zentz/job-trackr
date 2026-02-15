@@ -38,6 +38,12 @@ async def ingest_from_email(
         api_key=ingestion_api_key,
     )
 
-    await django_client.ingest_job_postings(jobs)
+    try:
+        await django_client.ingest_job_postings(jobs)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=502,
+            detail="Job extraction succeeded but ingestion into JobTrackr failed",
+        ) from exc
 
     return IngestResponse(jobs=jobs, total=len(jobs))

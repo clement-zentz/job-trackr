@@ -136,7 +136,7 @@ def test_ingest_service_failure_returns_500(client, mocker):
     assert response.status_code == 500
 
 
-def test_django_client_failure_returns_500(client, mocker):
+def test_django_client_failure_returns_502(client, mocker):
     settings = Settings(
         INGESTION_API_KEY="test",
         EMAIL_ADDRESS="a",
@@ -157,4 +157,8 @@ def test_django_client_failure_returns_500(client, mocker):
 
     response = client.post("/job-postings")
 
-    assert response.status_code == 500
+    assert response.status_code == 502
+    assert (
+        response.json()["detail"]
+        == "Job extraction succeeded but ingestion into JobTrackr failed"
+    )
