@@ -134,6 +134,7 @@ def test_ingest_service_failure_returns_500(client, mocker):
     response = client.post("/job-postings")
 
     assert response.status_code == 500
+    assert response.json()["detail"] == "Failed to extract job postings from email"
 
 
 def test_django_client_failure_returns_502(client, mocker):
