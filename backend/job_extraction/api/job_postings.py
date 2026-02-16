@@ -28,7 +28,14 @@ async def ingest_from_email(
         )
 
     service = JobIngestionService()
-    jobs = await service.ingest_from_email(email_address, email_password)
+
+    try:
+        jobs = await service.ingest_from_email(email_address, email_password)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to extract job postings from email",
+        ) from exc
 
     ingestion_api_key = settings.INGESTION_API_KEY
     job_trackr_url = settings.JOB_TRACKR_URL
