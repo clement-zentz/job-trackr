@@ -31,6 +31,8 @@ class JobIngestionService:
         created_jobs: list[JobPostingResponse] = []
 
         for raw_job in extracted_jobs:
+            uid = raw_job.get("source", {}).get("uid")
+
             job_posting = JobPostingResponse(
                 title=raw_job.get("title", ""),
                 company=raw_job.get("company", ""),
@@ -47,7 +49,7 @@ class JobIngestionService:
                 easy_apply=raw_job.get("easy_apply"),
                 active_hiring=raw_job.get("active_hiring"),
                 posted_at=raw_job.get("posted_at"),
-                source_email_id=raw_job.get("source", {}).get("uid"),
+                source_event_id=str(uid) if uid is not None else None,
             )
             created_jobs.append(job_posting)
 
