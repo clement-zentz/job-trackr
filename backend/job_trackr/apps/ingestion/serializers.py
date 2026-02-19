@@ -53,6 +53,16 @@ class IngestedJobPostingInputSerializer(serializers.Serializer):
         allow_blank=True,
     )
 
+    # --- Ingestion metadata ---
+    ingestion_source = serializers.ChoiceField(
+        choices=IngestionSource.choices,
+    )
+    source_event_id = serializers.CharField(
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+    )
+
     # --- Job Optional fields (null only) ---
     rating = serializers.FloatField(required=False, allow_null=True)
     easy_apply = serializers.BooleanField(required=False, allow_null=True)
@@ -81,16 +91,6 @@ class IngestedJobPostingInputSerializer(serializers.Serializer):
             if attrs.get(field) == "":
                 attrs[field] = None
         return attrs
-
-    # --- Ingestion metadata ---
-    ingestion_source = serializers.ChoiceField(
-        choices=IngestionSource.choices,
-    )
-    source_event_id = serializers.CharField(
-        required=False,
-        allow_null=True,
-        allow_blank=True,
-    )
 
 
 class IngestedJobPostingSerializer(serializers.ModelSerializer):

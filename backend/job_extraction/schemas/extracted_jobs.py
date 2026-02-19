@@ -22,7 +22,7 @@ class JobPostingResponse(BaseModel):
     easy_apply: bool | None = None
     active_hiring: bool | None = None
     posted_at: datetime | None = None
-    source_email_id: int | None = None
+    source_event_id: str | None = None
 
 
 class IngestResponse(BaseModel):
