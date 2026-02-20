@@ -33,9 +33,6 @@ def create_fixture(
     - brut fixture for tests
     - net fixture for human reader
     """
-    if not settings.DEBUG:
-        return  # no fixture generation in production
-
     name_re = build_name_pattern(settings=settings)
     email_re = build_email_pattern(settings=settings)
 

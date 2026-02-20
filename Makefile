@@ -1,6 +1,7 @@
 # Makefile
 .PHONY: up build build-nc restart logs down down-v bash psql \
 migrations migrate superuser django-check ingest-jobs \
+fixtures samples \
 cov
 
 # Ignore unknown target
@@ -62,9 +63,11 @@ ingest-jobs:
 	$(DC) exec job-trackr $(DJANGO_VENV) $(MANAGE) ingest_jobs
 
 # --- job-extraction (FastAPI) ---
+fixtures:
+	cd backend && PYTHONPATH=. python3 -m scripts.python.generate_fixtures
 
-# Fixture and sample targets will be reintroduced once the new
-# FastAPI-based scripts are implemented.
+samples:
+	cd backend && PYTHONPATH=. python3 -m scripts.python.generate_samples
 
 cov:
 	pytest --cov=app --cov-report=term-missing
