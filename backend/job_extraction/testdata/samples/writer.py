@@ -55,9 +55,6 @@ def create_sample(
     - headers_raw.json, headers_sanitized.json
     - jobs_raw.json, jobs_sanitized.json
     """
-    if not settings.DEBUG:
-        return  # no fixture generation in production
-
     name_re = build_name_pattern(settings=settings)
     email_re = build_email_pattern(settings=settings)
 
