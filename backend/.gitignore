@@ -1,4 +1,4 @@
-# .gitignore
+# backend/.gitignore
 
 .env.*
 *.env
@@ -38,7 +38,9 @@ db.sqlite3
 *.cache
 
 # fixtures
-tests/email_fixtures
+tests/email_fixtures/
 
 # samples
-email_samples/
+samples/email_samples/
+
+.backup

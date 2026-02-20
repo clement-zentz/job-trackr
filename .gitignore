@@ -9,3 +9,5 @@ ignore
 # --- pytest - coverage ---
 .pytest_cache
 .coverage
+
+.backup
