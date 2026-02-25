@@ -27,6 +27,8 @@ services:
       - "5680:5678"
     env_file:
       - backend/env/job-trackr/.env
+    environment:
+      - DJANGO_SETTINGS_MODULE=job_trackr.settings.dev
     volumes:
       - ./backend/job_trackr/:/app/job_trackr
     depends_on:
