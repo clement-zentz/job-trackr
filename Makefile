@@ -1,6 +1,6 @@
 # Makefile
 .PHONY: up build build-nc restart logs down down-v bash psql \
-migrations migrate superuser django-check ingest-jobs \
+migrations migrate superuser django-check ingest-jobs process-jobs \
 fixtures samples \
 cov
 
@@ -61,6 +61,9 @@ django-check:
 
 ingest-jobs:
 	$(DC) exec job-trackr $(DJANGO_VENV) $(MANAGE) ingest_jobs
+
+process-jobs:
+	$(DC) exec job-trackr $(DJANGO_VENV) $(MANAGE) process_jobs
 
 # --- job-extraction (FastAPI) ---
 fixtures:
