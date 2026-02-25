@@ -2,13 +2,16 @@
 # File: backend/job_trackr/apps/jobs/models.py
 
 from typing import TYPE_CHECKING
+from uuid import UUID
 
 from django.db import models
 
 from apps.common.uuid import uuid7_default
+from apps.ingestion.services.fingerprint import compute_fingerprint
+from apps.jobs.services.opportunity_identity import compute_opportunity_key
 
 if TYPE_CHECKING:
-    from django.db.models.manager import RelatedManager
+    from django_stubs_ext.db.models.manager import RelatedManager
 
     from apps.job_applications.models import JobApplication
 
@@ -44,12 +47,30 @@ class JobOpportunity(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    # Computed key for ingestion processor service
+    opportunity_key = models.CharField(max_length=64, editable=False)
+
     if TYPE_CHECKING:
         job_postings: "RelatedManager[JobPosting]"
 
     class Meta:
         db_table = "job_opportunity"
         ordering = ["-updated_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["opportunity_key"],
+                name="uq_job_opo_key",
+            )
+        ]
+
+    def save(self, *args, **kwargs):
+        if not self.opportunity_key:
+            self.opportunity_key = compute_opportunity_key(
+                title=self.title,
+                company=self.company,
+                location=self.location or None,
+            )
+        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return f"{self.company} - {self.title}"
@@ -66,6 +87,8 @@ class JobPosting(models.Model):
         JobOpportunity,
         related_name="job_postings",
         on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
     # --- Job Required Fields ---
     title = models.CharField(max_length=255)
@@ -89,19 +112,32 @@ class JobPosting(models.Model):
     # --- Metadata ---
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    posting_fingerprint = models.CharField(max_length=64, editable=False)
 
     if TYPE_CHECKING:
         job_applications: "RelatedManager[JobApplication]"
+        job_opportunity_id: UUID | None
 
     class Meta:
         db_table = "job_posting"
         constraints = [
             models.UniqueConstraint(
-                fields=["platform", "job_key"],
-                condition=~models.Q(job_key=""),
-                name="uq_job_posting_platform_job_key",
+                fields=["posting_fingerprint"],
+                name="uq_job_posting_fp",
             )
         ]
+
+    def save(self, *args, **kwargs):
+        if not self.posting_fingerprint:
+            self.posting_fingerprint = compute_fingerprint(
+                platform=self.platform,
+                job_key=self.job_key,
+                canonical_url=self.canonical_url,
+                title=self.title,
+                company=self.company,
+                location=self.location,
+            )
+        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return f"{self.platform} - {self.title}"
