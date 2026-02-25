@@ -42,6 +42,7 @@ class IngestJobPostingsView(APIView):
                 canonical_url=job.get("canonical_url"),
                 title=job["title"],
                 company=job["company"],
+                location=job.get("location"),
             )
 
             try:
