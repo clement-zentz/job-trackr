@@ -75,6 +75,24 @@ class IngestedJobPosting(models.Model):
     error_message = models.TextField(null=True, blank=True)
     ingested_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    processed_at = models.DateTimeField(null=True, blank=True)
+
+    # --- Foreign Keys ---
+    job_posting = models.ForeignKey(
+        "jobs.JobPosting",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="ingested_rows",
+    )
+
+    job_opportunity = models.ForeignKey(
+        "jobs.JobOpportunity",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="ingested_rows",
+    )
 
     class Meta:
         db_table = "ingested_job_posting"

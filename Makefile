@@ -1,12 +1,8 @@
 # Makefile
 .PHONY: up build build-nc restart logs down down-v bash psql \
-migrations migrate superuser django-check ingest-jobs \
+manage migrations migrate superuser django-check ingest-jobs process-jobs \
 fixtures samples \
-cov
-
-# Ignore unknown target
-%:
-	@:
+cov mypy
 
 DC=docker compose -f docker-compose.dev.yml
 
@@ -43,9 +39,9 @@ psql:
 DJANGO_VENV := /app/.venv/bin/python
 MANAGE := job_trackr/manage.py
 
-# make manage <command>
+# make manage CMD="<command> <args>"
 manage:
-	$(DC) exec job-trackr $(DJANGO_VENV) $(MANAGE) $(filter-out $@,$(MAKECMDGOALS))
+	$(DC) exec job-trackr $(DJANGO_VENV) $(MANAGE) $(CMD)
 
 migrations:
 	$(DC) exec job-trackr $(DJANGO_VENV) $(MANAGE) makemigrations
@@ -62,6 +58,9 @@ django-check:
 ingest-jobs:
 	$(DC) exec job-trackr $(DJANGO_VENV) $(MANAGE) ingest_jobs
 
+process-jobs:
+	$(DC) exec job-trackr $(DJANGO_VENV) $(MANAGE) process_jobs
+
 # --- job-extraction (FastAPI) ---
 fixtures:
 	cd backend && PYTHONPATH=. python3 -m scripts.python.generate_fixtures
@@ -71,3 +70,6 @@ samples:
 
 cov:
 	pytest --cov=app --cov-report=term-missing
+
+mypy:
+	$(DC) exec job-trackr mypy backend

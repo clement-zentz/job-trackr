@@ -29,7 +29,7 @@ def test_ingest_job_postings_creates_records(api_client):
         format="json",
     )
 
-    data = response.json()
+    data = response.data
     assert data == {"received": 1, "created": 1, "duplicates": 0}
 
     assert response.status_code == 201, data
@@ -60,10 +60,10 @@ def test_ingest_job_postings_is_idempotent(api_client):
     response1: Response = api_client.post(url, payload, format="json")
     response2: Response = api_client.post(url, payload, format="json")
 
-    data1 = response1.json()
+    data1 = response1.data
     assert data1 == {"received": 1, "created": 1, "duplicates": 0}
 
-    data2 = response2.json()
+    data2 = response2.data
     assert data2 == {"received": 1, "created": 0, "duplicates": 1}
 
     assert response1.status_code == 201, data1
@@ -106,10 +106,10 @@ def test_ingest_job_postings_partial_duplicate(api_client):
         format="json",
     )
 
-    data = response.json()
+    data = response.data
     assert data == {"received": 2, "created": 1, "duplicates": 1}
 
-    assert response.status_code == 201, response.json()
+    assert response.status_code == 201, response.data
     assert IngestedJobPosting.objects.count() == 2
 
 

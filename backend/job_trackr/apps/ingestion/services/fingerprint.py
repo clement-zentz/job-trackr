@@ -4,6 +4,8 @@
 import hashlib
 import json
 
+from apps.common.normalization import normalize_text, normalize_url
+
 
 def compute_fingerprint(
     *,
@@ -12,21 +14,24 @@ def compute_fingerprint(
     canonical_url: str | None,
     title: str,
     company: str,
+    location: str | None,
 ) -> str:
     """
     Compute a stable, deterministic fingerprint for job deduplication.
 
-    - Case-insensitive for title and company
-    - `None` values are preserved (serialized as `null`) and affect the fingerprint
-    - Empty strings are preserved and affect fingerprint
+    - Text fields are normalized via normalize_text
+    - URL fiels are normalized via normalize_url
+    - None and empty strings are treated equivalently for all fields
     - Uses unambiguous JSON encoding to avoid delimiter collisions
     """
+
     payload = [
-        platform,
-        job_key,
-        canonical_url,
-        title.lower(),
-        company.lower(),
+        normalize_text(platform),
+        normalize_text(job_key),
+        normalize_url(canonical_url),
+        normalize_text(title),
+        normalize_text(company),
+        normalize_text(location),
     ]
 
     base = json.dumps(
