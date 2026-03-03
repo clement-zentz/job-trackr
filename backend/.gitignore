@@ -21,6 +21,9 @@ logs
 # ruff
 .ruff_cache
 
+# mypy
+.mypy_cache
+
 # --- UV ---
 .venv/
 uv.lock

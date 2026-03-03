@@ -2,7 +2,7 @@
 .PHONY: up build build-nc restart logs down down-v bash psql \
 manage migrations migrate superuser django-check ingest-jobs process-jobs \
 fixtures samples \
-cov mypy
+cov mypy-trackr
 
 DC=docker compose -f docker-compose.dev.yml
 
@@ -71,5 +71,5 @@ samples:
 cov:
 	pytest --cov=app --cov-report=term-missing
 
-mypy:
-	$(DC) exec job-trackr mypy backend
+mypy-trackr:
+	$(DC) exec -w /app/job_trackr job-trackr mypy .
