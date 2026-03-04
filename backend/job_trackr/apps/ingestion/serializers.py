@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/job_trackr/apps/ingestion/serializers.py
 
+from typing import Any
+
 from rest_framework import serializers
 
 from .models import IngestedJobPosting, IngestionSource
@@ -69,17 +71,13 @@ class IngestedJobPostingInputSerializer(serializers.Serializer):
     active_hiring = serializers.BooleanField(required=False, allow_null=True)
     posted_at = serializers.DateTimeField(required=False, allow_null=True)
 
-    def validate(self, attrs):
+    def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
         """
         Normalize optional non-identity text fields so that blank strings are stored
         as None.
 
         This keeps a single internal representation for "no value" for descriptive
         fields, while still allowing both null and blank input at the API boundary.
-
-        Fields that participate in fingerprinting (e.g. job_key, canonical_url) are
-        intentionally excluded from this normalization to preserve the distinction
-        between None and empty string for deduplication semantics.
         """
         for field in (
             "location",

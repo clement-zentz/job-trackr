@@ -3,6 +3,7 @@
 
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
+from email.message import Message
 from email.utils import parsedate_to_datetime
 
 from .imap_client import IMAPClient
@@ -132,7 +133,7 @@ class EmailAlertFetcher:
         return ref_date.strftime("%d-%b-%Y")
 
     @staticmethod
-    def _is_recent_enough(message, days_back: int) -> bool:
+    def _is_recent_enough(message: Message, days_back: int) -> bool:
         """
         Check if email date falls within the lookback period.
 
@@ -147,10 +148,11 @@ class EmailAlertFetcher:
         if not header_date:
             return True
         try:
-            msg_dt = parsedate_to_datetime(header_date)
+            parsed = parsedate_to_datetime(header_date)
         except (TypeError, ValueError):
             return True
 
+        msg_dt = parsed
         if msg_dt.tzinfo is None:
             msg_dt = msg_dt.replace(tzinfo=UTC)
 

@@ -3,6 +3,7 @@
 
 from abc import ABC, abstractmethod
 from datetime import datetime
+from typing import Any
 
 
 class EmailParser(ABC):
@@ -12,6 +13,6 @@ class EmailParser(ABC):
         pass
 
     @abstractmethod
-    def parse(self, html: str, msg_dt: datetime | None = None) -> list[dict]:
+    def parse(self, html: str, msg_dt: datetime | None = None) -> list[dict[Any, Any]]:
         """Return a list of job dicts with title, company, url, location, platform."""
         pass

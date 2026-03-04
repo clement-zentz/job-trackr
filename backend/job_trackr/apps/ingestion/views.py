@@ -6,6 +6,7 @@ from typing import Any, cast
 from django.db import IntegrityError, transaction
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -23,7 +24,7 @@ class IngestJobPostingsView(APIView):
     authentication_classes = [IngestionApiKeyAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
+    def post(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         serializer = IngestedJobPostingInputSerializer(
             data=request.data,
             many=True,

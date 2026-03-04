@@ -12,7 +12,7 @@ from requests.exceptions import RequestException
 class Command(BaseCommand):
     help = "Trigger job ingestion via FastAPI"
 
-    def handle(self, *args: Any, **options: Any):
+    def handle(self, *args: Any, **options: Any) -> None:
         base_url: str = settings.JOB_EXTRACTION_BASE_URL
 
         try:
