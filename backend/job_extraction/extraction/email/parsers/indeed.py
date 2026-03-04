@@ -5,6 +5,7 @@ import logging
 import re
 from contextlib import suppress
 from datetime import datetime, timedelta
+from typing import Any
 
 from bs4 import BeautifulSoup
 
@@ -37,7 +38,11 @@ class IndeedParser(EmailParser):
             kw in s_subject for kw in self.keywords
         )
 
-    def parse(self, html: str, msg_dt: datetime) -> list[dict]:
+    def parse(
+        self,
+        html: str,
+        msg_dt: datetime | None = None,
+    ) -> list[dict[Any, Any]]:
         soup = BeautifulSoup(html, "html.parser")
 
         job_links = soup.select("td.pb-24 > a")
@@ -149,7 +154,7 @@ class IndeedParser(EmailParser):
 
                     else:
                         numbers = re.findall(r"\d+", normalized)
-                        if numbers:
+                        if numbers and msg_dt:
                             days_ago_int = int(numbers[0])
                             # msg_dt - days_ago = posted_at
                             posted_at = msg_dt - timedelta(days=days_ago_int)

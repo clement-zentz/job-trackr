@@ -7,7 +7,6 @@ from email.utils import parsedate_to_datetime
 from dateutil import parser as dateutil_parser
 
 
-@staticmethod
 def parse_msg_date(msg):
     # parse Date header to datetime for fixture naming
     header_date = msg.get("Date")

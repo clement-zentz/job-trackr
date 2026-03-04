@@ -16,8 +16,8 @@ def strip_structure(html: str) -> BeautifulSoup:
     soup = BeautifulSoup(html, "html.parser")
 
     # # --- 1. Remove all <style> blocks (media queries + hacks)
-    for style in soup.find_all("style"):
-        style.decompose()
+    for style_tag in soup.find_all("style"):
+        style_tag.decompose()
 
     # --- 2. Remove Outlook conditionnal comments and all comments
     for element in soup(text=lambda t: isinstance(t, Comment)):
@@ -29,8 +29,8 @@ def strip_structure(html: str) -> BeautifulSoup:
 
     # --- 3. Remove preview text (hidden divs)
     for div in soup.find_all("div"):
-        style = str(div.get("style", "")) or ""
-        if "display:none" in style or "max-height:0" in style:
+        style_attr = str(div.get("style", "")) or ""
+        if "display:none" in style_attr or "max-height:0" in style_attr:
             div.decompose()
 
     # --- 4. Remove tracking pixels

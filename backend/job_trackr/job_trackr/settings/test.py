@@ -20,12 +20,12 @@ PASSWORD_HASHERS = [
 
 
 # Disable migrations for faster test DB setup
-class DisableMigrations(dict):
-    def __contains__(self, item) -> bool:
+class DisableMigrations(dict[str, str | None]):
+    def __contains__(self, item: object) -> bool:
         return True
 
-    def __getitem__(self, item):
+    def __getitem__(self, item: str) -> None:
         return None
 
 
-MIGRATION_MODULES = DisableMigrations()
+MIGRATION_MODULES: dict[str, str | None] = DisableMigrations()

@@ -132,7 +132,7 @@ class IMAPClient:
                 return decoded.decode(charset, errors="ignore")
             except LookupError:
                 return decoded.decode("utf-8", errors="ignore")
-        return decoded
+        return str(decoded)
 
     @staticmethod
     def extract_html(msg: Message) -> str:

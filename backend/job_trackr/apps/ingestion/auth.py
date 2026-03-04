@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import secrets
 from dataclasses import dataclass
+from typing import Any
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -33,7 +34,7 @@ class IngestionApiKeyAuthentication(authentication.BaseAuthentication):
 
     header_name = "HTTP_X_INGESTION_API_KEY"
 
-    def authenticate(self, request):
+    def authenticate(self, request: Any) -> tuple[Any, None] | None:
         expected = getattr(settings, "INGESTION_API_KEY", None)
         if not expected:
             # Server misconfiguration: fail fast at startup rather than returning

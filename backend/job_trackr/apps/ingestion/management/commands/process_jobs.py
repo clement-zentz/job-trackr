@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/job_trackr/apps/ingestion/management/commands/process_jobs.py
 
+from typing import Any
+
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils import timezone
@@ -14,7 +16,7 @@ BATCH_SIZE = 50
 class Command(BaseCommand):
     help = "Process ingested job postings"
 
-    def handle(self, *args, **options):
+    def handle(self, *args: Any, **options: Any) -> None:
         processor = IngestionProcessor()
 
         success_count = 0

@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/job_trackr/apps/jobs/models.py
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
 from django.db import models
@@ -71,7 +71,7 @@ class JobOpportunity(models.Model):
             )
         ]
 
-    def save(self, *args, **kwargs):
+    def save(self, *args: Any, **kwargs: Any) -> None:
         if self._state.adding and not self.opportunity_key:
             self.opportunity_key = compute_opportunity_key(
                 title=self.title,
@@ -143,7 +143,7 @@ class JobPosting(models.Model):
             )
         ]
 
-    def save(self, *args, **kwargs):
+    def save(self, *args: Any, **kwargs: Any) -> None:
         if self._state.adding and not self.posting_fingerprint:
             self.posting_fingerprint = compute_fingerprint(
                 platform=self.platform,
