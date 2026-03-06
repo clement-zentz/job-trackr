@@ -27,8 +27,9 @@ down:
 down-v:
 	$(DC) down -v --remove-orphans
 
+APP ?= job-trackr
 bash:
-	$(DC) exec job-trackr bash
+	$(DC) exec $(APP) bash
 
 USER_DB ?= job_trackr
 DATABASE ?= job_trackr
@@ -53,7 +54,8 @@ superuser:
 	$(DC) exec job-trackr $(DJANGO_VENV) $(MANAGE) createsuperuser
 
 django-check:
-	$(DC) exec job-trackr $(DJANGO_VENV) -c "import django; print(django.get_version())"
+	$(DC) exec job-trackr $(DJANGO_VENV) \
+	-c "import django; print(django.get_version())"
 
 ingest-jobs:
 	$(DC) exec job-trackr $(DJANGO_VENV) $(MANAGE) ingest_jobs
