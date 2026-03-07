@@ -26,6 +26,7 @@ from django.urls import URLPattern, URLResolver, include, path
 urlpatterns: list[URLPattern | URLResolver] = [
     path("admin/", admin.site.urls),
     path("api/v1/", include("apps.ingestion.urls")),
+    path("api/v1/jobs/", include("apps.jobs.urls")),
 ]
 
 if settings.DEBUG:
