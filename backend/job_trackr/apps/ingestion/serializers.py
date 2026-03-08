@@ -8,7 +8,7 @@ from rest_framework import serializers
 from .models import IngestedJobPosting, IngestionSource
 
 
-class IngestedJobPostingInputSerializer(serializers.Serializer):
+class IngestedJobPostingInputSerializer(serializers.Serializer[Any]):
     """
     Payload received from FastAPI ingestion service.
     """
@@ -91,7 +91,7 @@ class IngestedJobPostingInputSerializer(serializers.Serializer):
         return attrs
 
 
-class IngestedJobPostingSerializer(serializers.ModelSerializer):
+class IngestedJobPostingSerializer(serializers.ModelSerializer[IngestedJobPosting]):
     class Meta:
         model = IngestedJobPosting
         fields = (

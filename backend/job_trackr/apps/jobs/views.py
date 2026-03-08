@@ -1,8 +1,10 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/job_trackr/apps/jobs/views.py
 
-from django.db.models import Count, Max
-from rest_framework import viewsets
+from typing import Any
+
+from django.db.models import Count, Max, QuerySet
+from rest_framework import serializers, viewsets
 
 from apps.jobs.models import JobOpportunity
 
@@ -12,7 +14,7 @@ from .serializers import (
 )
 
 
-class JobOpportunityViewSet(viewsets.ModelViewSet):
+class JobOpportunityViewSet(viewsets.ModelViewSet[JobOpportunity]):
     """
     ModelViewSet automatically provides:
 
@@ -23,7 +25,7 @@ class JobOpportunityViewSet(viewsets.ModelViewSet):
     - destroy(): DELETE /api/job-opportunities/{id}
     """
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[JobOpportunity]:
         queryset = JobOpportunity.objects.filter(is_active=True)
 
         if self.action == "list":
@@ -34,7 +36,7 @@ class JobOpportunityViewSet(viewsets.ModelViewSet):
 
         return queryset.order_by("-updated_at")
 
-    def get_serializer_class(self):
+    def get_serializer_class(self) -> type[serializers.BaseSerializer[Any]]:
         if self.action in ("create", "update", "partial_update"):
             return JobOpportunityWriteSerializer
         return JobOpportunityReadSerializer

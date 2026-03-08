@@ -6,7 +6,7 @@ from rest_framework import serializers
 from apps.jobs.models import JobOpportunity
 
 
-class JobOpportunityWriteSerializer(serializers.ModelSerializer):
+class JobOpportunityWriteSerializer(serializers.ModelSerializer[JobOpportunity]):
     """
     Serializer used when creating or updating JobOpportunity objects
     from the frontend UI.
@@ -24,7 +24,7 @@ class JobOpportunityWriteSerializer(serializers.ModelSerializer):
         ]
 
 
-class JobOpportunityReadSerializer(serializers.ModelSerializer):
+class JobOpportunityReadSerializer(serializers.ModelSerializer[JobOpportunity]):
     """
     Serializer used to expose JobOpportunity data to the frontend.
     Includes aggregated metadata derived from related JobPosting records.
