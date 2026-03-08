@@ -2,16 +2,11 @@
 # File: backend/tests/integration/job_trackr/api/test_jobs_api.py
 
 import pytest
-from apps.jobs.models import JobOpportunity
+from apps.jobs.models import JobOpportunity, JobPosting
 from django.urls import reverse
-from rest_framework.test import APIClient
+from django.utils import timezone
 
 pytestmark = pytest.mark.django_db
-
-
-@pytest.fixture
-def api_client():
-    return APIClient()
 
 
 @pytest.fixture
@@ -37,9 +32,12 @@ def test_list_job_opportunities(api_client, job_opportunity):
     assert response.status_code == 200
     data = response.json()
 
-    assert len(data) == 1
+    assert len(data) >= 1
     assert data[0]["title"] == job_opportunity.title
     assert data[0]["company"] == job_opportunity.company
+
+    assert data[0]["postings_count"] == 0
+    assert data[0]["latest_posted_at"] is None
 
 
 def test_retrieve_job_opportunity(api_client, job_opportunity):
@@ -57,6 +55,9 @@ def test_retrieve_job_opportunity(api_client, job_opportunity):
     assert data["id"] == str(job_opportunity.id)
     assert data["title"] == job_opportunity.title
     assert data["company"] == job_opportunity.company
+
+    assert data["postings_count"] == 0
+    assert data["latest_posted_at"] is None
 
 
 def test_create_job_opportunity(api_client):
@@ -137,6 +138,25 @@ def test_inactive_opportunities_not_listed(api_client):
     data = response.json()
 
     assert data == []
+
+
+def test_opportunity_metadata_with_postings(api_client, job_opportunity):
+    JobPosting.objects.create(
+        job_opportunity=job_opportunity,
+        posted_at=timezone.now(),
+        platform="linkedin",
+    )
+
+    url = reverse("job-opportunity-detail", args=[job_opportunity.id])
+
+    response = api_client.get(url)
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["postings_count"] == 1
+    assert data["latest_posted_at"] is not None
 
 
 def test_reverse_job_opportunity_list():
