@@ -1,8 +1,11 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/tests/integration/job_trackr/api/test_jobs_api.py
 
+from uuid import UUID
+
 import pytest
 from apps.jobs.models import JobOpportunity, JobPosting
+from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils import timezone
 
@@ -21,13 +24,28 @@ def job_opportunity():
     )
 
 
-def test_list_job_opportunities(api_client, job_opportunity):
+@pytest.fixture
+def user():
+    User = get_user_model()
+    return User.objects.create(
+        username="testuser",
+        password="testpass123",
+    )
+
+
+@pytest.fixture
+def authenticated_client(api_client, user):
+    api_client.force_authenticate(user=user)
+    return api_client
+
+
+def test_list_job_opportunities(authenticated_client, job_opportunity):
     """
     Ensure the API returns active job opportunities.
     """
     url = reverse("job-opportunity-list")
 
-    response = api_client.get(url)
+    response = authenticated_client.get(url)
 
     assert response.status_code == 200
     data = response.json()
@@ -40,13 +58,13 @@ def test_list_job_opportunities(api_client, job_opportunity):
     assert data[0]["latest_posted_at"] is None
 
 
-def test_retrieve_job_opportunity(api_client, job_opportunity):
+def test_retrieve_job_opportunity(authenticated_client, job_opportunity):
     """
     Ensure a single opportunity can be retrieved.
     """
     url = reverse("job-opportunity-detail", args=[job_opportunity.id])
 
-    response = api_client.get(url)
+    response = authenticated_client.get(url)
 
     assert response.status_code == 200
 
@@ -60,7 +78,7 @@ def test_retrieve_job_opportunity(api_client, job_opportunity):
     assert data["latest_posted_at"] is None
 
 
-def test_create_job_opportunity(api_client):
+def test_create_job_opportunity(authenticated_client):
     """
     Ensure a job opportunity can be created via the API.
     """
@@ -75,20 +93,40 @@ def test_create_job_opportunity(api_client):
         "priority": "medium",
     }
 
-    response = api_client.post(url, payload, format="json")
+    response = authenticated_client.post(url, payload, format="json")
 
     assert response.status_code == 201
 
+    data = response.json()
+
+    # Validate identity fields
+    assert "id" in data
+    UUID(data["id"])
+
+    assert data["title"] == payload["title"]
+    assert data["company"] == payload["company"]
+    assert data["location"] == payload["location"]
+    assert data["url"] == payload["url"]
+    assert data["notes"] == payload["notes"]
+    assert data["priority"] == payload["priority"]
+
+    # Validate derived / read-only fields
+    assert "created_at" in data
+    assert data["created_at"] is not None
+    assert data["postings_count"] == 0
+    assert data["latest_posted_at"] is None
+
+    # Validate DB state
     assert JobOpportunity.objects.count() == 1
 
-    job = JobOpportunity.objects.get(title=payload["title"])
+    job = JobOpportunity.objects.get(id=data["id"])
 
     assert job.title == payload["title"]
     assert job.company == payload["company"]
     assert job.location == payload["location"]
 
 
-def test_partial_update_job_opportunity(api_client, job_opportunity):
+def test_partial_update_job_opportunity(authenticated_client, job_opportunity):
     """
     Ensure a job opportunity can be partially updated.
     """
@@ -98,7 +136,7 @@ def test_partial_update_job_opportunity(api_client, job_opportunity):
         "priority": "medium",
     }
 
-    response = api_client.patch(url, payload, format="json")
+    response = authenticated_client.patch(url, payload, format="json")
 
     assert response.status_code == 200
 
@@ -107,19 +145,19 @@ def test_partial_update_job_opportunity(api_client, job_opportunity):
     assert job_opportunity.priority == "medium"
 
 
-def test_delete_job_opportunity(api_client, job_opportunity):
+def test_delete_job_opportunity(authenticated_client, job_opportunity):
     """
     Ensure a job opportunity can be deleted.
     """
     url = reverse("job-opportunity-detail", args=[job_opportunity.id])
 
-    response = api_client.delete(url)
+    response = authenticated_client.delete(url)
 
     assert response.status_code == 204
     assert JobOpportunity.objects.count() == 0
 
 
-def test_inactive_opportunities_not_listed(api_client):
+def test_inactive_opportunities_not_listed(authenticated_client):
     """
     Ensure inactive opportunities are not returned by the API.
     """
@@ -132,7 +170,7 @@ def test_inactive_opportunities_not_listed(api_client):
     )
     url = reverse("job-opportunity-list")
 
-    response = api_client.get(url)
+    response = authenticated_client.get(url)
 
     assert response.status_code == 200
     data = response.json()
@@ -140,16 +178,80 @@ def test_inactive_opportunities_not_listed(api_client):
     assert data == []
 
 
-def test_opportunity_metadata_with_postings(api_client, job_opportunity):
+def test_retrieve_inactive_opportunity_returns_404(authenticated_client):
+    """
+    Ensure retrieving an inactive opportunity returns 404.
+    """
+    opportunity = JobOpportunity.objects.create(
+        title="Backend Engineer",
+        company="Stripe",
+        location="Paris",
+        priority="high",
+        is_active=False,
+    )
+
+    url = reverse("job-opportunity-detail", args=[opportunity.id])
+
+    response = authenticated_client.get(url)
+
+    assert response.status_code == 404
+
+
+def test_update_inactive_opportunity_returns_404(authenticated_client):
+    """
+    Ensure updating an inactive opportunity returns 404.
+    """
+    opportunity = JobOpportunity.objects.create(
+        title="Backend Engineer",
+        company="Stripe",
+        location="Paris",
+        priority="high",
+        is_active=False,
+    )
+
+    url = reverse("job-opportunity-detail", args=[opportunity.id])
+
+    payload = {
+        "priority": "medium",
+    }
+
+    response = authenticated_client.put(url, payload, format="json")
+
+    assert response.status_code == 404
+
+
+def test_delete_inactive_opportunity_returns_404(authenticated_client):
+    """
+    Ensure deleting an inactive opportunity returns 404.
+    """
+    opportunity = JobOpportunity.objects.create(
+        title="Backend Engineer",
+        company="Stripe",
+        location="Paris",
+        priority="high",
+        is_active=False,
+    )
+
+    url = reverse("job-opportunity-detail", args=[opportunity.id])
+
+    response = authenticated_client.delete(url)
+
+    assert response.status_code == 404
+
+
+def test_opportunity_metadata_with_postings(authenticated_client, job_opportunity):
     JobPosting.objects.create(
         job_opportunity=job_opportunity,
-        posted_at=timezone.now(),
+        title=job_opportunity.title,
+        company=job_opportunity.company,
+        raw_url="https://example.com/postings",
         platform="linkedin",
+        posted_at=timezone.now(),
     )
 
     url = reverse("job-opportunity-detail", args=[job_opportunity.id])
 
-    response = api_client.get(url)
+    response = authenticated_client.get(url)
 
     assert response.status_code == 200
 
@@ -167,3 +269,11 @@ def test_reverse_job_opportunity_list():
 def test_reverse_job_opportunity_detail(job_opportunity):
     url = reverse("job-opportunity-detail", args=[job_opportunity.id])
     assert url == f"/api/v1/jobs/opportunities/{job_opportunity.id}/"
+
+
+def test_authentication_required(api_client):
+    url = reverse("job-opportunity-list")
+
+    response = api_client.get(url)
+
+    assert response.status_code == 403
