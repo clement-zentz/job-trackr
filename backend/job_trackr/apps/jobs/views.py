@@ -10,6 +10,7 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.reverse import reverse
 
 from apps.jobs.models import JobOpportunity
 from apps.jobs.serializers import (
@@ -67,7 +68,17 @@ class JobOpportunityViewSet(viewsets.ModelViewSet[JobOpportunity]):
         instance = self._annotated_queryset().get(pk=instance.pk)
 
         response_serializer = JobOpportunityReadSerializer(instance)
-        headers = self.get_success_headers(serializer.data)
+
+        # Manually compute the Location header because the serializer includes a
+        # `url` field for the external job posting. DRF's default `get_success_headers`
+        # would treat this field as the resource URL.
+        headers = {
+            "Location": reverse(
+                "job-opportunity-detail",
+                args=[instance.pk],
+                request=request,
+            )
+        }
 
         return Response(
             response_serializer.data,
