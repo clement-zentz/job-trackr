@@ -27,7 +27,7 @@ def job_opportunity():
 @pytest.fixture
 def user():
     User = get_user_model()
-    return User.objects.create(
+    return User.objects.create_user(  # type: ignore[attr-defined]
         username="testuser",
         password="testpass123",
     )
@@ -277,3 +277,64 @@ def test_authentication_required(api_client):
     response = api_client.get(url)
 
     assert response.status_code == 403
+
+
+def test_create_duplicate_job_opportunity_returns_409(authenticated_client):
+    """
+    Ensure creating a duplicate opportunity returns HTTP 409.
+    """
+    url = reverse("job-opportunity-list")
+
+    payload = {
+        "title": "Backend Engineer",
+        "company": "Stripe",
+        "location": "Paris",
+        "url": "https://example.com/job",
+        "notes": "Interesting role",
+        "priority": "high",
+    }
+
+    # First creation succeeds
+    response = authenticated_client.post(url, payload, format="json")
+    assert response.status_code == 201
+
+    # Second creation with same identity triggers conflict
+    response = authenticated_client.post(url, payload, format="json")
+
+    assert response.status_code == 409
+    assert response.json()["detail"] == (
+        "A job opportunity with the same identity already exists."
+    )
+
+
+def test_full_update_job_opportunity(authenticated_client, job_opportunity):
+    url = reverse("job-opportunity-detail", args=[job_opportunity.id])
+
+    payload = {
+        "title": "Updated Title",
+        "company": "Stripe",
+        "location": "Paris",
+        "url": "https://example.com/job",
+        "notes": "Updated",
+        "priority": "low",
+    }
+
+    response = authenticated_client.put(url, payload, format="json")
+
+    assert response.status_code == 200
+
+    job_opportunity.refresh_from_db()
+    assert job_opportunity.title == "Updated Title"
+
+
+def test_session_authentication(api_client, user):
+    """
+    Ensure SessionAuthentication works with a Django session.
+    """
+    api_client.force_login(user)
+
+    url = reverse("job-opportunity-list")
+
+    response = api_client.get(url)
+
+    assert response.status_code == 200
