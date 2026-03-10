@@ -24,10 +24,10 @@ class JobOpportunityViewSet(viewsets.ModelViewSet[JobOpportunity]):
     ModelViewSet automatically provides:
 
     - list(): GET /api/v1/jobs/opportunities/
-    - retrieve(): GET /api/v1/jobs/opportunities/{id}
+    - retrieve(): GET /api/v1/jobs/opportunities/{id}/
     - create(): POST /api/v1/jobs/opportunities/
-    - partial_update(): PATCH /api/v1/jobs/opportunities/{id}
-    - destroy(): DELETE /api/v1/jobs/opportunities/{id}
+    - partial_update(): PATCH /api/v1/jobs/opportunities/{id}/
+    - destroy(): DELETE /api/v1/jobs/opportunities/{id}/
     """
 
     authentication_classes = [SessionAuthentication]
@@ -97,13 +97,10 @@ class JobOpportunityViewSet(viewsets.ModelViewSet[JobOpportunity]):
         )
         serializer.is_valid(raise_exception=True)
 
-        try:
-            instance = serializer.save()
-        except IntegrityError:
-            return Response(
-                {"detail": "A job opportunity with the same identity already exists."},
-                status=status.HTTP_409_CONFLICT,
-            )
+        # opportunity_key is computed only on create and is not recomputed on updates.
+        # Therefore, a uniqueness conflict should not occur during updates and we do
+        # not handle IntegrityError here.
+        instance = serializer.save()
 
         # Re-fetch with annotated queryset for consistent response shape
         instance = self._annotated_queryset().get(pk=instance.pk)
