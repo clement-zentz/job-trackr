@@ -21,7 +21,7 @@ class DjangoIngestionClient:
         self,
         jobs: list[JobPostingResponse],
     ) -> None:
-        url = f"{self.base_url}/api/v1/ingest/job-postings/"
+        url = f"{self.base_url}/api/v1/ingestion/job-postings/"
 
         headers = {
             "X-Ingestion-Api-Key": self.api_key,

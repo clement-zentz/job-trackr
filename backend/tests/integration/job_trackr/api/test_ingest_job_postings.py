@@ -24,7 +24,7 @@ def test_ingest_job_postings_creates_records(api_client):
     ]
 
     response: Response = api_client.post(
-        "/api/v1/ingest/job-postings/",
+        "/api/v1/ingestion/job-postings/",
         payload,
         format="json",
     )
@@ -55,7 +55,7 @@ def test_ingest_job_postings_is_idempotent(api_client):
         }
     ]
 
-    url = "/api/v1/ingest/job-postings/"
+    url = "/api/v1/ingestion/job-postings/"
 
     response1: Response = api_client.post(url, payload, format="json")
     response2: Response = api_client.post(url, payload, format="json")
@@ -74,7 +74,7 @@ def test_ingest_job_postings_is_idempotent(api_client):
 
 @pytest.mark.django_db
 def test_ingest_job_postings_partial_duplicate(api_client):
-    url = "/api/v1/ingest/job-postings/"
+    url = "/api/v1/ingestion/job-postings/"
 
     existing_job = [
         {
@@ -126,7 +126,7 @@ def test_ingest_job_postings_validation_error(api_client):
     ]
 
     response: Response = api_client.post(
-        "/api/v1/ingest/job-postings/",
+        "/api/v1/ingestion/job-postings/",
         payload,
         format="json",
     )
@@ -145,7 +145,7 @@ def test_ingest_job_postings_requires_api_key():
     response = cast(
         Response,
         client.post(
-            "/api/v1/ingest/job-postings/",
+            "/api/v1/ingestion/job-postings/",
             [],
             format="json",
         ),
@@ -162,7 +162,7 @@ def test_ingest_job_postings_rejects_invalid_api_key(api_client):
     api_client.defaults["HTTP_X_INGESTION_API_KEY"] = "wrong-key"
 
     response: Response = api_client.post(
-        "/api/v1/ingest/job-postings/",
+        "/api/v1/ingestion/job-postings/",
         [],
         format="json",
     )

@@ -5,4 +5,11 @@ from django.urls import path
 
 from .views import IngestJobPostingsView
 
-urlpatterns = [path("ingest/job-postings/", IngestJobPostingsView.as_view())]
+urlpatterns = [
+    # Canonical endpoint
+    path(
+        "job-postings/",
+        IngestJobPostingsView.as_view(),
+        name="ingest-job-postings",
+    )
+]
