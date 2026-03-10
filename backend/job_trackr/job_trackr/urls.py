@@ -25,8 +25,10 @@ from django.urls import URLPattern, URLResolver, include, path
 
 urlpatterns: list[URLPattern | URLResolver] = [
     path("admin/", admin.site.urls),
-    path("api/v1/", include("apps.ingestion.urls")),
     path("api/v1/jobs/", include("apps.jobs.urls")),
+    path("api/v1/ingestion/", include("apps.ingestion.urls")),
+    # Temporary legacy alias for the old ingestion endpoint
+    path("api/v1/", include("apps.ingestion.urls_legacy")),
 ]
 
 if settings.DEBUG:
