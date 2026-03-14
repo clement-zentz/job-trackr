@@ -4,7 +4,7 @@
 from typing import Any
 
 from django.db import IntegrityError
-from django.db.models import Count, Max, QuerySet
+from django.db.models import Count, Max, Prefetch, QuerySet
 from rest_framework import serializers, status, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -12,7 +12,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
-from apps.jobs.models import JobOpportunity
+from apps.jobs.models import JobOpportunity, JobPosting
 from apps.jobs.serializers import (
     JobOpportunityReadSerializer,
     JobOpportunityWriteSerializer,
@@ -34,10 +34,20 @@ class JobOpportunityViewSet(viewsets.ModelViewSet[JobOpportunity]):
     permission_classes = [IsAuthenticated]
 
     def _annotated_queryset(self) -> QuerySet[JobOpportunity]:
-        return JobOpportunity.objects.filter(is_active=True).annotate(
+        qs = JobOpportunity.objects.filter(is_active=True).annotate(
             postings_count=Count("job_postings"),
             latest_posted_at=Max("job_postings__posted_at"),
         )
+
+        if self.action == "retrieve":
+            qs = qs.prefetch_related(
+                Prefetch(
+                    "job_postings",
+                    queryset=JobPosting.objects.order_by("-posted_at"),
+                )
+            )
+
+        return qs
 
     def get_queryset(self) -> QuerySet[JobOpportunity]:
         queryset = JobOpportunity.objects.filter(is_active=True)
