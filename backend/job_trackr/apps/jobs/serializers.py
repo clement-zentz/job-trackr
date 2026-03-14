@@ -18,7 +18,7 @@ class JobOpportunityWriteSerializer(serializers.ModelSerializer[JobOpportunity])
             "title",
             "company",
             "location",
-            "url",
+            "description",
             "notes",
             "priority",
         ]
@@ -40,7 +40,7 @@ class JobOpportunityReadSerializer(serializers.ModelSerializer[JobOpportunity]):
             "title",
             "company",
             "location",
-            "url",
+            "description",
             "notes",
             "priority",
             "is_active",
