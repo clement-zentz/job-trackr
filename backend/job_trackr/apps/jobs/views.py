@@ -14,7 +14,8 @@ from rest_framework.reverse import reverse
 
 from apps.jobs.models import JobOpportunity, JobPosting
 from apps.jobs.serializers import (
-    JobOpportunityReadSerializer,
+    JobOpportunityDetailSerializer,
+    JobOpportunityListSerializer,
     JobOpportunityWriteSerializer,
 )
 
@@ -60,7 +61,10 @@ class JobOpportunityViewSet(viewsets.ModelViewSet[JobOpportunity]):
     def get_serializer_class(self) -> type[serializers.BaseSerializer[Any]]:
         if self.action in ("create", "update", "partial_update"):
             return JobOpportunityWriteSerializer
-        return JobOpportunityReadSerializer
+        if self.action == "retrieve":
+            return JobOpportunityDetailSerializer
+
+        return JobOpportunityListSerializer
 
     def create(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         serializer = self.get_serializer(data=request.data)
@@ -77,7 +81,7 @@ class JobOpportunityViewSet(viewsets.ModelViewSet[JobOpportunity]):
         # Re-fetch with annotated queryset for consistent response shape
         instance = self._annotated_queryset().get(pk=instance.pk)
 
-        response_serializer = JobOpportunityReadSerializer(instance)
+        response_serializer = JobOpportunityDetailSerializer(instance)
 
         # Manually compute the Location header because the serializer includes a
         # `url` field for the external job posting. DRF's default `get_success_headers`
@@ -115,7 +119,7 @@ class JobOpportunityViewSet(viewsets.ModelViewSet[JobOpportunity]):
         # Re-fetch with annotated queryset for consistent response shape
         instance = self._annotated_queryset().get(pk=instance.pk)
 
-        response_serializer = JobOpportunityReadSerializer(instance)
+        response_serializer = JobOpportunityDetailSerializer(instance)
 
         return Response(
             response_serializer.data,
