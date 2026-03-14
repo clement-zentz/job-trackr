@@ -41,10 +41,11 @@ class JobOpportunityWriteSerializer(serializers.ModelSerializer[JobOpportunity])
         ]
 
 
-class JobOpportunityReadSerializer(serializers.ModelSerializer[JobOpportunity]):
+class JobOpportunityListSerializer(serializers.ModelSerializer[JobOpportunity]):
     """
-    Serializer used to expose JobOpportunity data to the frontend.
-    Includes aggregated metadata derived from related JobPosting records.
+    Serializer used to expose JobOpportunity data to the
+    frontend JobOpportunityList page. Includes aggregated
+    metadata derived from related JobPosting records.
     """
 
     postings_count = serializers.IntegerField(read_only=True)
@@ -58,10 +59,39 @@ class JobOpportunityReadSerializer(serializers.ModelSerializer[JobOpportunity]):
             "company",
             "location",
             "description",
+            "priority",
+            "updated_at",
+            "postings_count",
+            "latest_posted_at",
+        ]
+        read_only_fields = fields
+
+
+class JobOpportunityDetailSerializer(serializers.ModelSerializer[JobOpportunity]):
+    """
+    Serializer used to expose JobOpportunity data to the
+    frontend JobOpportunityDetail page. Includes aggregated
+    metadata derived from related JobPosting records.
+    """
+
+    postings_count = serializers.IntegerField(read_only=True)
+    latest_posted_at = serializers.DateTimeField(read_only=True)
+
+    job_postings = JobPostingReadSerializer(
+        many=True,
+        read_only=True,
+    )
+
+    class Meta:
+        model = JobOpportunity
+        fields = [
+            "id",
+            "title",
+            "company",
+            "location",
+            "description",
             "notes",
             "priority",
-            "is_active",
-            "created_at",
             "updated_at",
             "postings_count",
             "latest_posted_at",
