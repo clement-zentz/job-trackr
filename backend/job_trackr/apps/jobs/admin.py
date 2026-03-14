@@ -12,10 +12,10 @@ class JobOpportunityAdmin(admin.ModelAdmin):
         "title",
         "company",
         "location",
-        "url",
         "priority",
         "is_active",
         "updated_at",
+        "description",
     )
     list_filter = ("priority", "is_active")
     search_fields = ("company", "title")

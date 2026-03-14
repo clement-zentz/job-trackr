@@ -34,7 +34,7 @@ class JobOpportunity(models.Model):
 
     # --- Job Optional Fields ---
     location = models.CharField(max_length=255, blank=True)
-    url = models.URLField(max_length=2000, blank=True)
+    description = models.TextField(blank=True)
     notes = models.TextField(blank=True)
     priority = models.CharField(
         max_length=10,
