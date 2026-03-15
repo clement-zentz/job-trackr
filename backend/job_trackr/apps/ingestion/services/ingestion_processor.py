@@ -127,7 +127,6 @@ class IngestionProcessor:
                     "title": job_posting.title,
                     "company": job_posting.company,
                     "location": job_posting.location,
-                    "url": job_posting.canonical_url or job_posting.raw_url,
                 },
             )
         except IntegrityError:

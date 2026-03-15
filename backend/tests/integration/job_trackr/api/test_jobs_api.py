@@ -12,6 +12,20 @@ from django.utils import timezone
 pytestmark = pytest.mark.django_db
 
 
+EXPECTED_DETAIL_FIELDS = {
+    "id",
+    "title",
+    "company",
+    "location",
+    "notes",
+    "priority",
+    "description",
+    "job_postings",
+    "postings_count",
+    "latest_posted_at",
+}
+
+
 @pytest.fixture
 def job_opportunity():
     return JobOpportunity.objects.create(
@@ -97,6 +111,8 @@ def test_create_job_opportunity(authenticated_client):
 
     data = response.json()
 
+    assert set(data.keys()) >= EXPECTED_DETAIL_FIELDS
+
     # Validate identity fields
     assert "id" in data
     UUID(data["id"])
@@ -111,6 +127,14 @@ def test_create_job_opportunity(authenticated_client):
     assert data["postings_count"] == 0
     assert data["latest_posted_at"] is None
 
+    # Validate fields specific to JobOpportunityDetailSerializer
+    assert "description" in data
+    assert data["description"] == ""
+
+    assert "job_postings" in data
+    assert isinstance(data["job_postings"], list)
+    assert data["job_postings"] == []
+
     # Validate DB state
     assert JobOpportunity.objects.count() == 1
 
@@ -119,6 +143,7 @@ def test_create_job_opportunity(authenticated_client):
     assert job.title == payload["title"]
     assert job.company == payload["company"]
     assert job.location == payload["location"]
+    assert job.description == ""
 
 
 def test_partial_update_job_opportunity(authenticated_client, job_opportunity):
