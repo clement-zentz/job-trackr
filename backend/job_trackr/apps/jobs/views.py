@@ -73,7 +73,10 @@ class JobOpportunityViewSet(viewsets.ModelViewSet[JobOpportunity]):
         # Re-fetch with annotated queryset for consistent response shape
         instance = self._annotated_queryset().get(pk=instance.pk)
 
-        response_serializer = JobOpportunityDetailSerializer(instance)
+        response_serializer = JobOpportunityDetailSerializer(
+            instance,
+            context=self.get_serializer_context(),
+        )
 
         return Response(
             response_serializer.data,
@@ -99,7 +102,10 @@ class JobOpportunityViewSet(viewsets.ModelViewSet[JobOpportunity]):
         # Re-fetch with annotated queryset for consistent response shape
         instance = self._annotated_queryset().get(pk=instance.pk)
 
-        response_serializer = JobOpportunityDetailSerializer(instance)
+        response_serializer = JobOpportunityDetailSerializer(
+            instance,
+            context=self.get_serializer_context(),
+        )
 
         return Response(
             response_serializer.data,
