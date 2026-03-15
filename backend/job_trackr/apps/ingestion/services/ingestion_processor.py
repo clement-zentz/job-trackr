@@ -51,6 +51,7 @@ class IngestionProcessor:
             job_posting
         )
 
+        # attach job_posting to job_opportunity
         if job_posting.job_opportunity_id != job_opportunity.id:
             job_posting.job_opportunity = job_opportunity
             job_posting.save(update_fields=["job_opportunity", "updated_at"])

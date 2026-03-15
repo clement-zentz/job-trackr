@@ -20,7 +20,7 @@ class JobPostingReadSerializer(serializers.ModelSerializer[JobPosting]):
             "canonical_url",
             "posted_at",
         ]
-        read_only_fields = fields
+        read_only_fields = tuple(fields)
 
 
 class JobOpportunityWriteSerializer(serializers.ModelSerializer[JobOpportunity]):
@@ -64,7 +64,7 @@ class JobOpportunityListSerializer(serializers.ModelSerializer[JobOpportunity]):
             "postings_count",
             "latest_posted_at",
         ]
-        read_only_fields = fields
+        read_only_fields = tuple(fields)
 
 
 class JobOpportunityDetailSerializer(serializers.ModelSerializer[JobOpportunity]):
@@ -97,4 +97,4 @@ class JobOpportunityDetailSerializer(serializers.ModelSerializer[JobOpportunity]
             "latest_posted_at",
             "job_postings",
         ]
-        read_only_fields = fields
+        read_only_fields = tuple(fields)

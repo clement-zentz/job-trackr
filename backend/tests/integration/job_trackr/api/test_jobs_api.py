@@ -18,7 +18,6 @@ def job_opportunity():
         title="Backend Engineer",
         company="Stripe",
         location="Paris",
-        url="https://example.com/job",
         notes="Interesting role",
         priority="high",
     )
@@ -88,7 +87,6 @@ def test_create_job_opportunity(authenticated_client):
         "title": "Senior Backend Engineer",
         "company": "Datadog",
         "location": "Paris",
-        "url": "https://example.com/job",
         "notes": "Looks promising",
         "priority": "medium",
     }
@@ -106,13 +104,10 @@ def test_create_job_opportunity(authenticated_client):
     assert data["title"] == payload["title"]
     assert data["company"] == payload["company"]
     assert data["location"] == payload["location"]
-    assert data["url"] == payload["url"]
     assert data["notes"] == payload["notes"]
     assert data["priority"] == payload["priority"]
 
     # Validate derived / read-only fields
-    assert "created_at" in data
-    assert data["created_at"] is not None
     assert data["postings_count"] == 0
     assert data["latest_posted_at"] is None
 
@@ -289,7 +284,6 @@ def test_create_duplicate_job_opportunity_returns_409(authenticated_client):
         "title": "Backend Engineer",
         "company": "Stripe",
         "location": "Paris",
-        "url": "https://example.com/job",
         "notes": "Interesting role",
         "priority": "high",
     }
@@ -314,7 +308,6 @@ def test_full_update_job_opportunity(authenticated_client, job_opportunity):
         "title": "Updated Title",
         "company": "Stripe",
         "location": "Paris",
-        "url": "https://example.com/job",
         "notes": "Updated",
         "priority": "low",
     }

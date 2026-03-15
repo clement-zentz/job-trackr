@@ -4,15 +4,14 @@
 from typing import Any
 
 from django.db import IntegrityError
-from django.db.models import Count, Max, Prefetch, QuerySet
+from django.db.models import Count, Max, QuerySet
 from rest_framework import serializers, status, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.reverse import reverse
 
-from apps.jobs.models import JobOpportunity, JobPosting
+from apps.jobs.models import JobOpportunity
 from apps.jobs.serializers import (
     JobOpportunityDetailSerializer,
     JobOpportunityListSerializer,
@@ -40,23 +39,16 @@ class JobOpportunityViewSet(viewsets.ModelViewSet[JobOpportunity]):
             latest_posted_at=Max("job_postings__posted_at"),
         )
 
-        if self.action == "retrieve":
-            qs = qs.prefetch_related(
-                Prefetch(
-                    "job_postings",
-                    queryset=JobPosting.objects.order_by("-posted_at"),
-                )
-            )
+        if self.action in ("retrieve", "create", "update", "partial_update"):
+            qs = qs.prefetch_related("job_postings")
 
         return qs
 
     def get_queryset(self) -> QuerySet[JobOpportunity]:
-        queryset = JobOpportunity.objects.filter(is_active=True)
-
         if self.action in ("list", "retrieve"):
-            queryset = self._annotated_queryset()
+            return self._annotated_queryset().order_by("-updated_at")
 
-        return queryset.order_by("-updated_at")
+        return JobOpportunity.objects.filter(is_active=True).order_by("-updated_at")
 
     def get_serializer_class(self) -> type[serializers.BaseSerializer[Any]]:
         if self.action in ("create", "update", "partial_update"):
@@ -83,21 +75,9 @@ class JobOpportunityViewSet(viewsets.ModelViewSet[JobOpportunity]):
 
         response_serializer = JobOpportunityDetailSerializer(instance)
 
-        # Manually compute the Location header because the serializer includes a
-        # `url` field for the external job posting. DRF's default `get_success_headers`
-        # would treat this field as the resource URL.
-        headers = {
-            "Location": reverse(
-                "job-opportunity-detail",
-                args=[instance.pk],
-                request=request,
-            )
-        }
-
         return Response(
             response_serializer.data,
             status=status.HTTP_201_CREATED,
-            headers=headers,
         )
 
     def update(self, request: Request, *args: Any, **kwargs: Any) -> Response:
