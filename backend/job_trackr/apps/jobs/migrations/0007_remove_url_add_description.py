@@ -13,6 +13,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # NOTE:
+        # `JobOpportunity.url` was a legacy field from an early
+        # prototype. URLs now belong to `JobPosting` objects.
+        # No data migration is required before removing the column.
         migrations.RemoveField(
             model_name='jobopportunity',
             name='url',

@@ -136,6 +136,7 @@ class JobPosting(models.Model):
 
     class Meta:
         db_table = "job_posting"
+        ordering = ["-posted_at"]
         constraints = [
             models.UniqueConstraint(
                 fields=["posting_fingerprint"],
