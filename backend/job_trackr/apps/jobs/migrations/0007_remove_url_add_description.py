@@ -24,6 +24,10 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='jobopportunity',
             name='description',
-            field=models.TextField(blank=True),
+            # Provide a temporary default so the migration succeeds if rows already exist.
+            # `preserve_default=False` ensures the default is used only during the
+            # migration and is not kept as a permanent database default.
+            field=models.TextField(blank=True, default=""),
+            preserve_default=False,
         ),
     ]
