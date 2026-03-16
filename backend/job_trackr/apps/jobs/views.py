@@ -78,9 +78,20 @@ class JobOpportunityViewSet(viewsets.ModelViewSet[JobOpportunity]):
             context=self.get_serializer_context(),
         )
 
+        # Restore DRF default behavior: attempt to include a Location header for the
+        # created resource. DRF derives this header from a `url` field in the serializer
+        # output. Our serializers do not expose such a field, so this currently results
+        # in no Location header being added.
+        #
+        # Be careful not to introduce a field named `url` with a different semantic
+        # (e.g. an external job posting URL), as DRF would then incorrectly use it to
+        # populate the Location header.
+        headers = self.get_success_headers(serializer.data)
+
         return Response(
             response_serializer.data,
             status=status.HTTP_201_CREATED,
+            headers=headers,
         )
 
     def update(self, request: Request, *args: Any, **kwargs: Any) -> Response:
