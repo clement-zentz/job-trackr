@@ -9,8 +9,11 @@ from django.db import IntegrityError, transaction
 from django.utils import timezone
 
 from apps.ingestion.models import IngestedJobPosting, IngestionStatus
-from apps.jobs.models import JobOpportunity, JobPosting
-from apps.jobs.services.opportunity_identity import compute_opportunity_key
+from apps.jobs.opportunities.models import JobOpportunity
+from apps.jobs.opportunities.services.opportunity_identity import (
+    compute_opportunity_key,
+)
+from apps.jobs.postings.models import JobPosting
 
 
 @dataclass(slots=True)

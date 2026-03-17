@@ -5,7 +5,8 @@ import datetime
 
 import pytest
 from apps.job_applications.models import JobApplication, JobApplicationStatus
-from apps.jobs.models import JobOpportunity, JobPosting
+from apps.jobs.opportunities.models import JobOpportunity
+from apps.jobs.postings.models import JobPosting
 
 
 @pytest.mark.django_db

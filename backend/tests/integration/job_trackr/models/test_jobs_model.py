@@ -2,7 +2,8 @@
 # File: backend/tests/integration/job_trackr/models/test_jobs_model.py
 
 import pytest
-from apps.jobs.models import JobOpportunity, JobOpportunityPriority, JobPosting
+from apps.jobs.opportunities.models import JobOpportunity, JobOpportunityPriority
+from apps.jobs.postings.models import JobPosting
 
 
 @pytest.mark.django_db

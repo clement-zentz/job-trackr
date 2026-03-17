@@ -4,7 +4,8 @@
 import pytest
 from apps.ingestion.models import IngestedJobPosting, IngestionStatus
 from apps.ingestion.services.ingestion_processor import IngestionProcessor
-from apps.jobs.models import JobOpportunity, JobPosting
+from apps.jobs.opportunities.models import JobOpportunity
+from apps.jobs.postings.models import JobPosting
 
 
 @pytest.mark.django_db
