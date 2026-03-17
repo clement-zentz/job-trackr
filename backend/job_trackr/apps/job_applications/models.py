@@ -6,7 +6,6 @@ from datetime import date
 from django.db import models
 
 from apps.common.uuid import uuid7_default
-from apps.jobs.models import JobOpportunity, JobPosting
 
 
 class JobApplicationStatus(models.TextChoices):
@@ -27,13 +26,13 @@ class JobApplication(models.Model):
 
     # --- Job Application FK Fields ---
     job_opportunity = models.ForeignKey(
-        JobOpportunity,
+        "jobs.JobOpportunity",
         related_name="job_applications",
         on_delete=models.CASCADE,
     )
 
     job_posting = models.ForeignKey(
-        JobPosting,
+        "jobs.JobPosting",
         related_name="job_applications",
         null=True,
         blank=True,

@@ -4,7 +4,8 @@
 from uuid import UUID
 
 import pytest
-from apps.jobs.models import JobOpportunity, JobPosting
+from apps.jobs.opportunities.models import JobOpportunity
+from apps.jobs.postings.models import JobPosting
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils import timezone

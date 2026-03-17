@@ -1,8 +1,10 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/tests/unit/job_trackr/jobs/services/test_opportunity_identity.py
 
-from apps.jobs.services import opportunity_identity
-from apps.jobs.services.opportunity_identity import compute_opportunity_key
+from apps.jobs.opportunities.services import opportunity_identity
+from apps.jobs.opportunities.services.opportunity_identity import (
+    compute_opportunity_key,
+)
 
 
 def test_opportunity_key_is_deterministic():
