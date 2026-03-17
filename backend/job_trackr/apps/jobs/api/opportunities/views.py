@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# File: backend/job_trackr/apps/jobs/views.py
+# File: backend/job_trackr/apps/jobs/api/opportunities/views.py
 
 from typing import Any
 
@@ -11,12 +11,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from apps.jobs.models import JobOpportunity
-from apps.jobs.serializers import (
+from apps.jobs.api.opportunities.serializers import (
     JobOpportunityDetailSerializer,
     JobOpportunityListSerializer,
     JobOpportunityWriteSerializer,
 )
+from apps.jobs.opportunities.models import JobOpportunity
 
 
 class JobOpportunityViewSet(viewsets.ModelViewSet[JobOpportunity]):

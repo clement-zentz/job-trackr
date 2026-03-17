@@ -3,7 +3,7 @@
 
 from rest_framework.routers import DefaultRouter
 
-from .views import JobOpportunityViewSet
+from apps.jobs.api.opportunities.views import JobOpportunityViewSet
 
 router = DefaultRouter()
 router.register(
