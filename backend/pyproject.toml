@@ -116,7 +116,8 @@ ignore_missing_imports = false
 
 [[tool.mypy.overrides]]
 module = [
-  "apps.jobs.admin",
+  "apps.jobs.opportunities.admin",
+  "apps.jobs.postings.admin",
   "apps.ingestion.admin",
   "apps.job_applications.admin",
 ]
