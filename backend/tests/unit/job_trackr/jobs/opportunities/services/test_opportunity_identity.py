@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# File: backend/tests/unit/job_trackr/jobs/services/test_opportunity_identity.py
+# File: backend/tests/unit/job_trackr/jobs/opportunities/services/test_opportunity_identity.py
 
 from apps.jobs.opportunities.services import opportunity_identity
 from apps.jobs.opportunities.services.opportunity_identity import (

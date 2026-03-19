@@ -8,7 +8,6 @@ from django.db import models
 
 from apps.common.uuid import uuid7_default
 from apps.ingestion.services.fingerprint import compute_fingerprint
-from apps.jobs.opportunities.models import JobOpportunity
 
 if TYPE_CHECKING:
     from django_stubs_ext.db.models.manager import RelatedManager
@@ -24,7 +23,7 @@ class JobPosting(models.Model):
     )
 
     job_opportunity = models.ForeignKey(
-        JobOpportunity,
+        "jobs.JobOpportunity",
         related_name="job_postings",
         on_delete=models.CASCADE,
         null=True,
