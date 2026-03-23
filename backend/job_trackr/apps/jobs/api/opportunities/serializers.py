@@ -3,8 +3,25 @@
 
 from rest_framework import serializers
 
-from apps.jobs.api.postings.serializers import JobPostingReadSerializer
 from apps.jobs.opportunities.models import JobOpportunity
+from apps.jobs.postings.models import JobPosting
+
+
+class JobOpportunityPostingSerializer(serializers.ModelSerializer[JobPosting]):
+    """
+    Serializer exposing JobPosting records attached to a JobOpportunity.
+    """
+
+    class Meta:
+        model = JobPosting
+        fields = [
+            "id",
+            "platform",
+            "raw_url",
+            "canonical_url",
+            "posted_at",
+        ]
+        read_only_fields = tuple(fields)
 
 
 class JobOpportunityWriteSerializer(serializers.ModelSerializer[JobOpportunity]):
@@ -61,7 +78,7 @@ class JobOpportunityDetailSerializer(serializers.ModelSerializer[JobOpportunity]
     postings_count = serializers.IntegerField(read_only=True)
     latest_posted_at = serializers.DateTimeField(read_only=True)
 
-    job_postings = JobPostingReadSerializer(
+    job_postings = JobOpportunityPostingSerializer(
         many=True,
         read_only=True,
     )
