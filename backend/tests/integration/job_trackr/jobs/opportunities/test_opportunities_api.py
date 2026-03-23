@@ -1,12 +1,11 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# File: backend/tests/integration/job_trackr/api/test_jobs_api.py
+# File: backend/tests/integration/job_trackr/jobs/opportunities/test_opportunities_api.py
 
 from uuid import UUID
 
 import pytest
 from apps.jobs.opportunities.models import JobOpportunity
 from apps.jobs.postings.models import JobPosting
-from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils import timezone
 
@@ -36,21 +35,6 @@ def job_opportunity():
         notes="Interesting role",
         priority="high",
     )
-
-
-@pytest.fixture
-def user():
-    User = get_user_model()
-    return User.objects.create_user(  # type: ignore[attr-defined]
-        username="testuser",
-        password="testpass123",
-    )
-
-
-@pytest.fixture
-def authenticated_client(api_client, user):
-    api_client.force_authenticate(user=user)
-    return api_client
 
 
 def test_list_job_opportunities(authenticated_client, job_opportunity):
