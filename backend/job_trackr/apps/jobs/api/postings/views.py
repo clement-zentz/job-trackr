@@ -5,12 +5,11 @@ from typing import Any
 
 from django.db import IntegrityError
 from django.db.models import QuerySet
-from rest_framework import status, viewsets
+from rest_framework import serializers, status, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.serializers import BaseSerializer
 
 from apps.jobs.postings.models import JobPosting
 
@@ -21,7 +20,7 @@ from .serializers import (
 )
 
 
-class JobPostingViewSet(viewsets.ModelViewSet):
+class JobPostingViewSet(viewsets.ModelViewSet[JobPosting]):
     """
     ModelViewSet automatically provides:
 
@@ -52,7 +51,7 @@ class JobPostingViewSet(viewsets.ModelViewSet):
     # Serializers
     # -------------------------
 
-    def get_serializer_class(self) -> type[BaseSerializer]:
+    def get_serializer_class(self) -> type[serializers.BaseSerializer[Any]]:
         if self.action in ("create", "update", "partial_update"):
             return JobPostingWriteSerializer
         if self.action == "retrieve":
@@ -70,11 +69,16 @@ class JobPostingViewSet(viewsets.ModelViewSet):
 
         try:
             instance = serializer.save()
-        except IntegrityError:
-            return Response(
-                {"detail": "A job posting with the same identity already exists."},
-                status=status.HTTP_409_CONFLICT,
-            )
+        except IntegrityError as exc:
+            # Only treat the unique constraint on posting_fingerprint (uq_job_posting_fp)
+            # as a "duplicate identity" conflict. Re-raise other integrity errors so they
+            # are not incorrectly masked as duplicates.
+            if "uq_job_posting_fp" in str(exc):
+                return Response(
+                    {"detail": "A job posting with the same identity already exists."},
+                    status=status.HTTP_409_CONFLICT,
+                )
+            raise
 
         # Re-fetch with enriched queryset
         instance = self._detail_queryset().get(pk=instance.pk)
