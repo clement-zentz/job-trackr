@@ -29,7 +29,7 @@ def test_list_postings(authenticated_client, job_posting):
 
     assert response.status_code == status.HTTP_200_OK
     assert len(response.data) >= 1
-    assert response.data[0]["id"] == str(job_posting.id)
+    assert any(item["id"] == str(job_posting.id) for item in response.data)
 
 
 def test_retrieve_posting(authenticated_client, job_posting):

@@ -70,10 +70,15 @@ class JobPostingViewSet(viewsets.ModelViewSet[JobPosting]):
         try:
             instance = serializer.save()
         except IntegrityError as exc:
+            error_message = str(exc)
             # Only treat the unique constraint on posting_fingerprint (uq_job_posting_fp)
             # as a "duplicate identity" conflict. Re-raise other integrity errors so they
             # are not incorrectly masked as duplicates.
-            if "uq_job_posting_fp" in str(exc):
+            if (
+                # PostgreSQL includes constraint name, SQLite includes column name
+                "uq_job_posting_fp" in error_message  # PostgreSQL
+                or "posting_fingerprint" in error_message  # SQLite
+            ):
                 return Response(
                     {"detail": "A job posting with the same identity already exists."},
                     status=status.HTTP_409_CONFLICT,
