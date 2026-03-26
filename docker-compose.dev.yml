@@ -33,6 +33,21 @@ services:
       - postgres
     # command: tail -f /dev/null
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend-dev
+    ports:
+      - "5173:5173"
+    env_file:
+      - frontend/.env.development
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - job-trackr
+
   postgres:
     image: postgres:16-alpine
     ports:
