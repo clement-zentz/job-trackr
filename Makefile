@@ -22,7 +22,7 @@ logs:
 	$(DC) logs
 
 down:
-	$(DC) down
+	$(DC) down --remove-orphans
 
 down-v:
 	$(DC) down -v --remove-orphans
