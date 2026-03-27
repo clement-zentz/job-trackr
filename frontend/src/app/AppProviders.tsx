@@ -1,17 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/app/AppProviders.tsx
 
-import type { ReactNode } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import type { PropsWithChildren } from "react";
 
-type AppProvidersProps = {
-  children: ReactNode;
-};
+const queryClient = new QueryClient();
 
-export function AppProviders({ children }: AppProvidersProps) {
+export function AppProviders({ children }: PropsWithChildren) {
   return (
-    <>
-      {/* Later: QueryClientProvider, ThemeProvider, etc. */}
-      {children}
-    </>
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
 }
