@@ -3,12 +3,11 @@
 
 import { createBrowserRouter } from "react-router-dom";
 import { AppLayout } from "@/app";
-import { jobOfferRoutes } from "@/features/job_offers/routes";
 import { jobPostingsRoutes } from "@/features/jobs/postings";
 
 export const router = createBrowserRouter([
   {
     element: <AppLayout />,
-    children: [...jobOfferRoutes, ...jobPostingsRoutes],
+    children: [...jobPostingsRoutes],
   },
 ]);
