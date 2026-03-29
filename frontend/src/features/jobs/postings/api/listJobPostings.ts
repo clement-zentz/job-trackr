@@ -5,6 +5,6 @@ import { api } from "@/api/client";
 import type { JobPosting } from "../types";
 
 export const listJobPostings = async (): Promise<JobPosting[]> => {
-  const response = await api.get("/v1/jobs/postings/");
+  const response = await api.get<JobPosting[]>("/v1/jobs/postings/");
   return response.data;
 };
