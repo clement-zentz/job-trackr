@@ -21,7 +21,9 @@ export function JobPostingCard({ job }: { job: JobPosting }) {
       <h2 className="font-semibold">{job.title}</h2>
       <p>{job.company}</p>
       <p className="text-sm text-gray-500">
-        {job.location ?? "Location unknown"}
+        {job.location && job.location.trim()
+          ? job.location
+          : "Location unknown"}
       </p>
       <p>{job.platform}</p>
       <p className="text-sm text-gray-500">{formatDate(job.posted_at)}</p>
