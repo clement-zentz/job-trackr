@@ -6,21 +6,11 @@ import { describe, expect, it, vi } from "vitest";
 import { useJobPostings } from "./useJobPostings";
 import * as api from "../api/listJobPostings";
 import { createWrapper } from "@/tests/utils";
+import { createJobPosting } from "@/tests/factories/jobPosting";
 
 describe("useJobPostings", () => {
   it("returns data on success", async () => {
-    const mockData = [
-      {
-        id: "myid123",
-        title: "Backend Engineer",
-        company: "Acme",
-        location: "Paris",
-        platform: "linkedin",
-        raw_url: "https://example.com/123",
-        canonical_url: "https://example.com/123",
-        posted_at: "2025-01-01T10:00:00Z",
-      },
-    ];
+    const mockData = [createJobPosting()];
 
     vi.spyOn(api, "listJobPostings").mockResolvedValue(mockData);
 
