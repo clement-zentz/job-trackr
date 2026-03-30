@@ -4,17 +4,9 @@
 import { render, screen } from "@testing-library/react";
 import { JobPostingCard } from "./JobPostingCard";
 import { describe, it, expect } from "vitest";
+import { createJobPosting } from "@/tests/factories/jobPosting";
 
-const baseJob = {
-  id: "myid123",
-  title: "Backend Engineer",
-  company: "Acme",
-  location: "Paris",
-  platform: "linkedin",
-  raw_url: "https://example.com/123",
-  canonical_url: "https://example.com/123",
-  posted_at: "2025-01-01T10:00:00Z",
-};
+const baseJob = createJobPosting();
 
 describe("JobPostingCard", () => {
   it("renders job information", () => {

@@ -5,6 +5,7 @@ import { render, screen } from "@testing-library/react";
 import { JobPostingList } from "./JobPostingList";
 import * as hook from "../hooks/useJobPostings";
 import { describe, it, expect, vi } from "vitest";
+import { createJobPosting } from "@/tests/factories/jobPosting";
 
 describe("JobPostingList", () => {
   it("renders loading state", () => {
@@ -33,23 +34,14 @@ describe("JobPostingList", () => {
 
   it("renders job list", () => {
     vi.spyOn(hook, "useJobPostings").mockReturnValue({
-      data: [
-        {
-          id: "myid123",
-          title: "Frontend Dev",
-          company: "Acme",
-          location: "Paris",
-          platform: "linkedin",
-          posted_at: "2025-01-01T10:00:00Z",
-        },
-      ],
+      data: [createJobPosting()],
       isLoading: false,
       isError: false,
     } as ReturnType<typeof hook.useJobPostings>);
 
     render(<JobPostingList />);
 
-    expect(screen.getByText("Frontend Dev")).toBeInTheDocument();
+    expect(screen.getByText("Backend Engineer")).toBeInTheDocument();
     expect(screen.getByText("Acme")).toBeInTheDocument();
   });
 });
