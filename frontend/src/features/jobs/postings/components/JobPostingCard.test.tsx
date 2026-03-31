@@ -24,9 +24,9 @@ describe("JobPostingCard", () => {
     expect(screen.getByText("Location unknown")).toBeInTheDocument();
   });
 
-  it("shows fallback when date is null", () => {
+  it("does not render date element when posted_at is null", () => {
     render(<JobPostingCard job={{ ...baseJob, posted_at: null }} />);
 
-    expect(screen.getByText("Posting date unknown")).toBeInTheDocument();
+    expect(screen.queryByTestId("job-posting-date")).not.toBeInTheDocument();
   });
 });
