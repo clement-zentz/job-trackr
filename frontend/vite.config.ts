@@ -6,6 +6,9 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig as defineVitestConfig } from "vitest/config";
 import path from "node:path";
 
+// Resolve API target depending on environment
+const API_TARGET = process.env.VITE_API_PROXY_TARGET || "http://localhost:8000";
+
 // https://vite.dev/config/
 export default defineVitestConfig({
   plugins: [react(), tailwindcss()],
@@ -13,7 +16,7 @@ export default defineVitestConfig({
     host: true,
     proxy: {
       "/api": {
-        target: "http://job-trackr:8000",
+        target: API_TARGET,
         changeOrigin: true,
       },
     },
