@@ -30,6 +30,8 @@ export default defineVitestConfig(({ mode }) => {
       globals: true,
       environment: "jsdom",
       setupFiles: "./src/setupTests.ts",
+      // Automatically reset mocks after each test
+      restoreMocks: true,
     },
     resolve: {
       alias: {
