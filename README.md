@@ -39,6 +39,16 @@ This separation allows each part to evolve independently while keeping a single 
 
 ---
 
+## Development setup
+
+This project is designed to run using Docker Compose.
+
+The frontend relies on Docker service names (e.g. `job-trackr`) for API communication, which are only resolvable inside the Docker network.
+
+👉 Running the frontend directly with `npm run dev` on the host is not currently supported.
+
+---
+
 ## 🚧 Project Status
 
 This project is under active development.
