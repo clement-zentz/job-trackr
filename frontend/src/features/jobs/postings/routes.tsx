@@ -6,7 +6,7 @@ import { JobPostingsPage } from "./pages/JobPostingsPage";
 
 export const jobPostingsRoutes: RouteObject[] = [
   {
-    path: "/postings",
+    path: "postings",
     element: <JobPostingsPage />,
   },
 ];
