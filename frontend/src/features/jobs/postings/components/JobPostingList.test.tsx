@@ -13,6 +13,9 @@ describe("JobPostingList", () => {
       data: undefined,
       isLoading: true,
       isError: false,
+      isFetching: false,
+      error: null,
+      status: "pending",
     } as ReturnType<typeof hook.useJobPostings>);
 
     render(<JobPostingList />);
@@ -25,6 +28,9 @@ describe("JobPostingList", () => {
       data: undefined,
       isLoading: false,
       isError: true,
+      isFetching: false,
+      error: new Error("Test error"),
+      status: "error",
     } as ReturnType<typeof hook.useJobPostings>);
 
     render(<JobPostingList />);
@@ -37,6 +43,9 @@ describe("JobPostingList", () => {
       data: [createJobPosting()],
       isLoading: false,
       isError: false,
+      isFetching: false,
+      error: null,
+      status: "success",
     } as ReturnType<typeof hook.useJobPostings>);
 
     render(<JobPostingList />);
