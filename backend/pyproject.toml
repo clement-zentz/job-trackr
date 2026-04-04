@@ -50,6 +50,7 @@ test = [
     "pytest-django>=4.11",
     "pytest-mock>=3.15",
     "testcontainers>=4.13",
+    "factory-boy>=3.3.3",
 ]
 
 # --- Ruff ---
@@ -105,7 +106,7 @@ exclude = [
   "apps/.*/migrations/.*\\.py$",
 ]
 
-# # Do not allow missing stubs globally; handle per-module via overrides
+# Do not allow missing stubs globally; handle per-module via overrides
 ignore_missing_imports = false
 
 [[tool.mypy.overrides]]
