@@ -99,3 +99,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "/static/"
+
+REST_FRAMEWORK = {
+    **globals().get("REST_FRAMEWORK", {}),
+    "DEFAULT_PAGINATION_CLASS": "apps.common.api.pagination.DefaultPagination",
+    "PAGE_SIZE": 20,
+}
