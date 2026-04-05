@@ -28,8 +28,14 @@ def test_list_postings(authenticated_client, job_posting):
     response = authenticated_client.get(url)
 
     assert response.status_code == status.HTTP_200_OK
-    assert len(response.data) >= 1
-    assert any(item["id"] == str(job_posting.id) for item in response.data)
+
+    # Pagination structure
+    assert "count" in response.data
+    assert "results" in response.data
+
+    # Data assertions
+    assert response.data["count"] >= 1
+    assert any(item["id"] == str(job_posting.id) for item in response.data["results"])
 
 
 def test_retrieve_posting(authenticated_client, job_posting):

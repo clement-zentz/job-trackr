@@ -48,12 +48,18 @@ def test_list_job_opportunities(authenticated_client, job_opportunity):
     assert response.status_code == 200
     data = response.json()
 
-    assert len(data) >= 1
-    assert data[0]["title"] == job_opportunity.title
-    assert data[0]["company"] == job_opportunity.company
+    # Pagination structure
+    assert "count" in data
+    assert "results" in data
 
-    assert data[0]["postings_count"] == 0
-    assert data[0]["latest_posted_at"] is None
+    results = data["results"]
+    assert data["count"] >= 1
+
+    assert results[0]["title"] == job_opportunity.title
+    assert results[0]["company"] == job_opportunity.company
+
+    assert results[0]["postings_count"] == 0
+    assert results[0]["latest_posted_at"] is None
 
 
 def test_retrieve_job_opportunity(authenticated_client, job_opportunity):
@@ -180,7 +186,9 @@ def test_inactive_opportunities_not_listed(authenticated_client):
     assert response.status_code == 200
     data = response.json()
 
-    assert data == []
+    # Pagination-aware assertion
+    assert data["count"] == 0
+    assert data["results"] == []
 
 
 def test_retrieve_inactive_opportunity_returns_404(authenticated_client):
