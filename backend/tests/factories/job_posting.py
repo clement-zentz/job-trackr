@@ -7,7 +7,13 @@ from datetime import timedelta
 import factory
 from apps.jobs.postings.models import JobPosting
 from django.utils import timezone
-from factory.declarations import Iterator, LazyAttribute, Sequence, SubFactory
+from factory.declarations import (
+    Iterator,
+    LazyAttribute,
+    LazyFunction,
+    Sequence,
+    SubFactory,
+)
 from factory.faker import Faker
 
 from tests.factories.job_opportunity import JobOpportunityFactory
@@ -33,8 +39,8 @@ class JobPostingFactory(factory.django.DjangoModelFactory):
     summary = Faker("sentence")
     description = Faker("text")
 
-    salary = str(Faker("salary"))
-    rating = random.uniform(0.0, 5.0)
+    salary = LazyFunction(lambda: f"{random.randint(30000, 120000)} €")
+    rating = Faker("pyfloat", min_value=0.0, max_value=5.0, right_digits=1)
 
     easy_apply = Faker("boolean")
     active_hiring = Faker("boolean")
