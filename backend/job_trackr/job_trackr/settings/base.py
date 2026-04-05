@@ -103,6 +103,15 @@ STATIC_URL = "/static/"
 REST_FRAMEWORK = {
     **globals().get("REST_FRAMEWORK", {}),
     "DEFAULT_PAGINATION_CLASS": "apps.common.api.pagination.DefaultPagination",
-    # NOTE: PAGE_SIZE is overridden by DefaultPagination.page_size
+    # NOTE:
+    # Pagination is enabled globally for all DRF list endpoints.
+    # This changes the response shape from a raw list to:
+    # { "count", "next", "previous", "results" }.
+    #
+    # This is intentional to ensure a consistent API contract across the backend.
+    # All tests and API consumers must use the paginated structure.
+    #
+    # `PAGE_SIZE` is kept for DRF compatibility but is overridden by
+    # DefaultPagination.page_size.
     "PAGE_SIZE": 20,
 }
