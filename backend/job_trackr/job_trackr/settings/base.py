@@ -103,5 +103,6 @@ STATIC_URL = "/static/"
 REST_FRAMEWORK = {
     **globals().get("REST_FRAMEWORK", {}),
     "DEFAULT_PAGINATION_CLASS": "apps.common.api.pagination.DefaultPagination",
+    # NOTE: PAGE_SIZE is overridden by DefaultPagination.page_size
     "PAGE_SIZE": 20,
 }
