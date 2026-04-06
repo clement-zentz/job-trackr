@@ -125,4 +125,7 @@ def test_last_page_has_no_next(authenticated_client, job_postings):
 
     response = authenticated_client.get(url, {"page": 3, "page_size": 10})
 
+    assert response.status_code == 200
+    assert len(response.data["results"]) == 10
+    assert response.data["previous"] is not None
     assert response.data["next"] is None
