@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# File: backend/tests/integration/job_trackr/models/test_job_applications.py
+# File: backend/tests/integration/models/test_job_applications.py
 
 import datetime
 

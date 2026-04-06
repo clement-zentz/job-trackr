@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# File: backend/tests/integration/job_trackr/jobs/opportunities/test_opportunities_api.py
+# File: backend/tests/integration/jobs/opportunities/test_opportunities_api.py
 
 from uuid import UUID
 

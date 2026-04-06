@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# File: backend/tests/integration/job_trackr/commands/test_process_ingested_jobs_command.py
+# File: backend/tests/integration/commands/test_process_ingested_jobs_command.py
 
 from unittest.mock import patch
 

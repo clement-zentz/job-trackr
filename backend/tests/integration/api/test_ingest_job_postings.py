@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# File: backend/tests/integration/job_trackr/api/test_ingest_job_postings.py
+# File: backend/tests/integration/api/test_ingest_job_postings.py
 
 from typing import cast
 
