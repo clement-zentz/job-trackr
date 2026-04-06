@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# File: backend/tests/integration/job_trackr/models/test_ingestion.py
+# File: backend/tests/integration/models/test_ingestion.py
 
 import pytest
 from apps.ingestion.models import IngestedJobPosting, IngestionSource, IngestionStatus

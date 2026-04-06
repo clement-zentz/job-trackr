@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# File: backend/tests/integration/job_trackr/jobs/postings/test_job_posting_pagination.py
+# File: backend/tests/integration/jobs/postings/test_job_posting_pagination.py
 
 import pytest
 from django.urls import reverse
