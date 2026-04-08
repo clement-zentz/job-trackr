@@ -4,9 +4,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { listJobPostings } from "../api/listJobPostings";
 
-export const useJobPostings = () => {
+export const useJobPostings = (page: number) => {
   return useQuery({
-    queryKey: ["job-postings"],
-    queryFn: listJobPostings,
+    queryKey: ["job-postings", page],
+    queryFn: () => listJobPostings({ page }),
+    placeholderData: (previousData) => previousData,
   });
 };

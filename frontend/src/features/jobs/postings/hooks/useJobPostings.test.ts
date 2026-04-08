@@ -7,14 +7,15 @@ import { useJobPostings } from "./useJobPostings";
 import * as api from "../api/listJobPostings";
 import { createWrapper } from "@/tests/utils";
 import { createJobPosting } from "@/tests/factories/jobPosting";
+import { createPaginatedResponse } from "@/tests/factories/paginatedResponse";
 
 describe("useJobPostings", () => {
   it("returns data on success", async () => {
-    const mockData = [createJobPosting()];
+    const mockData = createPaginatedResponse([createJobPosting()]);
 
     vi.spyOn(api, "listJobPostings").mockResolvedValue(mockData);
 
-    const { result } = renderHook(() => useJobPostings(), {
+    const { result } = renderHook(() => useJobPostings(1), {
       wrapper: createWrapper(),
     });
 
@@ -26,7 +27,7 @@ describe("useJobPostings", () => {
   it("handles error state", async () => {
     vi.spyOn(api, "listJobPostings").mockRejectedValue(new Error("API error"));
 
-    const { result } = renderHook(() => useJobPostings(), {
+    const { result } = renderHook(() => useJobPostings(1), {
       wrapper: createWrapper(),
     });
 
