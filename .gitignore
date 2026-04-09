@@ -2,7 +2,7 @@
 
 .env
 
-ignore
+private
 
 .ruff_cache
 
