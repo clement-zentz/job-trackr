@@ -16,8 +16,14 @@ export function JobPostingList({ page, onPageChange }: JobPostingListProps) {
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error loading jobs</div>;
 
-  const totalPages = Math.ceil(
-    (data?.count ?? 0) / DEFAULT_JOB_POSTINGS_PAGE_SIZE,
+  // Empty list
+  if (!data?.results.length) {
+    return <div>No Job postings found.</div>;
+  }
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil((data?.count ?? 0) / DEFAULT_JOB_POSTINGS_PAGE_SIZE),
   );
 
   return (

@@ -79,7 +79,7 @@ describe("JobPostingList pagination", () => {
     } as ReturnType<typeof hook.useJobPostings>);
   }
 
-  it("disables previous button when then is no previous page", () => {
+  it("disables previous button when there is no previous page", () => {
     mockSuccessPagination({
       previous: null,
     });
@@ -131,5 +131,24 @@ describe("JobPostingList pagination", () => {
     render(<JobPostingList page={2} onPageChange={onPageChange} />);
 
     expect(screen.getByText("Page 2 / 3")).toBeInTheDocument();
+  });
+
+  it("hides pagination and shows empty state when the list is empty", () => {
+    mockSuccessPagination({
+      count: 0,
+      results: [],
+    });
+
+    render(<JobPostingList page={1} onPageChange={onPageChange} />);
+
+    expect(screen.getByText("No Job postings found.")).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole("button", { name: /previous/i }),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByRole("button", { name: /next/i }),
+    ).not.toBeInTheDocument();
   });
 });
