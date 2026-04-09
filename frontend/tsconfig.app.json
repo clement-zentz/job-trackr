@@ -8,7 +8,9 @@
     "types": ["vite/client"],
     "skipLibCheck": true,
 
-    /* Enable Alias */
+    /* Enable alias imports
+    (do not add baseUrl: deprecated / unnecessary
+    with moduleResolution=bundler) */
     "paths": {
       "@/*": ["./src/*"]
     },
