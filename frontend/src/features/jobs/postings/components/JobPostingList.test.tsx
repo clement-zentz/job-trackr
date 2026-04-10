@@ -4,7 +4,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { JobPostingList } from "./JobPostingList";
 import * as hook from "../hooks/useJobPostings";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { createJobPosting } from "@/tests/factories/jobPosting";
 import { createPaginatedResponse } from "@/tests/factories/paginatedResponse";
 import type { PaginatedResponse } from "@/types/pagination";
@@ -64,16 +64,22 @@ describe("JobPostingList", () => {
 });
 
 describe("JobPostingList pagination", () => {
-  const onPageChange = vi.fn();
+  let onPageChange: (page: number) => void;
+
+  beforeEach(() => {
+    onPageChange = vi.fn();
+    vi.clearAllMocks();
+  });
 
   function mockSuccessPagination(
     overrides: Partial<PaginatedResponse<JobPosting>> = {},
+    options?: { isFetching?: boolean },
   ) {
     vi.spyOn(hook, "useJobPostings").mockReturnValue({
       data: createPaginatedResponse([createJobPosting()], overrides),
       isLoading: false,
       isError: false,
-      isFetching: false,
+      isFetching: options?.isFetching ?? false,
       error: null,
       status: "success",
     } as ReturnType<typeof hook.useJobPostings>);
@@ -141,7 +147,7 @@ describe("JobPostingList pagination", () => {
 
     render(<JobPostingList page={1} onPageChange={onPageChange} />);
 
-    expect(screen.getByText("No Job postings found.")).toBeInTheDocument();
+    expect(screen.getByText("No job postings found.")).toBeInTheDocument();
 
     expect(
       screen.queryByRole("button", { name: /previous/i }),
@@ -150,5 +156,29 @@ describe("JobPostingList pagination", () => {
     expect(
       screen.queryByRole("button", { name: /next/i }),
     ).not.toBeInTheDocument();
+  });
+
+  it("shows loading indicator while fetching a new page", () => {
+    mockSuccessPagination({}, { isFetching: true });
+
+    render(<JobPostingList page={2} onPageChange={onPageChange} />);
+
+    expect(screen.getByText(/loading page/i)).toBeInTheDocument();
+  });
+
+  it("disables pagination buttons while fetching a new page", () => {
+    mockSuccessPagination(
+      {
+        previous: "http://api.test?page=1",
+        next: "http://api.test?page=3",
+      },
+      { isFetching: true },
+    );
+
+    render(<JobPostingList page={2} onPageChange={onPageChange} />);
+
+    expect(screen.getByRole("button", { name: /previous/i })).toBeDisabled();
+
+    expect(screen.getByRole("button", { name: /next/i })).toBeDisabled();
   });
 });
