@@ -11,14 +11,14 @@ interface JobPostingListProps {
 }
 
 export function JobPostingList({ page, onPageChange }: JobPostingListProps) {
-  const { data, isLoading, isError } = useJobPostings(page);
+  const { data, isLoading, isError, isFetching } = useJobPostings(page);
 
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error loading jobs</div>;
 
   // Empty list
   if (!data?.results.length) {
-    return <div>No Job postings found.</div>;
+    return <div>No job postings found.</div>;
   }
 
   const totalPages = Math.max(
@@ -28,6 +28,10 @@ export function JobPostingList({ page, onPageChange }: JobPostingListProps) {
 
   return (
     <div className="space-y-4">
+      {isFetching && (
+        <div className="text-sm text-muted-foreground">Loading page...</div>
+      )}
+
       {data?.results.map((job) => (
         <JobPostingCard key={job.id} job={job} />
       ))}
@@ -35,7 +39,7 @@ export function JobPostingList({ page, onPageChange }: JobPostingListProps) {
       <div className="flex items-center justify-between pt-4">
         <button
           onClick={() => onPageChange(page - 1)}
-          disabled={!data?.previous}
+          disabled={!data?.previous || isFetching}
           className="rounded border px-4 py-2 disabled:opacity-50"
         >
           Previous
@@ -47,7 +51,7 @@ export function JobPostingList({ page, onPageChange }: JobPostingListProps) {
 
         <button
           onClick={() => onPageChange(page + 1)}
-          disabled={!data?.next}
+          disabled={!data?.next || isFetching}
           className="rounded border px-4 py-2 disabled:opacity-50"
         >
           Next
