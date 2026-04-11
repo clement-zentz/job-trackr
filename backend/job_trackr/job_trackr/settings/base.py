@@ -27,6 +27,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # Filter
+    "django_filters",
     # DRF
     "rest_framework",
     # domain apps

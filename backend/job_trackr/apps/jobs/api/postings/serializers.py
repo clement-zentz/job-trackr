@@ -18,6 +18,8 @@ class JobPostingListSerializer(serializers.ModelSerializer[JobPosting]):
             "raw_url",
             "canonical_url",
             "posted_at",
+            "easy_apply",
+            "active_hiring",
         ]
         read_only_fields = tuple(fields)
 

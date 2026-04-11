@@ -5,7 +5,8 @@ from typing import Any
 
 from django.db import IntegrityError
 from django.db.models import QuerySet
-from rest_framework import serializers, status, viewsets
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, serializers, status, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
@@ -13,6 +14,7 @@ from rest_framework.response import Response
 
 from apps.jobs.postings.models import JobPosting
 
+from .filters import JobPostingFilter
 from .serializers import (
     JobPostingDetailSerializer,
     JobPostingListSerializer,
@@ -33,6 +35,33 @@ class JobPostingViewSet(viewsets.ModelViewSet[JobPosting]):
 
     authentication_classes = [SessionAuthentication]
     permission_classes = [IsAuthenticated]
+
+    # --- Search, Order, Filter ---
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter,
+    ]
+    filterset_class = JobPostingFilter
+
+    search_fields = [
+        "title",
+        "company",
+        "location",
+        "summary",
+        "description",
+    ]
+
+    ordering_fields = [
+        "posted_at",
+        "created_at",
+        "updated_at",
+        "company",
+        "title",
+        "platform",
+        "rating",
+    ]
+    ordering = ["-posted_at", "-created_at"]
 
     # -------------------------
     # Querysets
