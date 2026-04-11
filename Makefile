@@ -2,7 +2,7 @@
 .PHONY: up build build-nc restart logs down down-v bash psql \
 manage migrations migrate superuser django-check ingest-jobs process-jobs \
 fixtures samples \
-cov mypy-trackr mypy-extraction
+cov mypy-trackr mypy-extraction sync
 
 DC=docker compose -f docker-compose.dev.yml
 
@@ -70,6 +70,7 @@ fixtures:
 samples:
 	cd backend && PYTHONPATH=. python3 -m scripts.python.generate_samples
 
+# ---  Extra ---
 cov:
 	pytest --cov=app --cov-report=term-missing
 
@@ -79,3 +80,6 @@ mypy-trackr:
 mypy-extraction:
 	$(DC) exec -w /app/job_extraction job-extraction mypy \
 	--config-file mypy.ini .
+
+sync:
+	cd backend && uv sync --all-groups
