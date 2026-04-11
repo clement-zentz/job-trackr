@@ -68,6 +68,13 @@ class JobPosting(models.Model):
     class Meta:
         db_table = "job_posting"
         ordering = ["-posted_at"]
+        indexes = [
+            models.Index(fields=["platform"], name="idx_job_post_platform"),
+            models.Index(fields=["easy_apply"], name="idx_job_post_easy"),
+            models.Index(fields=["active_hiring"], name="idx_job_post_active"),
+            models.Index(fields=["posted_at"], name="idx_job_post_posted"),
+            models.Index(fields=["company"], name="idx_job_post_company"),
+        ]
         constraints = [
             models.UniqueConstraint(
                 fields=["posting_fingerprint"],
