@@ -10,7 +10,7 @@ class JobPostingFilter(filters.FilterSet):
     company = filters.CharFilter(field_name="company", lookup_expr="icontains")
     title = filters.CharFilter(field_name="title", lookup_expr="icontains")
     location = filters.CharFilter(field_name="location", lookup_expr="icontains")
-    platform = filters.CharFilter(field_name="platform", lookup_expr="iexact")
+    platform = filters.CharFilter(field_name="platform", lookup_expr="exact")
 
     easy_apply = filters.BooleanFilter(field_name="easy_apply")
     active_hiring = filters.BooleanFilter(field_name="active_hiring")
@@ -39,11 +39,9 @@ class JobPostingFilter(filters.FilterSet):
         ]
 
     def filter_has_salary(self, queryset, name, value):  # type: ignore[no-untyped-def]
-        if value is True:
+        if value:
             return queryset.exclude(salary="")
-        if value is False:
-            return queryset.filter(salary="")
-        return queryset
+        return queryset.filter(salary="")
 
     def filter_has_job_opportunity(self, queryset, name, value):  # type: ignore[no-untyped-def]
         if value is True:
