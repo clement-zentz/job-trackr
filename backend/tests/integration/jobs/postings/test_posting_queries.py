@@ -7,6 +7,7 @@ import pytest
 from django.urls import reverse
 from django.utils import timezone
 
+from tests.factories.job_opportunity import JobOpportunityFactory
 from tests.factories.job_posting import JobPostingFactory
 
 pytestmark = pytest.mark.django_db
@@ -124,7 +125,7 @@ def test_list_job_postings_filters_by_posted_at_before(authenticated_client):
     assert str(recent_posting.id) not in returned_ids
 
 
-def test_list_postings_supports_ordering_by_posted_at_desc(authenticated_client):
+def test_list_job_postings_supports_ordering_by_posted_at_desc(authenticated_client):
     older = JobPostingFactory(
         posted_at=timezone.now() - timedelta(days=10),
     )
@@ -200,3 +201,77 @@ def test_list_job_postings_combines_search_filters_and_ordering(authenticated_cl
 
     assert results[0]["id"] == str(matching_new.id)
     assert results[1]["id"] == str(matching_old.id)
+
+
+@pytest.mark.parametrize(
+    "has_salary, expected_with_salary, expected_without_salary",
+    [
+        (True, True, False),
+        (False, False, True),
+    ],
+)
+def test_list_job_postings_by_has_salary(
+    authenticated_client,
+    has_salary,
+    expected_with_salary,
+    expected_without_salary,
+):
+    with_salary = JobPostingFactory(salary="5000 €")
+    without_salary = JobPostingFactory(salary="")
+
+    response = authenticated_client.get(
+        reverse("job-posting-list"),
+        {"has_salary": has_salary},
+    )
+
+    assert response.status_code == 200
+
+    returned_ids = {item["id"] for item in response.data["results"]}
+
+    if expected_with_salary:
+        assert str(with_salary.id) in returned_ids
+    else:
+        assert str(with_salary.id) not in returned_ids
+
+    if expected_without_salary:
+        assert str(without_salary.id) in returned_ids
+    else:
+        assert str(without_salary.id) not in returned_ids
+
+
+@pytest.mark.parametrize(
+    "has_job_opportunity, expected_with_job_opportunity, expected_without_job_opportunity",
+    [
+        (True, True, False),
+        (False, False, True),
+    ],
+)
+def test_list_job_postings_by_has_job_opportunity(
+    authenticated_client,
+    has_job_opportunity,
+    expected_with_job_opportunity,
+    expected_without_job_opportunity,
+):
+    job_opportunity = JobOpportunityFactory()
+
+    with_job_opportunity = JobPostingFactory(job_opportunity=job_opportunity)
+    without_job_opportunity = JobPostingFactory(job_opportunity=None)
+
+    response = authenticated_client.get(
+        reverse("job-posting-list"),
+        {"has_job_opportunity": has_job_opportunity},
+    )
+
+    assert response.status_code == 200
+
+    returned_ids = {item["id"] for item in response.data["results"]}
+
+    if expected_with_job_opportunity:
+        assert str(with_job_opportunity.id) in returned_ids
+    else:
+        assert str(with_job_opportunity.id) not in returned_ids
+
+    if expected_without_job_opportunity:
+        assert str(without_job_opportunity.id) in returned_ids
+    else:
+        assert str(without_job_opportunity.id) not in returned_ids
