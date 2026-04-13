@@ -275,3 +275,68 @@ def test_list_job_postings_by_has_job_opportunity(
         assert str(without_job_opportunity.id) in returned_ids
     else:
         assert str(without_job_opportunity.id) not in returned_ids
+
+
+def test_list_job_postings_filters_by_rating_min(authenticated_client):
+    low = JobPostingFactory(rating=2.0)
+    high = JobPostingFactory(rating=4.5)
+
+    response = authenticated_client.get(
+        reverse("job-posting-list"),
+        {"rating_min": 3.0},
+    )
+
+    returned_ids = {item["id"] for item in response.data["results"]}
+
+    assert str(high.id) in returned_ids
+    assert str(low.id) not in returned_ids
+
+
+def test_list_job_postings_filters_by_rating_max(authenticated_client):
+    low = JobPostingFactory(rating=2.0)
+    high = JobPostingFactory(rating=4.5)
+
+    response = authenticated_client.get(
+        reverse("job-posting-list"),
+        {"rating_max": 3.0},
+    )
+
+    returned_ids = {item["id"] for item in response.data["results"]}
+
+    assert str(low.id) in returned_ids
+    assert str(high.id) not in returned_ids
+
+
+def test_list_job_postings_filters_by_company_icontains(authenticated_client):
+    matching = JobPostingFactory(company="OpenAI")
+    no_matching = JobPostingFactory(company="Google")
+
+    response = authenticated_client.get(
+        reverse("job-posting-list"),
+        {"company": "open"},  # case-insensitive partial
+    )
+
+    returned_ids = {item["id"] for item in response.data["results"]}
+
+    assert str(matching.id) in returned_ids
+    assert str(no_matching.id) not in returned_ids
+
+
+def test_list_job_postings_combines_rating_and_company_filters(authenticated_client):
+    matching = JobPostingFactory(company="OpenAI", rating=4.5)
+    no_matching1 = JobPostingFactory(company="OpenAI", rating=2.0)
+    no_matching2 = JobPostingFactory(company="Google", rating=4.5)
+
+    response = authenticated_client.get(
+        reverse("job-posting-list"),
+        {
+            "company": "open",
+            "rating_min": 4.0,
+        },
+    )
+
+    returned_ids = {item["id"] for item in response.data["results"]}
+
+    assert str(matching.id) in returned_ids
+    assert str(no_matching1.id) not in returned_ids
+    assert str(no_matching2.id) not in returned_ids
