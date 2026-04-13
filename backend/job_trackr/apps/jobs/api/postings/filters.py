@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/job_trackr/apps/jobs/api/postings/filters.py
 
+from django.db.models import QuerySet
 from django_filters import rest_framework as filters
 
 from apps.jobs.postings.models import JobPosting
@@ -38,14 +39,22 @@ class JobPostingFilter(filters.FilterSet):
             "active_hiring",
         ]
 
-    def filter_has_salary(self, queryset, name, value):  # type: ignore[no-untyped-def]
+    def filter_has_salary(
+        self,
+        queryset: QuerySet[JobPosting],
+        name: str,
+        value: bool,
+    ) -> QuerySet[JobPosting]:
         if value:
             return queryset.exclude(salary="")
         return queryset.filter(salary="")
 
-    def filter_has_job_opportunity(self, queryset, name, value):  # type: ignore[no-untyped-def]
-        if value is True:
+    def filter_has_job_opportunity(
+        self,
+        queryset: QuerySet[JobPosting],
+        name: str,
+        value: bool,
+    ) -> QuerySet[JobPosting]:
+        if value:
             return queryset.filter(job_opportunity__isnull=False)
-        if value is False:
-            return queryset.filter(job_opportunity__isnull=True)
-        return queryset
+        return queryset.filter(job_opportunity__isnull=True)
