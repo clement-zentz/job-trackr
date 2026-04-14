@@ -210,7 +210,7 @@ def test_list_job_postings_combines_search_filters_and_ordering(authenticated_cl
         (False, False, True),
     ],
 )
-def test_list_job_postings_by_has_salary(
+def test_list_job_postings_filters_by_has_salary(
     authenticated_client,
     has_salary,
     expected_with_salary,
@@ -246,7 +246,7 @@ def test_list_job_postings_by_has_salary(
         (False, False, True),
     ],
 )
-def test_list_job_postings_by_has_job_opportunity(
+def test_list_job_postings_filters_by_has_job_opportunity(
     authenticated_client,
     has_job_opportunity,
     expected_with_job_opportunity,

@@ -73,6 +73,9 @@ class JobPosting(models.Model):
             models.Index(fields=["easy_apply"], name="idx_job_post_easy"),
             models.Index(fields=["active_hiring"], name="idx_job_post_active"),
             models.Index(fields=["posted_at"], name="idx_job_post_posted"),
+            # Note: `company` is filtered using `icontains` (ILIKE '%...%'),
+            # so this btree index is not used for that query pattern.
+            # It is kept for potential exact/prefix queries and general use.
             models.Index(fields=["company"], name="idx_job_post_company"),
         ]
         constraints = [
