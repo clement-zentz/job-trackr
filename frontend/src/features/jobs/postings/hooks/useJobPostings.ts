@@ -3,11 +3,12 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { listJobPostings } from "../api/listJobPostings";
+import type { JobPostingListParams } from "../types";
 
-export const useJobPostings = (page: number) => {
+export const useJobPostings = (params: JobPostingListParams) => {
   return useQuery({
-    queryKey: ["job-postings", page],
-    queryFn: () => listJobPostings({ page }),
+    queryKey: ["job-postings", params],
+    queryFn: () => listJobPostings(params),
     placeholderData: (previousData) => previousData,
   });
 };
