@@ -11,3 +11,23 @@ export interface JobPosting {
   canonical_url: string;
   posted_at: string | null;
 }
+
+/*
+Query params for listing job postings
+(maps directly to DRF query params)
+*/
+export interface JobPostingListParams {
+  page?: number;
+  pageSize?: number;
+
+  search?: string;
+
+  company?: string;
+  location?: string;
+  platform?: string;
+
+  easy_apply?: boolean;
+  active_hiring?: boolean;
+
+  ordering?: string; // "-posted_at", "company", etc.
+}
