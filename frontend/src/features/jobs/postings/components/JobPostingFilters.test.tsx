@@ -4,22 +4,20 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { JobPostingFilters } from "./JobPostingFilters";
-import type { JobPostingFilters as Filters } from "../hooks/useJobPostingFilters";
+import type { JobPostingFilters as Filters } from "../types";
 
 const defaultParams: Filters = {
-  page: 1,
-  pageSize: 10,
   ordering: "-posted_at",
 };
 
 describe("JobPostingFilters", () => {
   it("updates search input", () => {
-    const updateParam = vi.fn();
+    const updateFilter = vi.fn();
 
     render(
       <JobPostingFilters
         params={defaultParams}
-        updateParam={updateParam}
+        updateFilter={updateFilter}
         resetFilters={vi.fn()}
       />,
     );
@@ -28,16 +26,16 @@ describe("JobPostingFilters", () => {
       target: { value: "python" },
     });
 
-    expect(updateParam).toHaveBeenCalledWith("search", "python");
+    expect(updateFilter).toHaveBeenCalledWith("search", "python");
   });
 
   it("updates platform filter", () => {
-    const updateParam = vi.fn();
+    const updateFilter = vi.fn();
 
     render(
       <JobPostingFilters
         params={defaultParams}
-        updateParam={updateParam}
+        updateFilter={updateFilter}
         resetFilters={vi.fn()}
       />,
     );
@@ -46,16 +44,16 @@ describe("JobPostingFilters", () => {
       target: { value: "linkedin" },
     });
 
-    expect(updateParam).toHaveBeenCalledWith("platform", "linkedin");
+    expect(updateFilter).toHaveBeenCalledWith("platform", "linkedin");
   });
 
   it("update boolean filters", () => {
-    const updateParam = vi.fn();
+    const updateFilter = vi.fn();
 
     render(
       <JobPostingFilters
         params={defaultParams}
-        updateParam={updateParam}
+        updateFilter={updateFilter}
         resetFilters={vi.fn()}
       />,
     );
@@ -64,7 +62,7 @@ describe("JobPostingFilters", () => {
       target: { value: "true" },
     });
 
-    expect(updateParam).toHaveBeenCalledWith("easy_apply", true);
+    expect(updateFilter).toHaveBeenCalledWith("easy_apply", true);
   });
 
   it("calls resetFilters when reset button is clicked", () => {
@@ -73,7 +71,7 @@ describe("JobPostingFilters", () => {
     render(
       <JobPostingFilters
         params={defaultParams}
-        updateParam={vi.fn()}
+        updateFilter={vi.fn()}
         resetFilters={resetFilters}
       />,
     );

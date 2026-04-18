@@ -8,10 +8,9 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { createJobPosting } from "@/tests/factories/jobPosting";
 import { createPaginatedResponse } from "@/tests/factories/paginatedResponse";
 import type { PaginatedResponse } from "@/types/pagination";
-import type { JobPosting } from "../types";
-import type { JobPostingFilters } from "../hooks/useJobPostingFilters";
+import type { JobPosting, JobPostingListParams } from "../types";
 
-const defaultParams: JobPostingFilters = {
+const defaultParams: JobPostingListParams = {
   page: 1,
   pageSize: 10,
   ordering: "-posted_at",
@@ -78,8 +77,8 @@ describe("JobPostingList pagination", () => {
     vi.clearAllMocks();
   });
 
-  function renderWithParams(overrides: Partial<JobPostingFilters> = {}) {
-    const params: JobPostingFilters = {
+  function renderWithParams(overrides: Partial<JobPostingListParams> = {}) {
+    const params: JobPostingListParams = {
       ...defaultParams,
       ...overrides,
     };

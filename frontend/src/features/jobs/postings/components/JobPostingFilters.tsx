@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/features/jobs/postings/components/JobPostingFilters.tsx
 
-import type { JobPostingFilters } from "../hooks/useJobPostingFilters";
+import type { JobPostingFilters } from "../types";
 
 interface JobPostingFiltersProps {
   params: JobPostingFilters;
-  updateParam: <K extends keyof JobPostingFilters>(
+  updateFilter: <K extends keyof JobPostingFilters>(
     key: K,
     value: JobPostingFilters[K],
   ) => void;
@@ -14,7 +14,7 @@ interface JobPostingFiltersProps {
 
 export function JobPostingFilters({
   params,
-  updateParam,
+  updateFilter,
   resetFilters,
 }: JobPostingFiltersProps) {
   return (
@@ -32,7 +32,7 @@ export function JobPostingFilters({
           type="text"
           placeholder="Search jobs..."
           value={params.search ?? ""}
-          onChange={(e) => updateParam("search", e.target.value)}
+          onChange={(e) => updateFilter("search", e.target.value)}
           className="w-full rounded border px-3 py-2"
         />
       </div>
@@ -48,7 +48,7 @@ export function JobPostingFilters({
             id="platform"
             value={params.platform ?? ""}
             onChange={(e) =>
-              updateParam("platform", e.target.value || undefined)
+              updateFilter("platform", e.target.value || undefined)
             }
             className="rounded border px-3 py-2"
           >
@@ -73,7 +73,7 @@ export function JobPostingFilters({
                   : "false"
             }
             onChange={(e) =>
-              updateParam(
+              updateFilter(
                 "easy_apply",
                 e.target.value === "" ? undefined : e.target.value === "true",
               )
@@ -101,7 +101,7 @@ export function JobPostingFilters({
                   : "false"
             }
             onChange={(e) =>
-              updateParam(
+              updateFilter(
                 "active_hiring",
                 e.target.value === "" ? undefined : e.target.value === "true",
               )
@@ -122,7 +122,7 @@ export function JobPostingFilters({
           <select
             id="ordering"
             value={params.ordering ?? "-posted_at"}
-            onChange={(e) => updateParam("ordering", e.target.value)}
+            onChange={(e) => updateFilter("ordering", e.target.value)}
             className="rounded border px-3 py-2"
           >
             <option value="-posted_at">Newest</option>

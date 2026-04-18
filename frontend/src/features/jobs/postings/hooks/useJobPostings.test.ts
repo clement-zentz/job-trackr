@@ -8,9 +8,9 @@ import * as api from "../api/listJobPostings";
 import { createWrapper } from "@/tests/utils";
 import { createJobPosting } from "@/tests/factories/jobPosting";
 import { createPaginatedResponse } from "@/tests/factories/paginatedResponse";
-import type { JobPostingFilters } from "./useJobPostingFilters";
+import type { JobPostingListParams } from "../types";
 
-const defaultParams: JobPostingFilters = {
+const defaultParams: JobPostingListParams = {
   page: 1,
   pageSize: 10,
   ordering: "-posted_at",
