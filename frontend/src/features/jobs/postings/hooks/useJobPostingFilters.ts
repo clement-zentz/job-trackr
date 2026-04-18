@@ -2,58 +2,48 @@
 // File: frontend/src/features/jobs/postings/hooks/useJobPostingFilters.ts
 
 import { useState } from "react";
-
-export interface JobPostingFilters {
-  page: number;
-  pageSize: number;
-
-  search?: string;
-
-  company?: string;
-  location?: string;
-  platform?: string;
-
-  easy_apply?: boolean;
-  active_hiring?: boolean;
-
-  ordering?: string;
-}
+import type { JobPostingFilters } from "../types";
 
 const DEFAULT_FILTERS: JobPostingFilters = {
-  page: 1,
-  pageSize: 10,
   ordering: "-posted_at",
 };
 
 export const useJobPostingFilters = () => {
-  const [params, setParams] = useState<JobPostingFilters>(DEFAULT_FILTERS);
+  const [filters, setFilters] = useState<JobPostingFilters>(DEFAULT_FILTERS);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   /**
-   * Generic helper to update a single param
+   * Update a single filter value and reset page to 1
    */
-  const updateParam = <K extends keyof JobPostingFilters>(
+  const updateFilter = <K extends keyof JobPostingFilters>(
     key: K,
     value: JobPostingFilters[K],
   ) => {
-    setParams((prev) => ({
+    setFilters((prev) => ({
       ...prev,
       [key]: value,
-      // Reset page when filters change (except page itself)
-      ...(key !== "page" ? { page: 1 } : {}),
     }));
+
+    // Reset page when filters change
+    setPage(1);
   };
 
   /**
    * Reset all filters (except page size)
    */
   const resetFilters = () => {
-    setParams(DEFAULT_FILTERS);
+    setFilters(DEFAULT_FILTERS);
+    setPage(1);
   };
 
   return {
-    params,
-    setParams,
-    updateParam,
+    filters,
+    page,
+    pageSize,
+    setPage,
+    setPageSize,
+    updateFilter,
     resetFilters,
   };
 };

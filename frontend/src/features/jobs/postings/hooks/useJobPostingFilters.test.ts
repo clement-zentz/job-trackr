@@ -10,58 +10,73 @@ describe("useJobPostingFilters", () => {
   it("initializes with default filters", () => {
     const { result } = renderHook(() => useJobPostingFilters());
 
-    expect(result.current.params).toEqual({
-      page: 1,
-      pageSize: 10,
+    expect(result.current.filters).toEqual({
       ordering: "-posted_at",
     });
+
+    expect(result.current.page).toBe(1);
+    expect(result.current.pageSize).toBe(10);
   });
 
-  it("update a filter and resets page", () => {
+  it("updates a filter and resets page", () => {
     const { result } = renderHook(() => useJobPostingFilters());
 
+    // Move to another page first
     act(() => {
-      result.current.updateParam("search", "python");
+      result.current.setPage(3);
     });
 
-    expect(result.current.params).toMatchObject({
+    // Update a filter
+    act(() => {
+      result.current.updateFilter("search", "python");
+    });
+
+    expect(result.current.filters).toMatchObject({
       search: "python",
-      page: 1, // reset
     });
+
+    expect(result.current.page).toBe(1); // reset
   });
 
-  it("does not reset page when updating page", () => {
+  it("update page without affecting filters", () => {
     const { result } = renderHook(() => useJobPostingFilters());
 
     act(() => {
-      result.current.updateParam("page", 3);
+      result.current.setPage(3);
     });
 
-    expect(result.current.params.page).toBe(3);
+    expect(result.current.page).toBe(3);
+    expect(result.current.filters).toEqual({
+      ordering: "-posted_at",
+    });
   });
 
   it("update boolean filters correctly", () => {
     const { result } = renderHook(() => useJobPostingFilters());
 
     act(() => {
-      result.current.updateParam("easy_apply", true);
+      result.current.updateFilter("easy_apply", true);
     });
 
-    expect(result.current.params.easy_apply).toBe(true);
+    expect(result.current.filters.easy_apply).toBe(true);
   });
 
-  it("reset all filters", () => {
+  it("reset filters and page", () => {
     const { result } = renderHook(() => useJobPostingFilters());
 
     act(() => {
-      result.current.updateParam("search", "python");
+      result.current.updateFilter("search", "python");
+      result.current.setPage(3);
+    });
+
+    act(() => {
       result.current.resetFilters();
     });
 
-    expect(result.current.params).toEqual({
-      page: 1,
-      pageSize: 10,
+    expect(result.current.filters).toEqual({
       ordering: "-posted_at",
     });
+
+    expect(result.current.page).toBe(1);
   });
 });
