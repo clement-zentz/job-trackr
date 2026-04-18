@@ -15,7 +15,7 @@ describe("useJobPostingFilters", () => {
     });
 
     expect(result.current.page).toBe(1);
-    expect(result.current.pageSize).toBe(10);
+    expect(result.current.pageSize).toBe(20);
   });
 
   it("updates a filter and resets page", () => {
