@@ -11,12 +11,23 @@ export function normalizeJobPostingParams(
 
   const cleanedParams = Object.fromEntries(
     Object.entries(rest).filter(
-      ([, value]) => value !== "" && value !== undefined,
+      ([, value]) =>
+        value !== undefined &&
+        !(typeof value === "string" && value.trim() === ""),
     ),
-  );
+  ) as Partial<JobPostingListParams>;
+
+  // Extract camelCase fields that need mapping
+  const { easyApply, activeHiring, ...restCleaned } = cleanedParams;
 
   return {
-    ...cleanedParams,
+    ...restCleaned,
+
+    // Explicit camelCase → snake_case mapping
+    ...(easyApply !== undefined && { easy_apply: easyApply }),
+    ...(activeHiring !== undefined && { active_hiring: activeHiring }),
+
+    // Pagination (always defined)
     page: page ?? 1,
     page_size: pageSize ?? DEFAULT_JOB_POSTINGS_PAGE_SIZE,
   };
