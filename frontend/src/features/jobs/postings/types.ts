@@ -32,8 +32,8 @@ export interface JobPostingListParams {
   location?: string;
   platform?: string;
 
-  easy_apply?: boolean;
-  active_hiring?: boolean;
+  easyApply?: boolean;
+  activeHiring?: boolean;
 
   ordering?: string; // "-posted_at", "company", etc.
 }

@@ -62,7 +62,7 @@ describe("JobPostingFilters", () => {
       target: { value: "true" },
     });
 
-    expect(updateFilter).toHaveBeenCalledWith("easy_apply", true);
+    expect(updateFilter).toHaveBeenCalledWith("easyApply", true);
   });
 
   it("calls resetFilters when reset button is clicked", () => {

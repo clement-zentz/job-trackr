@@ -60,21 +60,21 @@ export function JobPostingFilters({
 
         {/* Easy apply */}
         <div>
-          <label htmlFor="easy_apply" className="sr-only">
+          <label htmlFor="easyApply" className="sr-only">
             Easy apply
           </label>
           <select
-            id="easy_apply"
+            id="easyApply"
             value={
-              params.easy_apply === undefined
+              params.easyApply === undefined
                 ? ""
-                : params.easy_apply
+                : params.easyApply
                   ? "true"
                   : "false"
             }
             onChange={(e) =>
               updateFilter(
-                "easy_apply",
+                "easyApply",
                 e.target.value === "" ? undefined : e.target.value === "true",
               )
             }
@@ -88,21 +88,21 @@ export function JobPostingFilters({
 
         {/* Active hiring */}
         <div>
-          <label htmlFor="active_hiring" className="sr-only">
+          <label htmlFor="activeHiring" className="sr-only">
             Active hiring
           </label>
           <select
-            id="active_hiring"
+            id="activeHiring"
             value={
-              params.active_hiring === undefined
+              params.activeHiring === undefined
                 ? ""
-                : params.active_hiring
+                : params.activeHiring
                   ? "true"
                   : "false"
             }
             onChange={(e) =>
               updateFilter(
-                "active_hiring",
+                "activeHiring",
                 e.target.value === "" ? undefined : e.target.value === "true",
               )
             }

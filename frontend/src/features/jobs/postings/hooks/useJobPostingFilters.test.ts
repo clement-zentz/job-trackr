@@ -56,10 +56,10 @@ describe("useJobPostingFilters", () => {
     const { result } = renderHook(() => useJobPostingFilters());
 
     act(() => {
-      result.current.updateFilter("easy_apply", true);
+      result.current.updateFilter("easyApply", true);
     });
 
-    expect(result.current.filters.easy_apply).toBe(true);
+    expect(result.current.filters.easyApply).toBe(true);
   });
 
   it("reset filters and page", () => {
