@@ -8,11 +8,18 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { createJobPosting } from "@/tests/factories/jobPosting";
 import { createPaginatedResponse } from "@/tests/factories/paginatedResponse";
 import type { PaginatedResponse } from "@/types/pagination";
-import type { JobPosting } from "../types";
+import type { JobPosting, JobPostingListParams } from "../types";
+import { DEFAULT_JOB_POSTINGS_PAGE_SIZE } from "../constants";
+
+const defaultParams: JobPostingListParams = {
+  page: 1,
+  pageSize: DEFAULT_JOB_POSTINGS_PAGE_SIZE,
+  ordering: "-posted_at",
+};
 
 describe("JobPostingList", () => {
   const defaultProps = {
-    page: 1,
+    params: defaultParams,
     onPageChange: vi.fn(),
   };
 
@@ -71,6 +78,17 @@ describe("JobPostingList pagination", () => {
     vi.clearAllMocks();
   });
 
+  function renderWithParams(overrides: Partial<JobPostingListParams> = {}) {
+    const params: JobPostingListParams = {
+      ...defaultParams,
+      ...overrides,
+    };
+
+    return render(
+      <JobPostingList params={params} onPageChange={onPageChange} />,
+    );
+  }
+
   function mockSuccessPagination(
     overrides: Partial<PaginatedResponse<JobPosting>> = {},
     options?: { isFetching?: boolean },
@@ -90,7 +108,7 @@ describe("JobPostingList pagination", () => {
       previous: null,
     });
 
-    render(<JobPostingList page={1} onPageChange={onPageChange} />);
+    renderWithParams({ page: 1 });
 
     expect(screen.getByRole("button", { name: /previous/i })).toBeDisabled();
   });
@@ -100,7 +118,7 @@ describe("JobPostingList pagination", () => {
       next: null,
     });
 
-    render(<JobPostingList page={2} onPageChange={onPageChange} />);
+    renderWithParams({ page: 2 });
 
     expect(screen.getByRole("button", { name: /next/i })).toBeDisabled();
   });
@@ -110,7 +128,7 @@ describe("JobPostingList pagination", () => {
       next: "http://api.test?page=2",
     });
 
-    render(<JobPostingList page={1} onPageChange={onPageChange} />);
+    renderWithParams({ page: 1 });
 
     fireEvent.click(screen.getByRole("button", { name: /next/i }));
 
@@ -122,7 +140,7 @@ describe("JobPostingList pagination", () => {
       previous: "http://api.test?page=1",
     });
 
-    render(<JobPostingList page={2} onPageChange={onPageChange} />);
+    renderWithParams({ page: 2 });
 
     fireEvent.click(screen.getByRole("button", { name: /previous/i }));
 
@@ -134,7 +152,7 @@ describe("JobPostingList pagination", () => {
       count: 45,
     });
 
-    render(<JobPostingList page={2} onPageChange={onPageChange} />);
+    renderWithParams({ page: 2, pageSize: 20 });
 
     expect(screen.getByText("Page 2 / 3")).toBeInTheDocument();
   });
@@ -145,7 +163,7 @@ describe("JobPostingList pagination", () => {
       results: [],
     });
 
-    render(<JobPostingList page={1} onPageChange={onPageChange} />);
+    renderWithParams({ page: 1 });
 
     expect(screen.getByText("No job postings found.")).toBeInTheDocument();
 
@@ -161,7 +179,7 @@ describe("JobPostingList pagination", () => {
   it("shows loading indicator while fetching a new page", () => {
     mockSuccessPagination({}, { isFetching: true });
 
-    render(<JobPostingList page={2} onPageChange={onPageChange} />);
+    renderWithParams({ page: 2 });
 
     expect(screen.getByText(/loading page/i)).toBeInTheDocument();
   });
@@ -175,7 +193,7 @@ describe("JobPostingList pagination", () => {
       { isFetching: true },
     );
 
-    render(<JobPostingList page={2} onPageChange={onPageChange} />);
+    renderWithParams({ page: 2 });
 
     expect(screen.getByRole("button", { name: /previous/i })).toBeDisabled();
 
