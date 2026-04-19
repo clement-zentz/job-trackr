@@ -14,13 +14,13 @@ interface JobPostingListProps {
 export function JobPostingList({ params, onPageChange }: JobPostingListProps) {
   const { data, isLoading, isError, isFetching } = useJobPostings(params);
 
-  // Error state
-  if (isError) return <div>Error loading jobs</div>;
+  // 🚫 Blocking error: no data at all
+  if (isError && !data) return <div>Error loading jobs</div>;
 
-  // Loading state
-  if (isLoading || (!data && !isError)) return <div>Loading...</div>;
+  // ⏳ Initial loading
+  if (isLoading && !data) return <div>Loading...</div>;
 
-  // Empty state
+  // 📭 Empty state
   if (!data?.results.length) {
     return <div>No job postings found.</div>;
   }
@@ -31,17 +31,24 @@ export function JobPostingList({ params, onPageChange }: JobPostingListProps) {
 
   return (
     <div className="space-y-4">
-      {/* Background fetching indicator */}
+      {/* ⚠️ Non-blocking error (background refetch failed) */}
+      {isError && data && (
+        <div className="text-sm text-red-500">
+          Failed to refresh results. Showing previous data.
+        </div>
+      )}
+
+      {/* 🔄️ Background fetching indicator */}
       {isFetching && (
         <div className="text-sm text-muted-foreground">Loading page...</div>
       )}
 
-      {/* Job list */}
-      {data?.results.map((job) => (
+      {/* 📋 Job list */}
+      {data.results.map((job) => (
         <JobPostingCard key={job.id} job={job} />
       ))}
 
-      {/* Pagination */}
+      {/* 📄 Pagination */}
       <div className="flex items-center justify-between pt-4">
         <button
           onClick={() => onPageChange(currentPage - 1)}
