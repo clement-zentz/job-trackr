@@ -7,6 +7,7 @@ import { listJobPostings } from "./listJobPostings";
 import { api } from "@/api/client";
 import { createPaginatedResponse } from "@/tests/factories/paginatedResponse";
 import { createJobPosting } from "@/tests/factories/jobPosting";
+import { DEFAULT_JOB_POSTINGS_PAGE_SIZE } from "../constants";
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -25,7 +26,7 @@ describe("listJobPostings", () => {
 
     await listJobPostings({
       page: 2,
-      pageSize: 20,
+      pageSize: DEFAULT_JOB_POSTINGS_PAGE_SIZE,
       search: "python",
     });
 
@@ -34,7 +35,7 @@ describe("listJobPostings", () => {
       expect.objectContaining({
         params: expect.objectContaining({
           page: 2,
-          page_size: 20,
+          page_size: DEFAULT_JOB_POSTINGS_PAGE_SIZE,
           search: "python",
         }),
       }),
@@ -52,7 +53,7 @@ describe("listJobPostings", () => {
       expect.objectContaining({
         params: expect.objectContaining({
           page: 1,
-          page_size: 20,
+          page_size: DEFAULT_JOB_POSTINGS_PAGE_SIZE,
         }),
       }),
     );
