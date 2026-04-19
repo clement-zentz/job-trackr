@@ -9,10 +9,11 @@ import { createJobPosting } from "@/tests/factories/jobPosting";
 import { createPaginatedResponse } from "@/tests/factories/paginatedResponse";
 import type { PaginatedResponse } from "@/types/pagination";
 import type { JobPosting, JobPostingListParams } from "../types";
+import { DEFAULT_JOB_POSTINGS_PAGE_SIZE } from "../constants";
 
 const defaultParams: JobPostingListParams = {
   page: 1,
-  pageSize: 10,
+  pageSize: DEFAULT_JOB_POSTINGS_PAGE_SIZE,
   ordering: "-posted_at",
 };
 

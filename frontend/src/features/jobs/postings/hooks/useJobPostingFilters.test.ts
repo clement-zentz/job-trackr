@@ -5,6 +5,7 @@ import { renderHook } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import { useJobPostingFilters } from "./useJobPostingFilters";
 import { act } from "react";
+import { DEFAULT_JOB_POSTINGS_PAGE_SIZE } from "../constants";
 
 describe("useJobPostingFilters", () => {
   it("initializes with default filters", () => {
@@ -15,7 +16,7 @@ describe("useJobPostingFilters", () => {
     });
 
     expect(result.current.page).toBe(1);
-    expect(result.current.pageSize).toBe(20);
+    expect(result.current.pageSize).toBe(DEFAULT_JOB_POSTINGS_PAGE_SIZE);
   });
 
   it("updates a filter and resets page", () => {
@@ -38,7 +39,7 @@ describe("useJobPostingFilters", () => {
     expect(result.current.page).toBe(1); // reset
   });
 
-  it("update page without affecting filters", () => {
+  it("updates page without affecting filters", () => {
     const { result } = renderHook(() => useJobPostingFilters());
 
     act(() => {
