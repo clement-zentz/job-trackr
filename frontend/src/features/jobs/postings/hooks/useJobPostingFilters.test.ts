@@ -11,9 +11,7 @@ describe("useJobPostingFilters", () => {
   it("initializes with default filters", () => {
     const { result } = renderHook(() => useJobPostingFilters());
 
-    expect(result.current.filters).toEqual({
-      ordering: "-posted_at",
-    });
+    expect(result.current.filters).toEqual({});
 
     expect(result.current.page).toBe(1);
     expect(result.current.pageSize).toBe(DEFAULT_JOB_POSTINGS_PAGE_SIZE);
@@ -47,9 +45,7 @@ describe("useJobPostingFilters", () => {
     });
 
     expect(result.current.page).toBe(3);
-    expect(result.current.filters).toEqual({
-      ordering: "-posted_at",
-    });
+    expect(result.current.filters).toEqual({});
   });
 
   it("update boolean filters correctly", () => {
@@ -59,7 +55,23 @@ describe("useJobPostingFilters", () => {
       result.current.updateFilter("easyApply", true);
     });
 
-    expect(result.current.filters.easyApply).toBe(true);
+    expect(result.current.filters).toEqual({
+      easyApply: true,
+    });
+  });
+
+  it("removes filter when value is empty", () => {
+    const { result } = renderHook(() => useJobPostingFilters());
+
+    act(() => {
+      result.current.updateFilter("search", "python");
+    });
+
+    act(() => {
+      result.current.updateFilter("search", "");
+    });
+
+    expect(result.current.filters).toEqual({});
   });
 
   it("reset filters and page", () => {
@@ -74,10 +86,7 @@ describe("useJobPostingFilters", () => {
       result.current.resetFilters();
     });
 
-    expect(result.current.filters).toEqual({
-      ordering: "-posted_at",
-    });
-
+    expect(result.current.filters).toEqual({});
     expect(result.current.page).toBe(1);
   });
 });

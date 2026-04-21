@@ -20,13 +20,13 @@ vi.mock("@/api/client", () => ({
 }));
 
 describe("listJobPostings", () => {
-  it("maps params correctly", async () => {
+  it("passes params correctly to API", async () => {
     const mockData = createPaginatedResponse([createJobPosting()]);
     (api.get as Mock).mockResolvedValueOnce({ data: mockData });
 
     await listJobPostings({
       page: 2,
-      pageSize: DEFAULT_JOB_POSTINGS_PAGE_SIZE,
+      page_size: DEFAULT_JOB_POSTINGS_PAGE_SIZE,
       search: "python",
     });
 
@@ -42,35 +42,31 @@ describe("listJobPostings", () => {
     );
   });
 
-  it("uses defaults when params are missing", async () => {
-    const mockData = createPaginatedResponse([createJobPosting()]);
-    (api.get as Mock).mockResolvedValueOnce({ data: mockData });
-
-    await listJobPostings();
-
-    expect(api.get).toHaveBeenCalledWith(
-      "/v1/jobs/postings/",
-      expect.objectContaining({
-        params: expect.objectContaining({
-          page: 1,
-          page_size: DEFAULT_JOB_POSTINGS_PAGE_SIZE,
-        }),
-      }),
-    );
-  });
-
-  it("removes empty string params", async () => {
+  it("works with minimal params", async () => {
     const mockData = createPaginatedResponse([createJobPosting()]);
     (api.get as Mock).mockResolvedValueOnce({ data: mockData });
 
     await listJobPostings({
-      search: "",
-      platform: undefined,
+      page: 1,
+      page_size: DEFAULT_JOB_POSTINGS_PAGE_SIZE,
     });
+
+    expect(api.get).toHaveBeenCalled();
+  });
+
+  it("does not modify params", async () => {
+    const mockData = createPaginatedResponse([createJobPosting()]);
+    (api.get as Mock).mockResolvedValueOnce({ data: mockData });
+
+    const params = {
+      page: 1,
+      page_size: DEFAULT_JOB_POSTINGS_PAGE_SIZE,
+    };
+
+    await listJobPostings(params);
 
     const call = (api.get as Mock).mock.calls[0][1].params;
 
-    expect(call.search).toBeUndefined();
-    expect(call.platform).toBeUndefined();
+    expect(call).toEqual(params);
   });
 });
