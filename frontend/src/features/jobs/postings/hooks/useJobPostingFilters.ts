@@ -5,9 +5,7 @@ import { useState } from "react";
 import type { JobPostingFilters } from "../types";
 import { DEFAULT_JOB_POSTINGS_PAGE_SIZE } from "../constants";
 
-const DEFAULT_FILTERS: JobPostingFilters = {
-  ordering: "-posted_at",
-};
+const DEFAULT_FILTERS: JobPostingFilters = {};
 
 export const useJobPostingFilters = () => {
   const [filters, setFilters] = useState<JobPostingFilters>(DEFAULT_FILTERS);
