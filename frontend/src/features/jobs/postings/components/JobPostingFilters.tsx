@@ -121,10 +121,13 @@ export function JobPostingFilters({
           </label>
           <select
             id="ordering"
-            value={params.ordering ?? "-posted_at"}
-            onChange={(e) => updateFilter("ordering", e.target.value)}
+            value={params.ordering ?? ""}
+            onChange={(e) =>
+              updateFilter("ordering", e.target.value || undefined)
+            }
             className="rounded border px-3 py-2"
           >
+            <option value="">Default</option>
             <option value="-posted_at">Newest</option>
             <option value="posted_at">Oldest</option>
             <option value="company">Company A-Z</option>

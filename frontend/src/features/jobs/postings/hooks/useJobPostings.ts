@@ -11,7 +11,7 @@ export const useJobPostings = (params: JobPostingListParams) => {
 
   return useQuery({
     queryKey: ["job-postings", normalizedParams],
-    queryFn: () => listJobPostings(params),
+    queryFn: () => listJobPostings(normalizedParams),
     placeholderData: (previousData) => previousData,
   });
 };
