@@ -47,7 +47,7 @@ describe("JobPostingFilters", () => {
     expect(updateFilter).toHaveBeenCalledWith("platform", "linkedin");
   });
 
-  it("update boolean filters", () => {
+  it("updates boolean filters", () => {
     const updateFilter = vi.fn();
 
     render(

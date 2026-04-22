@@ -48,7 +48,7 @@ describe("useJobPostingFilters", () => {
     expect(result.current.filters).toEqual({});
   });
 
-  it("update boolean filters correctly", () => {
+  it("updates boolean filters correctly", () => {
     const { result } = renderHook(() => useJobPostingFilters());
 
     act(() => {
