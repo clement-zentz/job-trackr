@@ -94,7 +94,7 @@ describe("normalizeJobPostingParams", () => {
     });
   });
 
-  it("only include normalized and allowed keys", () => {
+  it("only includes normalized and allowed keys", () => {
     const result = normalizeJobPostingParams({
       search: "python",
     });

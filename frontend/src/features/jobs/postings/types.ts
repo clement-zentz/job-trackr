@@ -15,9 +15,9 @@ export interface JobPosting {
 /**
  * Frontend query params used by the UI and React state
  *
- * - Used camelCase naming (e.g. `pageSize`)
- * - Allow optional and raw values (e.g. undefined, empty strings)
- * - Represent the user-controlled filter state before normalization
+ * - Uses camelCase naming (e.g. `pageSize`)
+ * - Allows optional and raw values (e.g. undefined, empty strings)
+ * - Represents the user-controlled filter state before normalization
  *
  * These params are transformed into `JobPostingQueryParams`
  * before being sent to the API.
