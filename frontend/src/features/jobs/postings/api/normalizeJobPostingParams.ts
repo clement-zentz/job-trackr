@@ -10,11 +10,15 @@ export function normalizeJobPostingParams(
   const { page, pageSize, ...rest } = params;
 
   const cleanedParams = Object.fromEntries(
-    Object.entries(rest).filter(
-      ([, value]) =>
-        value !== undefined &&
-        !(typeof value === "string" && value.trim() === ""),
-    ),
+    Object.entries(rest)
+      .map(([key, value]) => [
+        key,
+        typeof value === "string" ? value.trim() : value,
+      ])
+      .filter(
+        ([, value]) =>
+          value !== undefined && !(typeof value === "string" && value === ""),
+      ),
   ) as Partial<JobPostingListParams>;
 
   // Extract camelCase fields that need mapping
