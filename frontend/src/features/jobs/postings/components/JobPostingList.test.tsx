@@ -68,6 +68,41 @@ describe("JobPostingList", () => {
     expect(screen.getByText("Backend Engineer")).toBeInTheDocument();
     expect(screen.getByText("Acme")).toBeInTheDocument();
   });
+
+  it("shows non-blocking error banner while keeping previous results", () => {
+    vi.spyOn(hook, "useJobPostings").mockReturnValue({
+      data: createPaginatedResponse([createJobPosting()]),
+      isLoading: false,
+      isError: true,
+      isFetching: false,
+      error: new Error("Refetch failed"),
+      status: "error",
+    } as ReturnType<typeof hook.useJobPostings>);
+
+    render(<JobPostingList {...defaultProps} />);
+
+    expect(screen.getByText(/failed to refresh results/i)).toBeInTheDocument();
+
+    // Still shows data
+    expect(screen.getByText("Backend Engineer")).toBeInTheDocument();
+  });
+
+  it("shows non-blocking error banner with empty state", () => {
+    vi.spyOn(hook, "useJobPostings").mockReturnValue({
+      data: createPaginatedResponse<JobPosting>([], { count: 0 }),
+      isLoading: false,
+      isError: true,
+      isFetching: false,
+      error: new Error("Refetch failed"),
+      status: "error",
+    } as ReturnType<typeof hook.useJobPostings>);
+
+    render(<JobPostingList {...defaultProps} />);
+
+    expect(screen.getByText(/failed to refresh results/i)).toBeInTheDocument();
+
+    expect(screen.getByText(/no job postings found/i)).toBeInTheDocument();
+  });
 });
 
 describe("JobPostingList pagination", () => {

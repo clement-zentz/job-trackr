@@ -89,4 +89,30 @@ describe("useJobPostingFilters", () => {
     expect(result.current.filters).toEqual({});
     expect(result.current.page).toBe(1);
   });
+
+  it("resets filters and page but preserves pageSize", () => {
+    const { result } = renderHook(() => useJobPostingFilters());
+
+    // Change pageSize first
+    act(() => {
+      result.current.setPageSize(50);
+    });
+
+    // Modify filters and page
+    act(() => {
+      result.current.updateFilter("search", "python");
+      result.current.setPage(3);
+    });
+
+    // Reset filters
+    act(() => {
+      result.current.resetFilters();
+    });
+
+    expect(result.current.filters).toEqual({});
+    expect(result.current.page).toBe(1);
+
+    // 🔑 Key assertion
+    expect(result.current.pageSize).toBe(50);
+  });
 });
