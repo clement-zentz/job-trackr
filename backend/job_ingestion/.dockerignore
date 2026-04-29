@@ -1,0 +1,36 @@
+# .dockerignore
+
+.venv
+
+.git
+.gitignore
+
+ignore
+
+__pycache__/
+*.pyc
+
+.vscode/
+
+# --- pytest ---
+.pytest_cache/
+tests/
+.coverage
+htmlcov
+
+# --- Logs / dumps ---
+*.log
+logs/
+*.sqlite3
+
+# --- Local env / config ---
+.env
+.env.*
+*.env
+
+# --- except ---
+!.env.example
+
+# cache
+.mypy_cache
+.ruff_cache
