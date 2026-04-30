@@ -1,65 +1,54 @@
 <!-- README.md -->
 
-# 📊 JobTrackr Platform
+# 📊 JobTrackr
 
-JobTrackr is a personal job-tracking platform designed to help collect, organize, and analyze job opportunities from multiple sources.
+## 🪟 Overview
 
-The project focuses on **reliable data ingestion**, **clean domain modeling**, and a **clear separation of concerns** between data pipelines and product logic.
+JobTrackr is a personal dashboard that helps you **track**, **organize**, and **apply** for jobs.
 
----
+## 🎯 Goal
 
-## 🎯 Project Goals
+The goals for this project are:
 
-- Collect job opportunities from external sources (email alerts, platforms, feeds)
-- Normalize and deduplicate job data
-- Track job opportunities and applications over time
-- Provide a clean dashboard for reviewing and managing job searches
+- keep track of job applications
+- provide information with statistics
+- keep it simple and authentic (less AI)
 
-The platform deliberately avoids full automation that would violate job platform Terms of Service.
-Human-in-the-loop workflows are preferred.
+Human targeted applications are encouraged.
 
----
+## 🖥️ Run it
 
-## 🧱 High-Level Architecture
+This project is using Docker for development and self hosting.
 
-The system is split into two main components:
+You can use the following command to run the project on your machine:
 
-### 1️⃣ Ingestion Pipeline
-- Responsible for fetching and parsing external job data (e.g. email alerts)
-- Stateless, async, and retry-friendly
-- Produces normalized job data
+```yml
+docker compose -f docker-compose.dev.yml up
+```
 
-### 2️⃣ Product Dashboard
-- Owns users, permissions, and business rules
-- Stores canonical job data
-- Enforces deduplication and consistency
-- Provides admin and dashboard functionality
+or use the `Makefile` for shortcuts:
 
-This separation allows each part to evolve independently while keeping a single source of truth.
+```Makefile
+make up
+```
 
----
+## 🏢 Use it
 
-## Development setup
+The project is currently user input centric.
+It is still in active development.
 
-This project is designed to run using Docker Compose.
+Soon it will be possible to make CRUD operations for job postings and job applications in the user interface.
 
-The frontend relies on Docker service names (e.g. `job-trackr`) for API communication, which are only resolvable inside the Docker network.
+The rest of the features, graphics, analytics, etc, will be incorporated incrementally.
 
-👉 Running the frontend directly with `npm run dev` on the host is not currently supported.
+## 🤝 Contribute
 
----
+Contributions are welcome, under certain conditions:
 
-## 🚧 Project Status
-
-This project is under active development.
-
-The architecture has evolved from a single service to a **Django-based product core** with a **FastAPI-based ingestion pipeline**, reflecting real-world constraints discovered during development.
-
-Details may change as the system matures.
+- Please contact me before your first pull request so that we can discuss your motivations
+- Handwritten code, pull requests, and comments are preferred, although AI is not strictly prohibited
+- Permissions will be granted depending on contributions and trust level
 
 ---
 
-## 📜 License
-
-This project is licensed under the **GNU Affero General Public License v3.0 or later (AGPL-3.0-or-later)**.
-See the [LICENSE](./LICENSE) file for details.
+Thank you for taking the time to read this far! 🙂
