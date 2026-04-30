@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# File: backend/tests/unit/job_trackr/ingestion/services/test_fingerprint.py
+# File: backend/tests/unit/job_trackr/jobs/postings/services/test_fingerprint.py
 
-from apps.ingestion.services.fingerprint import compute_fingerprint
+from apps.jobs.postings.services.fingerprint import compute_fingerprint
 
 
 def test_same_inputs_produce_same_fingerprint():

@@ -34,7 +34,6 @@ INSTALLED_APPS = [
     # domain apps
     "apps.jobs",
     "apps.job_applications",
-    "apps.ingestion",
 ]
 
 MIDDLEWARE = [

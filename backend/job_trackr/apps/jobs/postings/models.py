@@ -7,7 +7,7 @@ from uuid import UUID
 from django.db import models
 
 from apps.common.uuid import uuid7_default
-from apps.ingestion.services.fingerprint import compute_fingerprint
+from apps.jobs.postings.services.fingerprint import compute_fingerprint
 
 if TYPE_CHECKING:
     from django_stubs_ext.db.models.manager import RelatedManager
