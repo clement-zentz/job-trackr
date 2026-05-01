@@ -2,32 +2,14 @@
 [project]
 name = "job-trackr"
 version = "0.1.0"
-description = "Add your description here"
+description = "Django backend for a job application tracking dashboard."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    # --- Web / APIs ---
-    "fastapi>=0.121",
     "django>=6.0",
     "djangorestframework>=3.16",
-    "uvicorn>=0.38",
-    # --- Data / Validation ---
-    "pydantic>=2.12",
-    "pydantic-settings>=2.11",
-    "pydantic-extra-types>=2.10",
-    # --- HTTP ---
-    "httpx>=0.28",
-    # --- Database ---
     "psycopg[binary]>=3.2",
-    # --- Ingestion / Scraping ---
-    "beautifulsoup4>=4.14",
-    # --- Utils ---
-    "python-dotenv>=1.2",
-    "python-multipart>=0.0.20",
-    "python-dateutil>=2.9",
-    "python-slugify>=8.0",
     "uuid6>=2025.0.1",
-    "requests>=2.32.5",
     "django-filter>=25.2",
 ]
 
@@ -39,8 +21,6 @@ dev = [
     "django-stubs>=5.2.9",
     "django-stubs-ext>=5.2.9",
     "djangorestframework-stubs>=3.16.0",
-    "types-requests>=2.32.0.0",
-    'types-python-dateutil>=2.9.0.0',
     "mypy>=1.19.1",
     "types-django-filter>=25.2.0.20260408",
     "deptry>=0.25",
@@ -53,7 +33,7 @@ test = [
     "factory-boy>=3.3.3",
 ]
 
-# --- Ruff ---
+# --- ruff ---
 [tool.ruff]
 target-version = "py312"
 line-length = 88
@@ -61,7 +41,7 @@ fix = true
 show-fixes = true
 exclude = [
     "migrations",
-    "ignore/**",
+    "private/**",
 ]
 
 [tool.ruff.lint]
@@ -78,8 +58,6 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"app/services/*.py" = ["B008"]
-"app/api/*.py" = ["B008"]
 "backend/job-trackr/job_trackr/settings/*.py" = ["F403", "F401"]
 
 [tool.ruff.lint.isort]
@@ -92,7 +70,7 @@ indent-style = "space"
 [tool.django-stubs]
 django_settings_module = "job_trackr.settings.dev"
 
-# --- MYPY ---
+# --- mypy ---
 [tool.mypy]
 python_version = "3.12"
 plugins = [
@@ -111,26 +89,11 @@ ignore_missing_imports = false
 
 [[tool.mypy.overrides]]
 module = [
-  "requests.*",
-]
-ignore_missing_imports = false
-
-[[tool.mypy.overrides]]
-module = [
   "apps.jobs.opportunities.admin",
   "apps.jobs.postings.admin",
-  "apps.ingestion.admin",
   "apps.job_applications.admin",
 ]
 disable_error_code = ["type-arg"]
-
-[[tool.mypy.overrides]]
-module = [
-  "apps.ingestion.views",
-  "apps.ingestion.serializers",
-  "apps.ingestion.auth",
-]
-disable_error_code = ["misc"]
 
 # --- deptry ---
 [tool.deptry]
