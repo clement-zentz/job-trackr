@@ -1,0 +1,18 @@
+# .ignore
+
+# --- backend ---
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.venv/
+env/
+uv.lock
+
+# --- frontend ---
+node_modules/
+dist/
+build/
+package-lock.json
+
+# --- all ---
+*.log
