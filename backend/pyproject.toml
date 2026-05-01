@@ -43,6 +43,7 @@ dev = [
     'types-python-dateutil>=2.9.0.0',
     "mypy>=1.19.1",
     "types-django-filter>=25.2.0.20260408",
+    "deptry>=0.25",
 ]
 
 test = [
@@ -133,3 +134,20 @@ module = [
   "apps.ingestion.auth",
 ]
 disable_error_code = ["misc"]
+
+# --- deptry ---
+[tool.deptry]
+exclude = [
+  ".venv",
+  "env",
+  ".*/migrations/.*",
+  "tests",
+]
+
+known_first_party = [
+  "apps",
+  "job_trackr",
+]
+
+[tool.deptry.per_rule_ignores]
+DEP002 = ["psycopg"]
