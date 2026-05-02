@@ -58,7 +58,7 @@ django-check:
 
 # ---  Extra ---
 cov:
-	pytest --cov=app --cov-report=term-missing
+	cd backend && pytest --cov --cov-report=term-missing
 
 mypy:
 	cd backend && PYTHONPATH=job_trackr mypy job_trackr scripts

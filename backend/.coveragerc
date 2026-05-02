@@ -1,18 +1,27 @@
+; backend/.coveragerc
+
 [run]
 branch = True
-source = app
+source =
+    job_trackr
+    scripts
+
 omit =
     */tests/*
     */.venv/*
-    app/main.py
-    app/lifespan.py
     */__init__.py
-    app/scrapers/*.py
-    app/ingestion/web_ingestion.py
+    */migrations/*
+    */settings/*
+    */manage.py
+    */asgi.py
+    */wsgi.py
+    scripts/python/generate_*.py
+    scripts/python/*_logging.py
 
 [report]
 show_missing = True
 skip_covered = True
+
 exclude_lines =
     pragma: no cover
     if __name__ == .__main__.:
