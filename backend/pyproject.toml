@@ -67,9 +67,6 @@ combine-as-imports = true
 quote-style = "double"
 indent-style = "space"
 
-[tool.django-stubs]
-django_settings_module = "job_trackr.settings.dev"
-
 # --- mypy ---
 [tool.mypy]
 python_version = "3.12"
@@ -83,6 +80,9 @@ warn_return_any = true
 exclude = [
   "apps/.*/migrations/.*\\.py$",
 ]
+
+[tool.django-stubs]
+django_settings_module = "job_trackr.settings.test"
 
 # Do not allow missing stubs globally; handle per-module via overrides
 ignore_missing_imports = false
