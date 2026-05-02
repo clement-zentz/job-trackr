@@ -24,12 +24,12 @@ def setup_logging(
     formatter = logging.Formatter(fmt="%(levelname)s | %(name)s | %(message)s")
 
     if not logger.handlers:
-        handler = logging.StreamHandler(sys.stdout)
-        logger.addHandler(handler)
+        stream_handler = logging.StreamHandler(sys.stdout)
+        logger.addHandler(stream_handler)
 
-    for handler in logger.handlers:
-        handler.setLevel(level)
-        handler.setFormatter(formatter)
+    for existing_handler in logger.handlers:
+        existing_handler.setLevel(level)
+        existing_handler.setFormatter(formatter)
 
     logger.propagate = False
 
