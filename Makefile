@@ -61,7 +61,7 @@ cov:
 	pytest --cov=app --cov-report=term-missing
 
 mypy:
-	$(DC) exec -w /app/job_trackr job-trackr mypy .
+	cd backend && PYTHONPATH=job_trackr mypy job_trackr scripts
 
 sync:
 	cd backend && uv sync --all-groups
