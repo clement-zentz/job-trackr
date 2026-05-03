@@ -24,7 +24,6 @@ logs
 
 # --- UV ---
 .venv/
-uv.lock
 .uv/
 
 # sqlite3
