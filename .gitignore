@@ -2,12 +2,10 @@
 
 .env
 
-private
+private/
 
-.ruff_cache
+.*_cache
 
-# --- pytest - coverage ---
-.pytest_cache
 .coverage
 
-.backup
+*.backup

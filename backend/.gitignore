@@ -1,46 +1,37 @@
 # backend/.gitignore
 
+# --- Environment ---
 .env.*
 *.env
 !*.env.example
 
-__pycache__/
-*.pyc
-*.log
-logs
-*.py[cod]
-*.pyo
-*.pyd
-
-# pytest
-.pytest_cache
-.coverage
-
-# ruff
-.ruff_cache
-
-# mypy
-.mypy_cache
-
-# --- UV ---
+# --- Dependencies ---
 .venv/
 .uv/
 
-# sqlite3
+# --- Python ---
+__pycache__/
+*.py[cod]
+
+# --- Dev Tools ---
+.*_cache
+.coverage
+
+# --- Django ---
+# database
 *.db
 db.sqlite3
 
-# Django static & media
+# static & media
 /staticfiles/
 /media/
 
-# Django cache
+# cache
 *.cache
 
-# fixtures
-tests/email_fixtures/
+# --- Logs ---
+*.log
+logs/
 
-# samples
-samples/email_samples/
-
-.backup
+# --- Misc ---
+*.backup
