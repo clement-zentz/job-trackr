@@ -9,6 +9,11 @@
   "[python]": { "editor.tabSize": 4 },
   "[ini]": { "editor.tabSize": 4 },
 
+  "files.associations": {
+    ".coveragerc": "ini",
+    ".ignore": "ignore",
+  },
+
   "python.analysis.extraPaths": [
     "backend/job_trackr"
   ],
