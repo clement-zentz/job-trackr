@@ -1,36 +1,35 @@
-# .dockerignore
+# backend/.dockerignore
 
-.venv
-
+# --- Version Control ---
 .git
 .gitignore
 
-ignore
-
+# --- Python ---
 __pycache__/
-*.pyc
+*.py[cod]
 
+# --- Dependencies ---
+.venv/
+
+# --- Dev Tools ---
+.mypy_cache
+.pytest_cache
+.ruff_cache
+.coverage
 .vscode/
 
-# --- pytest ---
-.pytest_cache/
+# --- Tests ---
 tests/
-.coverage
-htmlcov
 
-# --- Logs / dumps ---
+# --- Logs & Dumps ---
 *.log
 logs/
 *.sqlite3
 
-# --- Local env / config ---
-.env
+# --- Environment ---
 .env.*
 *.env
+!*.env.example
 
-# --- except ---
-!.env.example
-
-# cache
-.mypy_cache
-.ruff_cache
+# --- Scripts ---
+scripts/
