@@ -1,10 +1,12 @@
 # Makefile
 .PHONY: up build build-nc restart logs down down-v bash psql \
 manage migrations migrate superuser django-check \
-cov mypy sync
+cov mypy pre-commit backend-test frontend-test \
+deptry backend-upgrade sync frontend-update outdated
 
 DC=docker compose -f compose.dev.yml
 
+# --- docker ---
 up:
 	$(DC) up
 
@@ -59,12 +61,34 @@ django-check:
 	$(DC) exec backend $(DJANGO_VENV) \
 	-c "import django; print(django.get_version())"
 
-# ---  Extra ---
+# --- Tooling ---
 cov:
 	cd backend && pytest --cov --cov-report=term-missing
 
 mypy:
 	cd backend && PYTHONPATH=job_trackr mypy job_trackr scripts
 
+pre-commit:
+	pre-commit run --all-files
+
+backend-test:
+	cd backend && pytest
+
+frontend-test:
+	cd frontend && npm run test
+
+# --- Dependencies ---
+deptry:
+	cd backend && deptry .
+
+backend-upgrade:
+	cd backend && uv lock --upgrade
+
 sync:
 	cd backend && uv sync --all-groups
+
+frontend-update:
+	cd frontend && npm update
+
+outdated:
+	cd frontend && npm outdated
