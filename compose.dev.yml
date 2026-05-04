@@ -1,0 +1,55 @@
+# compose.dev.yml
+
+services:
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "127.0.0.1:8000:8000"
+      - "127.0.0.1:5678:5678"
+    env_file:
+      - .env
+    volumes:
+      - ./backend/job_trackr/:/app/job_trackr
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "127.0.0.1:5173:5173"
+    env_file:
+      - frontend/.env.development
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "127.0.0.1:5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - pg_dev_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 1s
+    restart: unless-stopped
+
+volumes:
+  pg_dev_data:

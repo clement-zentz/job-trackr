@@ -3,7 +3,7 @@
 manage migrations migrate superuser django-check \
 cov mypy sync
 
-DC=docker compose -f docker-compose.dev.yml
+DC=docker compose -f compose.dev.yml
 
 up:
 	$(DC) up
@@ -26,7 +26,10 @@ down:
 down-v:
 	$(DC) down -v --remove-orphans
 
-APP ?= job-trackr
+prune:
+	docker system prune -a -f --volumes
+
+APP ?= backend
 bash:
 	$(DC) exec $(APP) bash
 
@@ -35,25 +38,25 @@ DATABASE ?= job_trackr
 psql:
 	$(DC) exec postgres psql -U $(USER_DB) -d $(DATABASE)
 
-# --- job-trackr (Django) ---
+# --- backend (Django) ---
 DJANGO_VENV := /app/.venv/bin/python
 MANAGE := job_trackr/manage.py
 
 # make manage CMD="<command> <args>"
 manage:
-	$(DC) exec job-trackr $(DJANGO_VENV) $(MANAGE) $(CMD)
+	$(DC) exec backend $(DJANGO_VENV) $(MANAGE) $(CMD)
 
 migrations:
-	$(DC) exec job-trackr $(DJANGO_VENV) $(MANAGE) makemigrations
+	$(DC) exec backend $(DJANGO_VENV) $(MANAGE) makemigrations
 
 migrate:
-	$(DC) exec job-trackr $(DJANGO_VENV) $(MANAGE) migrate
+	$(DC) exec backend $(DJANGO_VENV) $(MANAGE) migrate
 
 superuser:
-	$(DC) exec job-trackr $(DJANGO_VENV) $(MANAGE) createsuperuser
+	$(DC) exec backend $(DJANGO_VENV) $(MANAGE) createsuperuser
 
 django-check:
-	$(DC) exec job-trackr $(DJANGO_VENV) \
+	$(DC) exec backend $(DJANGO_VENV) \
 	-c "import django; print(django.get_version())"
 
 # ---  Extra ---
