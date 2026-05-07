@@ -1,5 +1,5 @@
 # Makefile
-.PHONY: up build build-nc restart logs down down-v bash psql \
+.PHONY: up build build-nc restart logs down down-v prune bash psql \
 manage migrations migrate superuser django-check \
 cov mypy pre-commit backend-test frontend-test \
 deptry backend-upgrade sync frontend-update outdated
@@ -63,23 +63,23 @@ django-check:
 
 # --- Tooling ---
 cov:
-	cd backend && pytest --cov --cov-report=term-missing
+	cd backend && uv run pytest --cov --cov-report=term-missing
 
 mypy:
-	cd backend && PYTHONPATH=job_trackr mypy job_trackr scripts
+	cd backend && uv run mypy job_trackr scripts
 
 pre-commit:
-	pre-commit run --all-files
+	cd backend && uv run pre-commit run --all-files
 
 backend-test:
-	cd backend && pytest
+	cd backend && uv run pytest
 
 frontend-test:
-	cd frontend && npm run test
+	cd frontend && npm run test:run
 
 # --- Dependencies ---
 deptry:
-	cd backend && deptry .
+	cd backend && uv run deptry .
 
 backend-upgrade:
 	cd backend && uv lock --upgrade

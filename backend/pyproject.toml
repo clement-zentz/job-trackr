@@ -70,6 +70,7 @@ indent-style = "space"
 # --- mypy ---
 [tool.mypy]
 python_version = "3.12"
+mypy_path = "job_trackr"
 plugins = [
   "mypy_django_plugin.main",
   "mypy_drf_plugin.main",
