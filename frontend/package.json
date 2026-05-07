@@ -11,6 +11,7 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "test": "vitest",
+    "test:run": "vitest run",
     "prettier": "pretty-quick --staged --pattern \"frontend/**/*.{ts,tsx,js,jsx,css,md,json,html}\"",
     "lint": "eslint ."
   },
