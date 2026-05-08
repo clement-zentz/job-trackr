@@ -1,5 +1,5 @@
 # Makefile
-.PHONY: up build build-nc restart logs down down-v prune bash psql \
+.PHONY: up build build-nc restart logs down reset-compose prune-global bash psql \
 manage migrations migrate superuser django-check \
 cov mypy pre-commit backend-test frontend-test \
 deptry backend-upgrade sync frontend-update outdated
@@ -25,11 +25,11 @@ logs:
 down:
 	$(DC) down --remove-orphans
 
-down-v:
-	$(DC) down -v --remove-orphans
+reset-compose:
+	$(DC) down -v --remove-orphans --rmi all
 
-prune:
-	docker system prune -a -f --volumes
+prune-global:
+	./scripts/prune_global_docker.sh
 
 APP ?= backend
 bash:
