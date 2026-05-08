@@ -17,9 +17,9 @@ RUN apt-get update && apt-get install -y \
 COPY --from=ghcr.io/astral-sh/uv:0.11.8 /uv /usr/local/bin/uv
 
 COPY pyproject.toml uv.lock ./
-RUN uv sync --frozen --no-cache --group dev
+RUN uv sync --locked --all-groups
 
-COPY job_trackr ./job_trackr
+COPY . .
 
 COPY entrypoint_dev.sh /entrypoint_dev.sh
 RUN chmod +x /entrypoint_dev.sh
