@@ -11,7 +11,7 @@
 
   "files.associations": {
     ".coveragerc": "ini",
-    ".ignore": "ignore",
+    ".ignore": "ignore"
   },
 
   "python.analysis.extraPaths": [
