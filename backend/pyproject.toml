@@ -70,22 +70,29 @@ indent-style = "space"
 # --- mypy ---
 [tool.mypy]
 python_version = "3.12"
-mypy_path = "job_trackr"
+mypy_path = "$MYPY_CONFIG_FILE_DIR/job_trackr"
+
 plugins = [
   "mypy_django_plugin.main",
   "mypy_drf_plugin.main",
 ]
+
 strict = true
 warn_unused_configs = true
 warn_return_any = true
+show_error_codes = true
+pretty = true
+
 exclude = [
-  "apps/.*/migrations/.*\\.py$",
+  "(^|/)migrations/.*\\.py$",
 ]
 
 [tool.django-stubs]
-django_settings_module = "job_trackr.settings.test"
+django_settings_module = "job_trackr.settings.mypy"
+strict_settings = true
 
-# Do not allow missing stubs globally; handle per-module via overrides
+# Do not allow missing stubs globally;
+# handle per-module via overrides
 ignore_missing_imports = false
 
 [[tool.mypy.overrides]]
