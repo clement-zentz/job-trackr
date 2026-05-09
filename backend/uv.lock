@@ -320,6 +320,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "django" },
     { name = "django-filter" },
+    { name = "django-stubs-ext" },
     { name = "djangorestframework" },
     { name = "psycopg", extra = ["binary"] },
     { name = "uuid6" },
@@ -330,7 +331,6 @@ dev = [
     { name = "debugpy" },
     { name = "deptry" },
     { name = "django-stubs" },
-    { name = "django-stubs-ext" },
     { name = "djangorestframework-stubs" },
     { name = "mypy" },
     { name = "pre-commit" },
@@ -348,6 +348,7 @@ test = [
 requires-dist = [
     { name = "django", specifier = ">=6.0" },
     { name = "django-filter", specifier = ">=25.2" },
+    { name = "django-stubs-ext", specifier = ">=6.0.3" },
     { name = "djangorestframework", specifier = ">=3.16" },
     { name = "psycopg", extras = ["binary"], specifier = ">=3.2" },
     { name = "uuid6", specifier = ">=2025.0.1" },
@@ -357,8 +358,7 @@ requires-dist = [
 dev = [
     { name = "debugpy", specifier = ">=1.8" },
     { name = "deptry", specifier = ">=0.25" },
-    { name = "django-stubs", specifier = ">=5.2.9" },
-    { name = "django-stubs-ext", specifier = ">=5.2.9" },
+    { name = "django-stubs", specifier = ">=6.0.0" },
     { name = "djangorestframework-stubs", specifier = ">=3.16.0" },
     { name = "mypy", specifier = ">=1.19.1" },
     { name = "pre-commit", specifier = ">=4.4" },

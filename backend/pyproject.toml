@@ -11,6 +11,7 @@ dependencies = [
     "psycopg[binary]>=3.2",
     "uuid6>=2025.0.1",
     "django-filter>=25.2",
+    "django-stubs-ext>=6.0.3",
 ]
 
 [dependency-groups]
@@ -18,8 +19,7 @@ dev = [
     "ruff>=0.14",
     "pre-commit>=4.4",
     "debugpy>=1.8",
-    "django-stubs>=5.2.9",
-    "django-stubs-ext>=5.2.9",
+    "django-stubs>=6.0.0",
     "djangorestframework-stubs>=3.16.0",
     "mypy>=1.19.1",
     "types-django-filter>=25.2.0.20260408",
@@ -32,6 +32,10 @@ test = [
     "pytest-django>=4.11",
     "factory-boy>=3.3.3",
 ]
+
+# --- uv ---
+[tool.uv]
+default-groups = ["dev", "test"]
 
 # --- ruff ---
 [tool.ruff]
