@@ -16,6 +16,7 @@ __pycache__/
 # --- Dev Tools ---
 .*_cache
 .coverage
+htmlcov/
 
 # --- Django ---
 # database

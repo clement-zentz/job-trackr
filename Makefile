@@ -1,94 +1,102 @@
 # Makefile
 .PHONY: up build build-nc restart logs down reset-compose prune-global bash psql \
 manage migrations migrate superuser django-check \
-cov mypy pre-commit backend-test frontend-test \
-deptry backend-upgrade sync frontend-update outdated
+backend-coverage backend-mypy pre-commit backend-test frontend-test \
+backend-deptry backend-upgrade backend-sync frontend-update frontend-outdated
 
-DC=docker compose -f compose.dev.yml
+COMPOSE_DEV=docker compose -f compose.dev.yml
+COMPOSE_TEST=docker compose -f compose.test.yml
 
 # --- docker ---
 up:
-	$(DC) up
+	$(COMPOSE_DEV) up
 
 build:
-	$(DC) build
+	$(COMPOSE_DEV) build
 
 build-nc:
-	$(DC) build --no-cache
+	$(COMPOSE_DEV) build --no-cache
 
 restart:
-	$(DC) restart
+	$(COMPOSE_DEV) restart
 
 logs:
-	$(DC) logs
+	$(COMPOSE_DEV) logs
 
 down:
-	$(DC) down --remove-orphans
+	$(COMPOSE_DEV) down --remove-orphans
 
 reset-compose:
-	$(DC) down -v --remove-orphans --rmi all
+	$(COMPOSE_DEV) down -v --remove-orphans --rmi all
 
 prune-global:
 	./scripts/prune_global_docker.sh
 
 APP ?= backend
 bash:
-	$(DC) exec $(APP) bash
+	$(COMPOSE_DEV) exec $(APP) bash
 
 USER_DB ?= job_trackr
 DATABASE ?= job_trackr
 psql:
-	$(DC) exec postgres psql -U $(USER_DB) -d $(DATABASE)
+	$(COMPOSE_DEV) exec postgres psql -U $(USER_DB) -d $(DATABASE)
 
 # --- backend (Django) ---
-DJANGO_VENV := /app/.venv/bin/python
+BACKEND_PYTHON := /app/.venv/bin/python
 MANAGE := job_trackr/manage.py
 
 # make manage CMD="<command> <args>"
 manage:
-	$(DC) exec backend $(DJANGO_VENV) $(MANAGE) $(CMD)
+	$(COMPOSE_DEV) exec backend $(BACKEND_PYTHON) $(MANAGE) $(CMD)
 
 migrations:
-	$(DC) exec backend $(DJANGO_VENV) $(MANAGE) makemigrations
+	$(COMPOSE_DEV) exec backend $(BACKEND_PYTHON) $(MANAGE) makemigrations
 
 migrate:
-	$(DC) exec backend $(DJANGO_VENV) $(MANAGE) migrate
+	$(COMPOSE_DEV) exec backend $(BACKEND_PYTHON) $(MANAGE) migrate
 
 superuser:
-	$(DC) exec backend $(DJANGO_VENV) $(MANAGE) createsuperuser
+	$(COMPOSE_DEV) exec backend $(BACKEND_PYTHON) $(MANAGE) createsuperuser
 
 django-check:
-	$(DC) exec backend $(DJANGO_VENV) \
+	$(COMPOSE_DEV) exec backend $(BACKEND_PYTHON) \
 	-c "import django; print(django.get_version())"
 
 # --- Tooling ---
-cov:
-	cd backend && uv run pytest --cov --cov-report=term-missing
+backend-mypy:
+	$(COMPOSE_DEV) exec backend uv run mypy job_trackr scripts
 
-mypy:
-	cd backend && uv run mypy job_trackr scripts
+backend-test:
+	$(COMPOSE_TEST) run --rm backend; status=$$?; \
+	$(COMPOSE_TEST) down --remove-orphans; \
+	exit $$status
+
+backend-coverage:
+	$(COMPOSE_TEST) run --rm backend uv run pytest \
+	--cov \
+	--cov-report=term-missing \
+	--cov-report=html; status=$$?; \
+	$(COMPOSE_TEST) down --remove-orphans; \
+	exit $$status
+
+frontend-test:
+	$(COMPOSE_DEV) exec frontend npm run test:run
 
 pre-commit:
 	cd backend && uv run pre-commit run --all-files
 
-backend-test:
-	cd backend && uv run pytest
-
-frontend-test:
-	cd frontend && npm run test:run
-
 # --- Dependencies ---
-deptry:
-	cd backend && uv run deptry .
+backend-deptry:
+	$(COMPOSE_DEV) exec backend uv run deptry .
 
 backend-upgrade:
 	cd backend && uv lock --upgrade
 
-sync:
+backend-sync:
 	cd backend && uv sync --all-groups
 
 frontend-update:
 	cd frontend && npm update
 
-outdated:
+frontend-outdated:
 	cd frontend && npm outdated
