@@ -64,7 +64,7 @@ django-check:
 
 # --- Tooling ---
 backend-mypy:
-	$(COMPOSE_DEV) exec backend uv run mypy job_trackr scripts
+	$(COMPOSE_DEV) run --rm --no-deps backend uv run mypy job_trackr scripts
 
 backend-test:
 	$(COMPOSE_TEST) run --rm backend; status=$$?; \
@@ -80,14 +80,14 @@ backend-coverage:
 	exit $$status
 
 frontend-test:
-	$(COMPOSE_DEV) exec frontend npm run test:run
+	$(COMPOSE_DEV) run --rm --no-deps frontend npm run test:run
 
 pre-commit:
 	cd backend && uv run pre-commit run --all-files
 
 # --- Dependencies ---
 backend-deptry:
-	$(COMPOSE_DEV) exec backend uv run deptry .
+	$(COMPOSE_DEV) run --rm --no-deps backend uv run deptry .
 
 backend-upgrade:
 	cd backend && uv lock --upgrade
