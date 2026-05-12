@@ -2,7 +2,7 @@
 [project]
 name = "job-trackr"
 version = "0.1.0"
-description = "Django backend for a job application tracking dashboard."
+description = "Django backend for a job candidacy tracking dashboard."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -101,9 +101,8 @@ ignore_missing_imports = false
 
 [[tool.mypy.overrides]]
 module = [
-  "apps.jobs.opportunities.admin",
   "apps.jobs.postings.admin",
-  "apps.job_applications.admin",
+  "apps.jobs.candidacies.admin",
 ]
 disable_error_code = ["type-arg"]
 

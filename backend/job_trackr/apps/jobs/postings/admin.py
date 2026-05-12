@@ -12,7 +12,6 @@ class JobPostingAdmin(admin.ModelAdmin):
         "title",
         "company",
         "location",
-        "job_opportunity",
         "posted_at",
         "created_at",
     )

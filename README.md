@@ -10,11 +10,11 @@ JobTrackr is a personal dashboard that helps you **track**, **organize**, and **
 
 The goals for this project are:
 
-- keep track of job applications
+- keep track of job candidacies
 - provide information with statistics
 - keep it simple and authentic (less AI)
 
-Human targeted applications are encouraged.
+Human targeted candidacies are encouraged.
 
 ## 🖥️ Run it
 
@@ -37,7 +37,7 @@ make up
 The project is currently user input centric.
 It is still in active development.
 
-Soon it will be possible to make CRUD operations for job postings and job applications in the user interface.
+Soon it will be possible to make CRUD operations for job postings and job candidacies in the user interface.
 
 The rest of the features, graphics, analytics, etc, will be incorporated incrementally.
 

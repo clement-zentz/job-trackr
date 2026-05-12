@@ -38,7 +38,6 @@ INSTALLED_APPS = [
     "rest_framework",
     # domain apps
     "apps.jobs",
-    "apps.job_applications",
 ]
 
 MIDDLEWARE = [

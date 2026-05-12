@@ -29,7 +29,7 @@ class JobPostingFilter(filters.FilterSet):
     rating_max = filters.NumberFilter(field_name="rating", lookup_expr="lte")
 
     has_salary = filters.BooleanFilter(method="filter_has_salary")
-    has_job_opportunity = filters.BooleanFilter(method="filter_has_job_opportunity")
+    has_candidacy = filters.BooleanFilter(method="filter_has_candidacy")
 
     class Meta:
         model = JobPosting
@@ -49,12 +49,12 @@ class JobPostingFilter(filters.FilterSet):
             return queryset.exclude(salary="")
         return queryset.filter(salary="")
 
-    def filter_has_job_opportunity(
+    def filter_has_job_candidacy(
         self,
         queryset: QuerySet[JobPosting],
         name: str,
         value: bool,
     ) -> QuerySet[JobPosting]:
         if value:
-            return queryset.filter(job_opportunity__isnull=False)
-        return queryset.filter(job_opportunity__isnull=True)
+            return queryset.filter(candidacy__isnull=False)
+        return queryset.filter(candidacy__isnull=True)

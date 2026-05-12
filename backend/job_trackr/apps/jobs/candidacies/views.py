@@ -1,4 +1,4 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# File: backend/job_trackr/apps/job_applications/views.py
+# File: backend/job_trackr/apps/jobs/candidacies/views.py
 
 # Create your views here.

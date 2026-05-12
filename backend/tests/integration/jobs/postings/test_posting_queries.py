@@ -7,7 +7,7 @@ import pytest
 from django.urls import reverse
 from django.utils import timezone
 
-from tests.factories.job_opportunity import JobOpportunityFactory
+from tests.factories.job_candidacy import JobCandidacyFactory
 from tests.factories.job_posting import JobPostingFactory
 
 pytestmark = pytest.mark.django_db
@@ -240,41 +240,41 @@ def test_list_job_postings_filters_by_has_salary(
 
 
 @pytest.mark.parametrize(
-    "has_job_opportunity, expected_with_job_opportunity, expected_without_job_opportunity",
+    "has_candidacy, expected_with_candidacy, expected_without_candidacy",
     [
         (True, True, False),
         (False, False, True),
     ],
 )
-def test_list_job_postings_filters_by_has_job_opportunity(
+def test_list_job_postings_filters_by_has_candidacy(
     authenticated_client,
-    has_job_opportunity,
-    expected_with_job_opportunity,
-    expected_without_job_opportunity,
+    has_candidacy,
+    expected_with_candidacy,
+    expected_without_candidacy,
 ):
-    job_opportunity = JobOpportunityFactory()
+    candidacy = JobCandidacyFactory()
 
-    with_job_opportunity = JobPostingFactory(job_opportunity=job_opportunity)
-    without_job_opportunity = JobPostingFactory(job_opportunity=None)
+    with_candidacy = JobPostingFactory(candidacy=candidacy)
+    without_candidacy = JobPostingFactory(candidacy=None)
 
     response = authenticated_client.get(
         reverse("job-posting-list"),
-        {"has_job_opportunity": has_job_opportunity},
+        {"has_candidacy": has_candidacy},
     )
 
     assert response.status_code == 200
 
     returned_ids = {item["id"] for item in response.data["results"]}
 
-    if expected_with_job_opportunity:
-        assert str(with_job_opportunity.id) in returned_ids
+    if expected_with_candidacy:
+        assert str(with_candidacy.id) in returned_ids
     else:
-        assert str(with_job_opportunity.id) not in returned_ids
+        assert str(with_candidacy.id) not in returned_ids
 
-    if expected_without_job_opportunity:
-        assert str(without_job_opportunity.id) in returned_ids
+    if expected_without_candidacy:
+        assert str(without_candidacy.id) in returned_ids
     else:
-        assert str(without_job_opportunity.id) not in returned_ids
+        assert str(without_candidacy.id) not in returned_ids
 
 
 def test_list_job_postings_filters_by_rating_min(authenticated_client):

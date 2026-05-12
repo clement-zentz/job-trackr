@@ -7,20 +7,16 @@ Public models API for the `jobs` app.
 This module re-exports domain models from submodules to provide a stable
 import path:
 
-    from apps.jobs.models import JobOpportunity, JobPosting
+    from apps.jobs.models import JobPosting, JobCandidacy
 
 This allows internal refactoring of the domain structure without breaking
 external imports (e.g., FKs, services, tests).
 """
 
-from apps.jobs.opportunities.models import (  # noqa: F401
-    JobOpportunity,
-    JobOpportunityPriority,
-)
+from apps.jobs.candidacies.models import JobCandidacy  # noqa: F401
 from apps.jobs.postings.models import JobPosting  # noqa: F401
 
 __all__ = [
-    "JobOpportunity",
-    "JobOpportunityPriority",
     "JobPosting",
+    "JobCandidacy",
 ]

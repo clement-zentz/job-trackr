@@ -12,18 +12,13 @@ from factory.declarations import (
     LazyAttribute,
     LazyFunction,
     Sequence,
-    SubFactory,
 )
 from factory.faker import Faker
-
-from tests.factories.job_opportunity import JobOpportunityFactory
 
 
 class JobPostingFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = JobPosting
-
-    job_opportunity = SubFactory(JobOpportunityFactory)
 
     title = Sequence(lambda n: f"Backend Developer {n}")
     company = Faker("company")

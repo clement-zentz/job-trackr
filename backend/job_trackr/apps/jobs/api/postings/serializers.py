@@ -29,7 +29,6 @@ class JobPostingDetailSerializer(serializers.ModelSerializer[JobPosting]):
         model = JobPosting
         fields = [
             "id",
-            "job_opportunity",
             "title",
             "company",
             "platform",
@@ -51,7 +50,6 @@ class JobPostingWriteSerializer(serializers.ModelSerializer[JobPosting]):
     class Meta:
         model = JobPosting
         fields = [
-            "job_opportunity",
             "title",
             "company",
             "platform",
