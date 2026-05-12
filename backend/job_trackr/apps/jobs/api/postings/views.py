@@ -68,7 +68,7 @@ class JobPostingViewSet(viewsets.ModelViewSet[JobPosting]):
     # -------------------------
 
     def _detail_queryset(self) -> QuerySet[JobPosting]:
-        return JobPosting.objects.select_related("job_opportunity")
+        return JobPosting.objects.select_related("candidacy")
 
     def get_queryset(self) -> QuerySet[JobPosting]:
         if self.action in ("retrieve", "create", "update", "partial_update"):

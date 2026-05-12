@@ -1,18 +1,12 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/job_trackr/apps/jobs/postings/models.py
 
-from typing import TYPE_CHECKING, Any
-from uuid import UUID
+from typing import Any
 
 from django.db import models
 
 from apps.common.uuid import uuid7_default
 from apps.jobs.postings.services.fingerprint import compute_fingerprint
-
-if TYPE_CHECKING:
-    from django_stubs_ext.db.models.manager import RelatedManager
-
-    from apps.job_applications.models import JobApplication
 
 
 class JobPosting(models.Model):
@@ -22,13 +16,6 @@ class JobPosting(models.Model):
         editable=False,
     )
 
-    job_opportunity = models.ForeignKey(
-        "jobs.JobOpportunity",
-        related_name="job_postings",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-    )
     # --- Job Required Fields ---
     title = models.CharField(max_length=255)
     company = models.CharField(max_length=255)
@@ -60,10 +47,6 @@ class JobPosting(models.Model):
         null=False,
         editable=False,
     )
-
-    if TYPE_CHECKING:
-        job_applications: "RelatedManager[JobApplication]"
-        job_opportunity_id: UUID | None
 
     class Meta:
         db_table = "job_posting"
