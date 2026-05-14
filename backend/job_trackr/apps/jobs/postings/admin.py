@@ -3,7 +3,7 @@
 
 from django.contrib import admin
 
-from .models import JobPosting
+from apps.jobs.postings.models import JobPosting
 
 
 @admin.register(JobPosting)
@@ -12,11 +12,85 @@ class JobPostingAdmin(admin.ModelAdmin):
         "title",
         "company",
         "location",
+        "platform",
+        "employment_type",
+        "work_mode",
+        "easy_apply",
+        "active_hiring",
         "posted_at",
         "created_at",
     )
-    list_filter = ("platform",)
-    search_fields = ("title", "company", "location", "raw_url", "job_key")
-    ordering = ("-created_at",)
 
-    readonly_fields = ("created_at",)
+    list_filter = (
+        "platform",
+        "employment_type",
+        "work_mode",
+        "easy_apply",
+        "active_hiring",
+        "posted_at",
+        "created_at",
+    )
+
+    search_fields = (
+        "title",
+        "company",
+        "location",
+        "url",
+        "description",
+        "salary",
+    )
+
+    ordering = ("-posted_at", "-created_at")
+
+    readonly_fields = (
+        "id",
+        "created_at",
+        "updated_at",
+    )
+
+    fieldsets = (
+        (
+            "Job information",
+            {
+                "fields": (
+                    "title",
+                    "company",
+                    "location",
+                    "url",
+                    "description",
+                    "salary",
+                )
+            },
+        ),
+        (
+            "Classification",
+            {
+                "fields": (
+                    "platform",
+                    "employment_type",
+                    "work_mode",
+                )
+            },
+        ),
+        (
+            "Status",
+            {
+                "fields": (
+                    "easy_apply",
+                    "active_hiring",
+                    "posted_at",
+                )
+            },
+        ),
+        (
+            "Metadata",
+            {
+                "fields": (
+                    "id",
+                    "created_at",
+                    "updated_at",
+                ),
+                "classes": ("collapse",),
+            },
+        ),
+    )
