@@ -4,17 +4,19 @@
 from django.db.models import QuerySet
 from django_filters import rest_framework as filters
 
+from apps.jobs.postings.choices import Platforms
 from apps.jobs.postings.models import JobPosting
 
 
 class JobPostingFilter(filters.FilterSet):
-    company = filters.CharFilter(field_name="company", lookup_expr="icontains")
-    title = filters.CharFilter(field_name="title", lookup_expr="icontains")
-    location = filters.CharFilter(field_name="location", lookup_expr="icontains")
-    platform = filters.CharFilter(field_name="platform", lookup_expr="exact")
+    title = filters.CharFilter(lookup_expr="icontains")
+    company = filters.CharFilter(lookup_expr="icontains")
+    location = filters.CharFilter(lookup_expr="icontains")
 
-    easy_apply = filters.BooleanFilter(field_name="easy_apply")
-    active_hiring = filters.BooleanFilter(field_name="active_hiring")
+    platform = filters.ChoiceFilter(choices=Platforms.choices)
+
+    easy_apply = filters.BooleanFilter()
+    active_hiring = filters.BooleanFilter()
 
     posted_at_after = filters.IsoDateTimeFilter(
         field_name="posted_at",
@@ -24,9 +26,6 @@ class JobPostingFilter(filters.FilterSet):
         field_name="posted_at",
         lookup_expr="lte",
     )
-
-    rating_min = filters.NumberFilter(field_name="rating", lookup_expr="gte")
-    rating_max = filters.NumberFilter(field_name="rating", lookup_expr="lte")
 
     has_salary = filters.BooleanFilter(method="filter_has_salary")
     has_candidacy = filters.BooleanFilter(method="filter_has_candidacy")
@@ -49,7 +48,7 @@ class JobPostingFilter(filters.FilterSet):
             return queryset.exclude(salary="")
         return queryset.filter(salary="")
 
-    def filter_has_job_candidacy(
+    def filter_has_candidacy(
         self,
         queryset: QuerySet[JobPosting],
         name: str,

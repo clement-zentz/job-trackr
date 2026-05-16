@@ -3,7 +3,6 @@
 
 from typing import Any
 
-from django.db import IntegrityError
 from django.db.models import QuerySet
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, serializers, status, viewsets
@@ -48,7 +47,6 @@ class JobPostingViewSet(viewsets.ModelViewSet[JobPosting]):
         "title",
         "company",
         "location",
-        "summary",
         "description",
     ]
 
@@ -59,7 +57,6 @@ class JobPostingViewSet(viewsets.ModelViewSet[JobPosting]):
         "company",
         "title",
         "platform",
-        "rating",
     ]
     ordering = ["-posted_at", "-created_at"]
 
@@ -71,7 +68,7 @@ class JobPostingViewSet(viewsets.ModelViewSet[JobPosting]):
         return JobPosting.objects.select_related("candidacy")
 
     def get_queryset(self) -> QuerySet[JobPosting]:
-        if self.action in ("retrieve", "create", "update", "partial_update"):
+        if self.action in ("retrieve", "update", "partial_update", "destroy"):
             return self._detail_queryset()
 
         return JobPosting.objects.all()
@@ -96,23 +93,7 @@ class JobPostingViewSet(viewsets.ModelViewSet[JobPosting]):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        try:
-            instance = serializer.save()
-        except IntegrityError as exc:
-            error_message = str(exc)
-            # Only treat the unique constraint on posting_fingerprint (uq_job_posting_fp)
-            # as a "duplicate identity" conflict. Re-raise other integrity errors so they
-            # are not incorrectly masked as duplicates.
-            if (
-                # PostgreSQL includes constraint name, SQLite includes column name
-                "uq_job_posting_fp" in error_message  # PostgreSQL
-                or "posting_fingerprint" in error_message  # SQLite
-            ):
-                return Response(
-                    {"detail": "A job posting with the same identity already exists."},
-                    status=status.HTTP_409_CONFLICT,
-                )
-            raise
+        instance = serializer.save()
 
         # Re-fetch with enriched queryset
         instance = self._detail_queryset().get(pk=instance.pk)
@@ -122,12 +103,9 @@ class JobPostingViewSet(viewsets.ModelViewSet[JobPosting]):
             context=self.get_serializer_context(),
         )
 
-        headers = self.get_success_headers(serializer.data)
-
         return Response(
             response_serializer.data,
             status=status.HTTP_201_CREATED,
-            headers=headers,
         )
 
     # -------------------------
@@ -146,7 +124,6 @@ class JobPostingViewSet(viewsets.ModelViewSet[JobPosting]):
 
         serializer.is_valid(raise_exception=True)
 
-        # posting_fingerprint is computed only on create --> no IntegrityError expected
         instance = serializer.save()
 
         # Re-fetch with enriched queryset

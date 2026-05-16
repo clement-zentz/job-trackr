@@ -6,7 +6,25 @@ from rest_framework import serializers
 from apps.jobs.postings.models import JobPosting
 
 
-class JobPostingListSerializer(serializers.ModelSerializer[JobPosting]):
+class JobPostingChoiceLabelsMixin(serializers.Serializer):
+    platform_label = serializers.CharField(
+        source="get_platform_display",
+        read_only=True,
+    )
+    employment_type_label = serializers.CharField(
+        source="get_employment_type_display",
+        read_only=True,
+    )
+    work_mode_label = serializers.CharField(
+        source="get_work_mode_display",
+        read_only=True,
+    )
+
+
+class JobPostingListSerializer(
+    JobPostingChoiceLabelsMixin,
+    serializers.ModelSerializer[JobPosting],
+):
     class Meta:
         model = JobPosting
         fields = [
@@ -14,34 +32,47 @@ class JobPostingListSerializer(serializers.ModelSerializer[JobPosting]):
             "title",
             "company",
             "location",
-            "platform",
-            "raw_url",
-            "canonical_url",
-            "posted_at",
+            "url",
             "easy_apply",
             "active_hiring",
+            "platform",
+            "platform_label",
+            "employment_type",
+            "employment_type_label",
+            "work_mode",
+            "work_mode_label",
+            "posted_at",
+            "created_at",
+            "updated_at",
         ]
         read_only_fields = tuple(fields)
 
 
-class JobPostingDetailSerializer(serializers.ModelSerializer[JobPosting]):
+class JobPostingDetailSerializer(
+    JobPostingChoiceLabelsMixin,
+    serializers.ModelSerializer[JobPosting],
+):
     class Meta:
         model = JobPosting
         fields = [
             "id",
             "title",
             "company",
-            "platform",
-            "raw_url",
-            "canonical_url",
             "location",
-            "summary",
-            "salary",
+            "url",
             "description",
-            "rating",
+            "salary",
             "easy_apply",
             "active_hiring",
+            "platform",
+            "platform_label",
+            "employment_type",
+            "employment_type_label",
+            "work_mode",
+            "work_mode_label",
             "posted_at",
+            "created_at",
+            "updated_at",
         ]
         read_only_fields = tuple(fields)
 
@@ -52,16 +83,14 @@ class JobPostingWriteSerializer(serializers.ModelSerializer[JobPosting]):
         fields = [
             "title",
             "company",
-            "platform",
-            "raw_url",
-            "canonical_url",
-            "job_key",
             "location",
-            "summary",
+            "url",
             "salary",
             "description",
-            "rating",
             "easy_apply",
             "active_hiring",
+            "platform",
+            "employment_type",
+            "work_mode",
             "posted_at",
         ]
