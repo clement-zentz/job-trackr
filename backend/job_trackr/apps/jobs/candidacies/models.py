@@ -4,17 +4,10 @@
 from datetime import date
 
 from django.db import models
+from django.utils.encoding import force_str
 
 from apps.common.uuid import uuid7_default
-
-
-class JobCandidacyStatus(models.TextChoices):
-    APPLIED = "applied", "Applied"
-    INTERVIEW = "interview", "Interview"
-    TECHNICAL_TEST = "technical_test", "Technical test"
-    OFFER = "offer", "Offer"
-    REJECTED = "rejected", "Rejected"
-    WITHDRAWN = "withdrawn", "Withdrawn"
+from apps.jobs.candidacies.choices import CandidacyStatus
 
 
 class JobCandidacy(models.Model):
@@ -24,30 +17,36 @@ class JobCandidacy(models.Model):
         editable=False,
     )
 
-    # --- Job Candidacy FK Fields ---
-    job_posting = models.ForeignKey(
+    job_posting = models.OneToOneField(
         "jobs.JobPosting",
-        related_name="job_candidacy",
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
+        related_name="candidacy",
+        on_delete=models.CASCADE,
     )
 
-    # --- Job Candidacy Fields ---
-    job_candidacy_date = models.DateField(default=date.today)
-    notes = models.TextField(blank=True)
     status = models.CharField(
-        max_length=20,
-        choices=JobCandidacyStatus.choices,
-        default=JobCandidacyStatus.APPLIED,
+        max_length=50,
+        choices=CandidacyStatus.choices,
+        default=CandidacyStatus.APPLIED,
     )
 
-    # --- Metadata ---
+    applied_on = models.DateField(default=date.today)
+    notes = models.TextField(blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "job_candidacy"
+        verbose_name = "job candidacy"
+        verbose_name_plural = "job candidacies"
+        ordering = ["-applied_on", "-created_at"]
+        indexes = [
+            models.Index(fields=["status"], name="idx_job_cand_status"),
+            models.Index(fields=["applied_on"], name="idx_job_cand_applied"),
+        ]
 
     def __str__(self) -> str:
-        return f"{self.job_posting.title} ({self.status})"
+        return f"{self.job_posting} ({self.status_label()})"
+
+    def status_label(self) -> str:
+        return force_str(CandidacyStatus(self.status).label)
