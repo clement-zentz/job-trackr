@@ -252,10 +252,10 @@ def test_list_job_postings_filters_by_has_candidacy(
     expected_with_candidacy,
     expected_without_candidacy,
 ):
-    candidacy = JobCandidacyFactory()
+    with_candidacy = JobPostingFactory()
+    JobCandidacyFactory(job_posting=with_candidacy)
 
-    with_candidacy = JobPostingFactory(candidacy=candidacy)
-    without_candidacy = JobPostingFactory(candidacy=None)
+    without_candidacy = JobPostingFactory()
 
     response = authenticated_client.get(
         reverse("job-posting-list"),
@@ -277,36 +277,6 @@ def test_list_job_postings_filters_by_has_candidacy(
         assert str(without_candidacy.id) not in returned_ids
 
 
-def test_list_job_postings_filters_by_rating_min(authenticated_client):
-    low = JobPostingFactory(rating=2.0)
-    high = JobPostingFactory(rating=4.5)
-
-    response = authenticated_client.get(
-        reverse("job-posting-list"),
-        {"rating_min": 3.0},
-    )
-
-    returned_ids = {item["id"] for item in response.data["results"]}
-
-    assert str(high.id) in returned_ids
-    assert str(low.id) not in returned_ids
-
-
-def test_list_job_postings_filters_by_rating_max(authenticated_client):
-    low = JobPostingFactory(rating=2.0)
-    high = JobPostingFactory(rating=4.5)
-
-    response = authenticated_client.get(
-        reverse("job-posting-list"),
-        {"rating_max": 3.0},
-    )
-
-    returned_ids = {item["id"] for item in response.data["results"]}
-
-    assert str(low.id) in returned_ids
-    assert str(high.id) not in returned_ids
-
-
 def test_list_job_postings_filters_by_company_icontains(authenticated_client):
     matching = JobPostingFactory(company="OpenAI")
     no_matching = JobPostingFactory(company="Google")
@@ -322,16 +292,18 @@ def test_list_job_postings_filters_by_company_icontains(authenticated_client):
     assert str(no_matching.id) not in returned_ids
 
 
-def test_list_job_postings_combines_rating_and_company_filters(authenticated_client):
-    matching = JobPostingFactory(company="OpenAI", rating=4.5)
-    no_matching1 = JobPostingFactory(company="OpenAI", rating=2.0)
-    no_matching2 = JobPostingFactory(company="Google", rating=4.5)
+def test_list_job_postings_combines_active_hiring_and_company_filters(
+    authenticated_client,
+):
+    matching = JobPostingFactory(company="OpenAI", active_hiring=True)
+    no_matching1 = JobPostingFactory(company="OpenAI", active_hiring=False)
+    no_matching2 = JobPostingFactory(company="Google", active_hiring=True)
 
     response = authenticated_client.get(
         reverse("job-posting-list"),
         {
             "company": "open",
-            "rating_min": 4.0,
+            "active_hiring": True,
         },
     )
 
