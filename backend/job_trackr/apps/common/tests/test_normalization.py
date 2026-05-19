@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# File: backend/tests/unit/job_trackr/common/test_normalization.py
+# File: backend/job_trackr/apps/common/tests/test_normalization.py
 
 from apps.common.normalization import normalize_text
 

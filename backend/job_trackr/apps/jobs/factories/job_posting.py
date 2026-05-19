@@ -1,14 +1,15 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# File: backend/tests/factories/job_posting.py
+# File: backend/job_trackr/apps/jobs/factories/job_posting.py
 
 import random
 
-from apps.jobs.postings.choices import EmploymentType, Platforms, WorkMode
-from apps.jobs.postings.models import JobPosting
 from django.utils import timezone
 from factory.declarations import Iterator, LazyFunction, Sequence
 from factory.django import DjangoModelFactory
 from factory.faker import Faker
+
+from apps.jobs.postings.choices import EmploymentType, Platforms, WorkMode
+from apps.jobs.postings.models import JobPosting
 
 
 class JobPostingFactory(DjangoModelFactory):

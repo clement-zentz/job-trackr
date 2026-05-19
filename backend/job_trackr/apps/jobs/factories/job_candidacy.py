@@ -1,13 +1,14 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# File: backend/tests/factories/job_candidacy.py
+# File: backend/job_trackr/apps/jobs/factories/job_candidacy.py
 
 import random
 
-from apps.jobs.candidacies.choices import CandidacyStatus
-from apps.jobs.candidacies.models import JobCandidacy
 from factory.declarations import LazyFunction, SubFactory
 from factory.django import DjangoModelFactory
 from factory.faker import Faker
+
+from apps.jobs.candidacies.choices import CandidacyStatus
+from apps.jobs.candidacies.models import JobCandidacy
 
 from .job_posting import JobPostingFactory
 
