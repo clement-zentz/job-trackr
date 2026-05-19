@@ -14,11 +14,9 @@ def job_posting():
     return JobPosting.objects.create(
         title="Backend Engineer",
         company="Stripe",
-        platform="linkedin",
-        raw_url="https://example.com/job/1",
-        canonical_url="https://example.com/job/1",
-        job_key="job-1",
         location="Paris",
+        platform="linkedin",
+        url="https://example.com/job/1",
     )
 
 
@@ -53,11 +51,9 @@ def test_create_posting(authenticated_client):
     payload = {
         "title": "Frontend Engineer",
         "company": "Google",
-        "platform": "linkedin",
-        "raw_url": "https://example.com/job/2",
-        "canonical_url": "https://example.com/job/2",
-        "job_key": "job-2",
         "location": "Lyon",
+        "url": "https://example.com/job/2",
+        "platform": "linkedin",
     }
 
     response = authenticated_client.post(url, payload, format="json")
@@ -87,11 +83,9 @@ def test_full_update_posting(authenticated_client, job_posting):
     payload = {
         "title": "Full Stack Engineer",
         "company": "Amazon",
-        "platform": "indeed",
-        "raw_url": "https://example.com/job/3",
-        "canonical_url": "https://example.com/job/3",
-        "job_key": "job-3",
         "location": "Lille",
+        "url": "https://example.com/job/3",
+        "platform": "indeed",
     }
 
     response = authenticated_client.put(url, payload, format="json")
@@ -130,33 +124,6 @@ def test_session_authentication(api_client, user):
     response = api_client.get(url)
 
     assert response.status_code == 200
-
-
-def test_create_duplicate_posting_returns_409(authenticated_client):
-    url = reverse("job-posting-list")
-
-    payload = {
-        "title": "Backend Engineer",
-        "company": "Stripe",
-        "platform": "linkedin",
-        "raw_url": "https://example.com/job/1",
-        "canonical_url": "https://example.com/job/1",
-        "job_key": "job-1",
-        "location": "Paris",
-    }
-
-    # First create
-    response1 = authenticated_client.post(url, payload, format="json")
-    assert response1.status_code == 201
-
-    # Duplicate create --> same fingerprint
-    response2 = authenticated_client.post(url, payload, format="json")
-
-    assert response2.status_code == 409
-    assert "detail" in response2.data
-    assert response2.json()["detail"] == (
-        "A job posting with the same identity already exists."
-    )
 
 
 def test_reverse_job_posting_list():

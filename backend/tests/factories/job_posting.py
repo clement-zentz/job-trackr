@@ -2,42 +2,39 @@
 # File: backend/tests/factories/job_posting.py
 
 import random
-from datetime import timedelta
 
-import factory
+from apps.jobs.postings.choices import EmploymentType, Platforms, WorkMode
 from apps.jobs.postings.models import JobPosting
 from django.utils import timezone
-from factory.declarations import (
-    Iterator,
-    LazyAttribute,
-    LazyFunction,
-    Sequence,
-)
+from factory.declarations import Iterator, LazyFunction, Sequence
+from factory.django import DjangoModelFactory
 from factory.faker import Faker
 
 
-class JobPostingFactory(factory.django.DjangoModelFactory):
+class JobPostingFactory(DjangoModelFactory):
     class Meta:
         model = JobPosting
 
-    title = Sequence(lambda n: f"Backend Developer {n}")
+    title = Faker("job")
     company = Faker("company")
-    platform = Iterator(["linkedin", "indeed", "wttj"])
-
-    raw_url = Sequence(lambda n: f"https://example.com/job/{n}")
-    canonical_url = LazyAttribute(lambda obj: obj.raw_url)
-
-    job_key = Sequence(lambda n: f"job-{n}")
-
     location = Faker("city")
 
-    summary = Faker("sentence")
-    description = Faker("text")
-
-    salary = LazyFunction(lambda: f"{random.randint(30000, 120000)} €")
-    rating = Faker("pyfloat", min_value=0.0, max_value=5.0, right_digits=1)
-
+    url = Sequence(lambda n: f"https://example.com/jobs/{n}")
+    description = Faker("paragraph", nb_sentences=5)
     easy_apply = Faker("boolean")
     active_hiring = Faker("boolean")
 
-    posted_at = Sequence(lambda n: timezone.now() - timedelta(days=n))
+    posted_at = Faker(
+        "date_time_between",
+        start_date="-30d",
+        end_date="now",
+        tzinfo=timezone.get_current_timezone(),
+    )
+
+    salary = LazyFunction(lambda: f"{random.randint(50_000, 130_000)} €")
+
+    platform = Iterator([choice for choice, _label in Platforms.choices])
+
+    employment_type = Iterator([choice for choice, _label in EmploymentType.choices])
+
+    work_mode = Iterator([choice for choice, _label in WorkMode.choices])

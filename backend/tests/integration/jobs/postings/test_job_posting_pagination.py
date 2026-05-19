@@ -4,23 +4,14 @@
 import pytest
 from django.urls import reverse
 
-from tests.factories.job_candidacy import JobCandidacyFactory
 from tests.factories.job_posting import JobPostingFactory
 
 pytestmark = pytest.mark.django_db
 
 
 @pytest.fixture
-def shared_job_candidacy():
-    return JobCandidacyFactory()
-
-
-@pytest.fixture
-def job_postings(shared_job_candidacy):
-    return JobPostingFactory.create_batch(
-        30,
-        job_candidacy=shared_job_candidacy,
-    )
+def job_postings():
+    return JobPostingFactory.create_batch(30)
 
 
 def test_list_job_postings_is_paginated(authenticated_client, job_postings):
@@ -57,12 +48,11 @@ def test_list_job_postings_multiple_pages(authenticated_client, job_postings):
     assert ids_page_1 != ids_page_2
 
 
-def test_page_size_is_capped(authenticated_client, shared_job_candidacy):
+def test_page_size_is_capped(authenticated_client):
     url = reverse("job-posting-list")
 
     JobPostingFactory.create_batch(
         130,  # more than 100
-        job_candidacy=shared_job_candidacy,
     )
 
     response = authenticated_client.get(url, {"page_size": 1000})
