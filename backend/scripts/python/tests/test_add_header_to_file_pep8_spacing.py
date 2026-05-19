@@ -1,5 +1,6 @@
+#!/usr/bin/env python3
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# File: backend/tests/scripts/test_add_header_to_file_pep8_spacing.py
+# File: backend/scripts/python/tests/test_add_header_to_file_pep8_spacing.py
 
 from pathlib import Path
 

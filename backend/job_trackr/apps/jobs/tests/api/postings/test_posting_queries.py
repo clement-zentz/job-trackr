@@ -1,14 +1,13 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# File: backend/tests/integration/jobs/postings/test_posting_queries.py
+# File: backend/job_trackr/apps/jobs/tests/api/postings/test_posting_queries.py
 
 from datetime import timedelta
 
 import pytest
+from apps.jobs.factories.job_candidacy import JobCandidacyFactory
+from apps.jobs.factories.job_posting import JobPostingFactory
 from django.urls import reverse
 from django.utils import timezone
-
-from tests.factories.job_candidacy import JobCandidacyFactory
-from tests.factories.job_posting import JobPostingFactory
 
 pytestmark = pytest.mark.django_db
 

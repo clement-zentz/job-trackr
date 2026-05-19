@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# File: backend/tests/integration/jobs/postings/test_postings_api.py
+# File: backend/job_trackr/apps/jobs/tests/api/postings/test_postings_api.py
 
 import pytest
 from apps.jobs.postings.models import JobPosting

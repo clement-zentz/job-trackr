@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# File: backend/tests/integration/jobs/conftest.py
+# File: backend/job_trackr/apps/jobs/tests/api/conftest.py
 
 import pytest
 from django.contrib.auth import get_user_model
