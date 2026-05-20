@@ -5,10 +5,10 @@ export interface JobPosting {
   id: string;
   title: string;
   company: string;
-  location: string | null;
+  location: string;
   platform: string;
-  raw_url: string;
-  canonical_url: string;
+  platform_label: string;
+  url: string;
   posted_at: string | null;
 }
 
