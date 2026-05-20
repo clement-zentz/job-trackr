@@ -12,8 +12,8 @@ export function createJobPosting(
     company: "Acme",
     location: "Paris",
     platform: "linkedin",
-    raw_url: "https://example.com/123",
-    canonical_url: "https://example.com/123",
+    platform_label: "LinkedIn",
+    url: "https://example.com/123",
     posted_at: "2025-01-01T10:00:00Z",
     ...overrides,
   } satisfies JobPosting;

@@ -15,13 +15,13 @@ describe("JobPostingCard", () => {
     expect(screen.getByText("Backend Engineer")).toBeInTheDocument();
     expect(screen.getByText("Acme")).toBeInTheDocument();
     expect(screen.getByText("Paris")).toBeInTheDocument();
-    expect(screen.getByText("linkedin")).toBeInTheDocument();
+    expect(screen.getByText("LinkedIn")).toBeInTheDocument();
   });
 
-  it("shows fallback when location is null", () => {
-    render(<JobPostingCard job={{ ...baseJob, location: null }} />);
+  it("does not render url element when url is empty", () => {
+    render(<JobPostingCard job={{ ...baseJob, url: "" }} />);
 
-    expect(screen.getByText("Location unknown")).toBeInTheDocument();
+    expect(screen.queryByTestId("job-posting-url")).not.toBeInTheDocument();
   });
 
   it("does not render date element when posted_at is null", () => {
