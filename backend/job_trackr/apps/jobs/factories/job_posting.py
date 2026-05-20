@@ -12,7 +12,7 @@ from apps.jobs.postings.choices import EmploymentType, Platforms, WorkMode
 from apps.jobs.postings.models import JobPosting
 
 
-class JobPostingFactory(DjangoModelFactory):
+class JobPostingFactory(DjangoModelFactory[JobPosting]):
     class Meta:
         model = JobPosting
 

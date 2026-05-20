@@ -6,7 +6,7 @@ from rest_framework import serializers
 from apps.jobs.postings.models import JobPosting
 
 
-class JobPostingChoiceLabelsMixin(serializers.Serializer):
+class JobPostingChoiceLabelsMixin(serializers.Serializer[JobPosting]):
     platform_label = serializers.CharField(
         source="get_platform_display",
         read_only=True,

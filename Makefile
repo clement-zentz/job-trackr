@@ -26,6 +26,9 @@ logs:
 down:
 	$(COMPOSE_DEV) down --remove-orphans
 
+down-v:
+	$(COMPOSE_DEV) down -v --remove-orphans
+
 reset-compose:
 	$(COMPOSE_DEV) down -v --remove-orphans --rmi all
 
