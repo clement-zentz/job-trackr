@@ -10,7 +10,7 @@ from .models import JobCandidacy
 
 
 @admin.register(JobCandidacy)
-class JobCandidacyAdmin(admin.ModelAdmin):
+class JobCandidacyAdmin(admin.ModelAdmin[JobCandidacy]):
     list_display = (
         "short_job_candidacy",
         "job_posting_link",

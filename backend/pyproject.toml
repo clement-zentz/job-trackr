@@ -89,6 +89,7 @@ pretty = true
 
 exclude = [
   "(^|/)migrations/.*\\.py$",
+  "(^|/)tests/.*\\.py$",
 ]
 
 [tool.django-stubs]
@@ -101,18 +102,16 @@ ignore_missing_imports = false
 
 [[tool.mypy.overrides]]
 module = [
-  "apps.jobs.postings.admin",
-  "apps.jobs.candidacies.admin",
+  "apps.jobs.factories.*",
+  "apps.jobs.management.commands.seed_demo_jobs",
 ]
-disable_error_code = ["type-arg"]
+disable_error_code = ["no-untyped-call"]
 
 # --- deptry ---
 [tool.deptry]
-exclude = [
-  ".venv",
-  "env",
+extend_exclude = [
   ".*/migrations/.*",
-  "tests",
+  ".*/tests/.*",
 ]
 
 known_first_party = [

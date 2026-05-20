@@ -7,7 +7,7 @@ from apps.jobs.postings.models import JobPosting
 
 
 @admin.register(JobPosting)
-class JobPostingAdmin(admin.ModelAdmin):
+class JobPostingAdmin(admin.ModelAdmin[JobPosting]):
     list_display = (
         "title",
         "company",

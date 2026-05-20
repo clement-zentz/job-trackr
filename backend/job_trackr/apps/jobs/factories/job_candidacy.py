@@ -13,7 +13,7 @@ from apps.jobs.candidacies.models import JobCandidacy
 from .job_posting import JobPostingFactory
 
 
-class JobCandidacyFactory(DjangoModelFactory):
+class JobCandidacyFactory(DjangoModelFactory[JobCandidacy]):
     class Meta:
         model = JobCandidacy
 
