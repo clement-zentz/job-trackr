@@ -36,6 +36,26 @@ repos:
       - id: ruff-format
         name: Ruff formatter
 
+  # --- Python type checking with mypy ---
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy (backend)
+        entry: uv --directory backend run mypy job_trackr scripts
+        language: system
+        pass_filenames: false
+        files: ^backend/(job_trackr|scripts)/.*\.py$
+
+  # --- Python dependency checks with deptry ---
+  - repo: local
+    hooks:
+      - id: deptry
+        name: deptry (backend)
+        entry: uv --directory backend run deptry . --config pyproject.toml
+        language: system
+        pass_filenames: false
+        files: ^backend/(pyproject\.toml|uv\.lock|job_trackr/.*\.py|scripts/.*\.py)$
+
   # --- Frontend lint & format via ESLint ---
   - repo: local
     hooks:
