@@ -13,8 +13,8 @@ DATABASES = {
         "NAME": os.getenv("POSTGRES_TEST_DB", "test_database"),
         "USER": os.getenv("POSTGRES_TEST_USER", "test_user"),
         "PASSWORD": os.getenv("POSTGRES_TEST_PASSWORD", "test_password"),
-        "HOST": os.getenv("POSTGRES_TEST_HOST", "postgres"),
-        "PORT": os.getenv("POSTGRES_TEST_PORT", "5432"),
+        "HOST": os.getenv("POSTGRES_TEST_HOST", "localhost"),
+        "PORT": os.getenv("POSTGRES_TEST_PORT", "5433"),
     }
 }
 

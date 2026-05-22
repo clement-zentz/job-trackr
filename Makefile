@@ -1,7 +1,7 @@
 # Makefile
 .PHONY: up build build-nc restart logs down reset-compose prune-global bash psql \
 manage migrations migrate superuser django-check \
-backend-coverage backend-mypy pre-commit backend-test frontend-test \
+backend-mypy test-db backend-test backend-coverage down-test frontend-test pre-commit \
 backend-deptry backend-upgrade backend-sync frontend-update frontend-outdated
 
 COMPOSE_DEV=docker compose -f compose.dev.yml
@@ -69,18 +69,19 @@ django-check:
 backend-mypy:
 	uv --directory backend run mypy job_trackr scripts
 
-backend-test:
-	$(COMPOSE_TEST) run --rm backend; status=$$?; \
-	$(COMPOSE_TEST) down --remove-orphans; \
-	exit $$status
+test-db:
+	$(COMPOSE_TEST) up -d --wait postgres
 
-backend-coverage:
-	$(COMPOSE_TEST) run --rm backend uv run pytest \
-	--cov \
+backend-test: test-db
+	uv --directory backend run pytest $(ARGS)
+
+backend-coverage: test-db
+	uv --directory backend run pytest $(ARGS) --cov \
 	--cov-report=term-missing \
-	--cov-report=html; status=$$?; \
-	$(COMPOSE_TEST) down --remove-orphans; \
-	exit $$status
+	--cov-report=html
+
+down-test:
+	$(COMPOSE_TEST) down -v --remove-orphans
 
 frontend-test:
 	cd frontend && npm run test:run
