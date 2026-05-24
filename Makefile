@@ -1,5 +1,5 @@
 # Makefile
-.PHONY: up build build-nc restart logs down reset-compose prune-global bash psql \
+.PHONY: up build build-nc restart logs down down-v reset-compose prune-global bash psql \
 manage migrations migrate superuser django-check \
 backend-mypy test-db backend-test backend-coverage down-test frontend-test pre-commit \
 backend-deptry backend-upgrade backend-sync frontend-update frontend-outdated
@@ -39,10 +39,10 @@ APP ?= backend
 bash:
 	$(COMPOSE_DEV) exec $(APP) bash
 
-USER_DB ?= job_trackr
-DATABASE ?= job_trackr
+USER_DB ?= dev_user
+DATABASE ?= dev_database
 psql:
-	$(COMPOSE_DEV) exec postgres psql -U $(USER_DB) -d $(DATABASE)
+	$(COMPOSE_DEV) exec database psql -U $(USER_DB) -d $(DATABASE)
 
 # --- backend (Django) ---
 BACKEND_PYTHON := /app/.venv/bin/python
@@ -70,7 +70,7 @@ backend-mypy:
 	uv --directory backend run mypy job_trackr scripts
 
 test-db:
-	$(COMPOSE_TEST) up -d --wait postgres
+	$(COMPOSE_TEST) up -d --wait database
 
 backend-test: test-db
 	uv --directory backend run pytest $(ARGS)

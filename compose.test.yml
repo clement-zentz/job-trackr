@@ -3,7 +3,7 @@ name: job-trackr-test
 
 services:
 
-  postgres:
+  database:
     image: postgres:16-alpine
     ports:
       - "127.0.0.1:5433:5432"
