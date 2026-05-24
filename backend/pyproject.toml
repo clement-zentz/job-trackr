@@ -12,6 +12,7 @@ dependencies = [
     "uuid6>=2025.0.1",
     "django-filter>=25.2",
     "django-stubs-ext>=6.0.3",
+    "django-environ>=0.13.0",
 ]
 
 [dependency-groups]
@@ -99,6 +100,10 @@ strict_settings = true
 # Do not allow missing stubs globally;
 # handle per-module via overrides
 ignore_missing_imports = false
+
+[[tool.mypy.overrides]]
+module = ["environ"]
+ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
 module = [
