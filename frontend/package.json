@@ -13,7 +13,8 @@
     "test": "vitest",
     "test:run": "vitest run",
     "prettier": "pretty-quick --staged --pattern \"frontend/**/*.{ts,tsx,js,jsx,css,md,json,html}\"",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "typecheck": "tsc -b --noEmit"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.90.21",
