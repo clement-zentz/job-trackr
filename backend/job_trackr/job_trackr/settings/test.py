@@ -8,7 +8,7 @@ from .base import *  # noqa: F403,F401
 env = environ.Env(
     DATABASE_URL=(
         str,
-        "postgres://test_user:test_password@localhost:5433/test_database",
+        "postgres://test_user:test_password@127.0.0.1:5433/test_database",
     ),
 )
 
