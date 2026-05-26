@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/postings/api/normalizeJobPostingParams.test.ts
+// File: frontend/src/features/jobs/postings/api/tests/normalizeJobPostingParams.test.ts
 
 import { describe, it, expect } from "vitest";
-import { normalizeJobPostingParams } from "./normalizeJobPostingParams";
-import { DEFAULT_JOB_POSTINGS_PAGE_SIZE } from "../constants";
+import { normalizeJobPostingParams } from "../normalizeJobPostingParams";
+import { DEFAULT_JOB_POSTINGS_PAGE_SIZE } from "../../constants";
 
 describe("normalizeJobPostingParams", () => {
   it("applies default pagination when params are empty", () => {

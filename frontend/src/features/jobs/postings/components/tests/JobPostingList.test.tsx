@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/postings/components/JobPostingList.test.tsx
+// File: frontend/src/features/jobs/postings/components/tests/JobPostingList.test.tsx
 
 import { fireEvent, render, screen } from "@testing-library/react";
-import { JobPostingList } from "./JobPostingList";
-import * as hook from "../hooks/useJobPostings";
+import { JobPostingList } from "../JobPostingList";
+import * as hook from "../../hooks/useJobPostings";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { createJobPosting } from "@/tests/factories/jobPosting";
 import { createPaginatedResponse } from "@/tests/factories/paginatedResponse";
 import type { PaginatedResponse } from "@/types/pagination";
-import type { JobPosting, JobPostingListParams } from "../types";
-import { DEFAULT_JOB_POSTINGS_PAGE_SIZE } from "../constants";
+import type { JobPosting, JobPostingListParams } from "../../types";
+import { DEFAULT_JOB_POSTINGS_PAGE_SIZE } from "../../constants";
 
 const defaultParams: JobPostingListParams = {
   page: 1,
