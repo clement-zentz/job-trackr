@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/postings/hooks/useJobPostingFilters.test.ts
+// File: frontend/src/features/jobs/postings/hooks/tests/useJobPostingFilters.test.ts
 
 import { renderHook } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
-import { useJobPostingFilters } from "./useJobPostingFilters";
+import { useJobPostingFilters } from "../useJobPostingFilters";
 import { act } from "react";
-import { DEFAULT_JOB_POSTINGS_PAGE_SIZE } from "../constants";
+import { DEFAULT_JOB_POSTINGS_PAGE_SIZE } from "../../constants";
 
 describe("useJobPostingFilters", () => {
   it("initializes with default filters", () => {

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/postings/components/JobPostingCard.test.tsx
+// File: frontend/src/features/jobs/postings/components/tests/JobPostingCard.test.tsx
 
 import { render, screen } from "@testing-library/react";
-import { JobPostingCard } from "./JobPostingCard";
+import { JobPostingCard } from "../JobPostingCard";
 import { describe, it, expect } from "vitest";
 import { createJobPosting } from "@/tests/factories/jobPosting";
 
