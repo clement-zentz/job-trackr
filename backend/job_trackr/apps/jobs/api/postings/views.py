@@ -15,8 +15,7 @@ from apps.jobs.postings.models import JobPosting
 
 from .filters import JobPostingFilter
 from .serializers import (
-    JobPostingDetailSerializer,
-    JobPostingListSerializer,
+    JobPostingReadSerializer,
     JobPostingWriteSerializer,
 )
 
@@ -28,6 +27,7 @@ class JobPostingViewSet(viewsets.ModelViewSet[JobPosting]):
     - list(): GET /api/v1/jobs/postings/
     - retrieve(): GET /api/v1/jobs/postings/{id}/
     - create(): POST /api/v1/jobs/postings/
+    - update(): PUT /api/v1/jobs/postings/{id}/
     - partial_update(): PATCH /api/v1/jobs/postings/{id}/
     - destroy(): DELETE /api/v1/jobs/postings/{id}/
     """
@@ -64,14 +64,8 @@ class JobPostingViewSet(viewsets.ModelViewSet[JobPosting]):
     # Querysets
     # -------------------------
 
-    def _detail_queryset(self) -> QuerySet[JobPosting]:
-        return JobPosting.objects.select_related("candidacy")
-
     def get_queryset(self) -> QuerySet[JobPosting]:
-        if self.action in ("retrieve", "update", "partial_update", "destroy"):
-            return self._detail_queryset()
-
-        return JobPosting.objects.all()
+        return JobPosting.objects.select_related("candidacy")
 
     # -------------------------
     # Serializers
@@ -80,10 +74,23 @@ class JobPostingViewSet(viewsets.ModelViewSet[JobPosting]):
     def get_serializer_class(self) -> type[serializers.BaseSerializer[Any]]:
         if self.action in ("create", "update", "partial_update"):
             return JobPostingWriteSerializer
-        if self.action == "retrieve":
-            return JobPostingDetailSerializer
+        return JobPostingReadSerializer
 
-        return JobPostingListSerializer
+    def _serialize_read_response(
+        self,
+        instance: JobPosting,
+        *,
+        status_code: int = status.HTTP_200_OK,
+    ) -> Response:
+        # Re-fetch with enriched queryset
+        instance = self.get_queryset().get(pk=instance.pk)
+
+        serializer = JobPostingReadSerializer(
+            instance,
+            context=self.get_serializer_context(),
+        )
+
+        return Response(serializer.data, status=status_code)
 
     # -------------------------
     # Create
@@ -91,21 +98,14 @@ class JobPostingViewSet(viewsets.ModelViewSet[JobPosting]):
 
     def create(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         serializer = self.get_serializer(data=request.data)
+
         serializer.is_valid(raise_exception=True)
 
         instance = serializer.save()
 
-        # Re-fetch with enriched queryset
-        instance = self._detail_queryset().get(pk=instance.pk)
-
-        response_serializer = JobPostingDetailSerializer(
+        return self._serialize_read_response(
             instance,
-            context=self.get_serializer_context(),
-        )
-
-        return Response(
-            response_serializer.data,
-            status=status.HTTP_201_CREATED,
+            status_code=status.HTTP_201_CREATED,
         )
 
     # -------------------------
@@ -121,20 +121,8 @@ class JobPostingViewSet(viewsets.ModelViewSet[JobPosting]):
             data=request.data,
             partial=partial,
         )
-
         serializer.is_valid(raise_exception=True)
 
         instance = serializer.save()
 
-        # Re-fetch with enriched queryset
-        instance = self._detail_queryset().get(pk=instance.pk)
-
-        response_serializer = JobPostingDetailSerializer(
-            instance,
-            context=self.get_serializer_context(),
-        )
-
-        return Response(
-            response_serializer.data,
-            status=status.HTTP_200_OK,
-        )
+        return self._serialize_read_response(instance)
