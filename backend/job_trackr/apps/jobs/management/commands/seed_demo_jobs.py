@@ -19,8 +19,8 @@ class Command(BaseCommand):
             raise CommandError("This command can only be run with DEBUG=True.")
 
         try:
-            from apps.jobs.factories.job_candidacy import JobCandidacyFactory
-            from apps.jobs.factories.job_posting import JobPostingFactory
+            from apps.jobs.demo_data.job_candidacy import DemoJobCandidacyFactory
+            from apps.jobs.demo_data.job_posting import DemoJobPostingFactory
         except ImportError as exc:
             raise CommandError(
                 "The seed_demo_jobs command requires test dependencies. "
@@ -42,10 +42,10 @@ class Command(BaseCommand):
                 "Candidacies count cannot be greater than postings count."
             )
 
-        postings = JobPostingFactory.create_batch(postings_count)
+        postings = DemoJobPostingFactory.create_batch(postings_count)
 
         for posting in postings[:candidacies_count]:
-            JobCandidacyFactory(job_posting=posting)
+            DemoJobCandidacyFactory(job_posting=posting)
 
         self.stdout.write(
             self.style.SUCCESS(
