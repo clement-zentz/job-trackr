@@ -1,27 +1,23 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# File: backend/job_trackr/apps/jobs/factories/job_candidacy.py
+# File: backend/job_trackr/apps/jobs/demo_data/job_candidacy.py
 
-import random
-
-from factory.declarations import LazyFunction, SubFactory
+from factory.declarations import Iterator, SubFactory
 from factory.django import DjangoModelFactory
 from factory.faker import Faker
 
 from apps.jobs.candidacies.choices import CandidacyStatus
 from apps.jobs.candidacies.models import JobCandidacy
 
-from .job_posting import JobPostingFactory
+from .job_posting import DemoJobPostingFactory
 
 
-class JobCandidacyFactory(DjangoModelFactory[JobCandidacy]):
+class DemoJobCandidacyFactory(DjangoModelFactory[JobCandidacy]):
     class Meta:
         model = JobCandidacy
 
-    job_posting = SubFactory(JobPostingFactory)
+    job_posting = SubFactory(DemoJobPostingFactory)
 
-    status = LazyFunction(
-        lambda: random.choice([choice for choice, _ in CandidacyStatus.choices])
-    )
+    status = Iterator([choice for choice, _label in CandidacyStatus.choices])
 
     applied_on = Faker(
         "date_between",
