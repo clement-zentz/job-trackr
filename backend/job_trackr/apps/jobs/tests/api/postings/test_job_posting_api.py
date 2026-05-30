@@ -1,8 +1,10 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# File: backend/job_trackr/apps/jobs/tests/api/postings/test_postings_api.py
+# File: backend/job_trackr/apps/jobs/tests/api/postings/test_job_posting_api.py
 
 import pytest
+from apps.jobs.postings.choices import EmploymentType, Platforms, WorkMode
 from apps.jobs.postings.models import JobPosting
+from apps.jobs.tests.factories.job_posting import JobPostingFactory
 from django.urls import reverse
 from rest_framework import status
 
@@ -11,16 +13,36 @@ pytestmark = pytest.mark.django_db
 
 @pytest.fixture
 def job_posting():
-    return JobPosting.objects.create(
-        title="Backend Engineer",
-        company="Stripe",
-        location="Paris",
-        platform="linkedin",
-        url="https://example.com/job/1",
-    )
+    return JobPostingFactory()
 
 
-def test_list_postings(authenticated_client, job_posting):
+def assert_job_posting_read_shape(data: dict) -> None:
+    expected_keys = {
+        "id",
+        "title",
+        "company",
+        "location",
+        "url",
+        "description",
+        "description_preview",
+        "salary",
+        "easy_apply",
+        "active_hiring",
+        "platform",
+        "platform_label",
+        "employment_type",
+        "employment_type_label",
+        "work_mode",
+        "work_mode_label",
+        "candidacy_id",
+        "posted_at",
+        "created_at",
+        "updated_at",
+    }
+    assert expected_keys <= data.keys()
+
+
+def test_list_job_postings(authenticated_client, job_posting):
     url = reverse("job-posting-list")
 
     response = authenticated_client.get(url)
@@ -33,19 +55,58 @@ def test_list_postings(authenticated_client, job_posting):
 
     # Data assertions
     assert response.data["count"] >= 1
-    assert any(item["id"] == str(job_posting.id) for item in response.data["results"])
+
+    item = next(
+        (
+            item
+            for item in response.data["results"]
+            if item["id"] == str(job_posting.id)
+        ),
+        None,
+    )
+
+    assert item is not None
+    assert_job_posting_read_shape(item)
 
 
-def test_retrieve_posting(authenticated_client, job_posting):
+def test_retrieve_job_posting(authenticated_client):
+    job_posting = JobPostingFactory(
+        title="Backend Engineer",
+        company="Stripe",
+        location="Paris",
+        url="https://example.com/job/1",
+        description="Build backend services for payments and financial systems.",
+        salary="60k-80k",
+        easy_apply=True,
+        active_hiring=True,
+        platform=Platforms.LINKEDIN,
+        employment_type=EmploymentType.FULL_TIME,
+        work_mode=WorkMode.HYBRID,
+    )
+
     url = reverse("job-posting-detail", args=[job_posting.id])
 
     response = authenticated_client.get(url)
 
     assert response.status_code == status.HTTP_200_OK
+    assert_job_posting_read_shape(response.data)
+
     assert response.data["id"] == str(job_posting.id)
+    assert response.data["title"] == job_posting.title
+    assert response.data["company"] == job_posting.company
+    assert response.data["location"] == job_posting.location
+    assert response.data["url"] == job_posting.url
+    assert response.data["description"] == job_posting.description
+    assert response.data["salary"] == job_posting.salary
+    assert response.data["easy_apply"] is True
+    assert response.data["active_hiring"] is True
+    assert response.data["platform"] == "linkedin"
+    assert response.data["employment_type"] == "full_time"
+    assert response.data["work_mode"] == "hybrid"
+    assert response.data["candidacy_id"] is None
 
 
-def test_create_posting(authenticated_client):
+def test_create_job_posting(authenticated_client):
     url = reverse("job-posting-list")
 
     payload = {
@@ -59,11 +120,13 @@ def test_create_posting(authenticated_client):
     response = authenticated_client.post(url, payload, format="json")
 
     assert response.status_code == status.HTTP_201_CREATED
+    assert_job_posting_read_shape(response.data)
+
     assert JobPosting.objects.filter(title="Frontend Engineer").exists()
     assert response.data["title"] == "Frontend Engineer"
 
 
-def test_partial_update_posting(authenticated_client, job_posting):
+def test_partial_update_job_posting(authenticated_client, job_posting):
     url = reverse("job-posting-detail", args=[job_posting.id])
 
     payload = {
@@ -73,11 +136,13 @@ def test_partial_update_posting(authenticated_client, job_posting):
     response = authenticated_client.patch(url, payload, format="json")
 
     assert response.status_code == status.HTTP_200_OK
+    assert_job_posting_read_shape(response.data)
+
     job_posting.refresh_from_db()
     assert job_posting.title == "Senior Backend Engineer"
 
 
-def test_full_update_posting(authenticated_client, job_posting):
+def test_full_update_job_posting(authenticated_client, job_posting):
     url = reverse("job-posting-detail", args=[job_posting.id])
 
     payload = {
@@ -91,12 +156,14 @@ def test_full_update_posting(authenticated_client, job_posting):
     response = authenticated_client.put(url, payload, format="json")
 
     assert response.status_code == status.HTTP_200_OK
+    assert_job_posting_read_shape(response.data)
+
     job_posting.refresh_from_db()
     assert job_posting.title == "Full Stack Engineer"
     assert job_posting.company == "Amazon"
 
 
-def test_delete_posting(authenticated_client, job_posting):
+def test_delete_job_posting(authenticated_client, job_posting):
     url = reverse("job-posting-detail", args=[job_posting.id])
 
     response = authenticated_client.delete(url)
@@ -110,7 +177,7 @@ def test_authentication_required(api_client):
 
     response = api_client.get(url)
 
-    assert response.status_code == 403
+    assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
 def test_session_authentication(api_client, user):
@@ -123,7 +190,7 @@ def test_session_authentication(api_client, user):
 
     response = api_client.get(url)
 
-    assert response.status_code == 200
+    assert response.status_code == status.HTTP_200_OK
 
 
 def test_reverse_job_posting_list():

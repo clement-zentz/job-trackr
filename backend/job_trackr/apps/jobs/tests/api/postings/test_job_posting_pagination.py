@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# File: backend/job_trackr/apps/jobs/tests/api/postings/test_posting_pagination.py
+# File: backend/job_trackr/apps/jobs/tests/api/postings/test_job_posting_pagination.py
 
 import pytest
-from apps.jobs.factories.job_posting import JobPostingFactory
+from apps.jobs.tests.factories.job_posting import JobPostingFactory
 from django.urls import reverse
 
 pytestmark = pytest.mark.django_db
