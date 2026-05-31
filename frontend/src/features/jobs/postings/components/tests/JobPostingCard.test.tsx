@@ -4,13 +4,23 @@
 import { render, screen } from "@testing-library/react";
 import { JobPostingCard } from "../JobPostingCard";
 import { describe, it, expect } from "vitest";
-import { createJobPosting } from "@/tests/factories/jobPosting";
+import { createJobPostingRead } from "@/tests/factories/jobPosting";
 
-const baseJob = createJobPosting();
+const baseJob = createJobPostingRead();
 
 describe("JobPostingCard", () => {
   it("renders job information", () => {
-    render(<JobPostingCard job={baseJob} />);
+    render(
+      <JobPostingCard
+        job={{
+          ...baseJob,
+          url: "https://example.com/1",
+          posted_at: "2026-01-01T10:00:00Z",
+          platform: "linkedin",
+          platform_label: "LinkedIn",
+        }}
+      />,
+    );
 
     expect(screen.getByText("Backend Engineer")).toBeInTheDocument();
     expect(screen.getByText("Acme")).toBeInTheDocument();

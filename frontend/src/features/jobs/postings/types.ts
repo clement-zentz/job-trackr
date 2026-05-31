@@ -1,16 +1,41 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/features/jobs/postings/types.ts
 
-export interface JobPosting {
+// --- API READ MODELS ---
+
+// API response body returned by job posting endpoints.
+export interface JobPostingRead {
   id: string;
+
   title: string;
   company: string;
   location: string;
+
+  url: string;
+  description: string;
+  description_preview: string;
+  salary: string;
+
+  easy_apply: boolean;
+  active_hiring: boolean;
+
   platform: string;
   platform_label: string;
-  url: string;
+
+  employment_type: string;
+  employment_type_label: string;
+
+  work_mode: string;
+  work_mode_label: string;
+
+  candidacy_id: string | null;
+
   posted_at: string | null;
+  created_at: string;
+  updated_at: string;
 }
+
+// --- API QUERY MODELS ---
 
 /**
  * Frontend query params used by the UI and React state

@@ -3,12 +3,12 @@
 
 import { api } from "@/api/client";
 import type { PaginatedResponse } from "@/types/pagination";
-import type { JobPosting, JobPostingQueryParams } from "../types";
+import type { JobPostingRead, JobPostingQueryParams } from "../types";
 
 export const listJobPostings = async (
   params: JobPostingQueryParams,
-): Promise<PaginatedResponse<JobPosting>> => {
-  const response = await api.get<PaginatedResponse<JobPosting>>(
+): Promise<PaginatedResponse<JobPostingRead>> => {
+  const response = await api.get<PaginatedResponse<JobPostingRead>>(
     "/v1/jobs/postings/",
     { params },
   );

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/features/jobs/postings/components/JobPostingCard.tsx
 
-import type { JobPosting } from "../types";
+import type { JobPostingRead } from "../types";
 
 function formatDate(dateString: string): string {
   return new Date(dateString).toLocaleString(undefined, {
@@ -17,7 +17,7 @@ function formatUrlForDisplay(url: string, maxLength = 60): string {
   return url.length > maxLength ? `${url.slice(0, maxLength)}…` : url;
 }
 
-export function JobPostingCard({ job }: { job: JobPosting }) {
+export function JobPostingCard({ job }: { job: JobPostingRead }) {
   const formattedDate = job.posted_at ? formatDate(job.posted_at) : null;
   const formattedUrl = job.url ? formatUrlForDisplay(job.url) : null;
 
