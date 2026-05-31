@@ -6,7 +6,7 @@ import type { Mock } from "vitest";
 import { listJobPostings } from "../listJobPostings";
 import { api } from "@/api/client";
 import { createPaginatedResponse } from "@/tests/factories/paginatedResponse";
-import { createJobPosting } from "@/tests/factories/jobPosting";
+import { createJobPostingRead } from "@/tests/factories/jobPosting";
 import { DEFAULT_JOB_POSTINGS_PAGE_SIZE } from "../../constants";
 
 beforeEach(() => {
@@ -21,7 +21,7 @@ vi.mock("@/api/client", () => ({
 
 describe("listJobPostings", () => {
   it("passes params correctly to API", async () => {
-    const mockData = createPaginatedResponse([createJobPosting()]);
+    const mockData = createPaginatedResponse([createJobPostingRead()]);
     (api.get as Mock).mockResolvedValueOnce({ data: mockData });
 
     await listJobPostings({
@@ -43,7 +43,7 @@ describe("listJobPostings", () => {
   });
 
   it("works with minimal params", async () => {
-    const mockData = createPaginatedResponse([createJobPosting()]);
+    const mockData = createPaginatedResponse([createJobPostingRead()]);
     (api.get as Mock).mockResolvedValueOnce({ data: mockData });
 
     await listJobPostings({
@@ -55,7 +55,7 @@ describe("listJobPostings", () => {
   });
 
   it("does not modify params", async () => {
-    const mockData = createPaginatedResponse([createJobPosting()]);
+    const mockData = createPaginatedResponse([createJobPostingRead()]);
     (api.get as Mock).mockResolvedValueOnce({ data: mockData });
 
     const params = {
