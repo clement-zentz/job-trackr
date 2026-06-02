@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/tests/factories/jobPosting.ts
 
-import type { JobPostingRead } from "@/features/jobs/postings/types";
+import type {
+  JobPostingRead,
+  JobPostingCreatePayload,
+} from "@/features/jobs/postings/types";
 
 export function createJobPostingRead(
   overrides: Partial<JobPostingRead> = {},
@@ -29,4 +32,15 @@ export function createJobPostingRead(
     updated_at: "2025-01-01T10:00:00Z",
     ...overrides,
   } satisfies JobPostingRead;
+}
+
+export function createJobPostingCreatePayload(
+  overrides: Partial<JobPostingCreatePayload> = {},
+): JobPostingCreatePayload {
+  return {
+    title: "Backend Engineer",
+    company: "Acme",
+    location: "Paris",
+    ...overrides,
+  } satisfies JobPostingCreatePayload;
 }
