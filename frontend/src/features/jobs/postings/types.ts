@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/features/jobs/postings/types.ts
 
+import type { Platform, EmploymentType, WorkMode } from "./choices";
+
 // --- API READ MODELS ---
 
 // API response body returned by job posting endpoints.
@@ -19,13 +21,13 @@ export interface JobPostingRead {
   easy_apply: boolean;
   active_hiring: boolean;
 
-  platform: string;
+  platform: Platform;
   platform_label: string;
 
-  employment_type: string;
+  employment_type: EmploymentType;
   employment_type_label: string;
 
-  work_mode: string;
+  work_mode: WorkMode;
   work_mode_label: string;
 
   candidacy_id: string | null;
@@ -34,6 +36,32 @@ export interface JobPostingRead {
   created_at: string;
   updated_at: string;
 }
+
+// --- API WRITE MODELS ---
+
+// API request body for create/update
+export interface JobPostingWritePayload {
+  title: string;
+  company: string;
+  location: string;
+
+  url?: string;
+  salary?: string;
+  description?: string;
+
+  easy_apply?: boolean;
+  active_hiring?: boolean;
+
+  platform?: Platform;
+  employment_type?: EmploymentType;
+  work_mode?: WorkMode;
+
+  posted_at?: string | null;
+}
+
+export type JobPostingCreatePayload = JobPostingWritePayload;
+
+export type JobPostingUpdatePayload = Partial<JobPostingWritePayload>;
 
 // --- API QUERY MODELS ---
 
