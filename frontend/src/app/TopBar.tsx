@@ -9,7 +9,7 @@ export function TopBar() {
       <div className="flex items-center gap-2">
         {/* Placeholder for search / filters / add button */}
         <button className="rounded bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700">
-          + Add
+          + Action
         </button>
       </div>
     </header>
