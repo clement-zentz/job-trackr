@@ -3,10 +3,20 @@
 
 import type { RouteObject } from "react-router-dom";
 import { JobPostingsPage } from "./pages/JobPostingsPage";
+import { CreateJobPostingPage } from "./pages/CreateJobPostingPage";
 
 export const jobPostingsRoutes: RouteObject[] = [
   {
     path: "postings",
-    element: <JobPostingsPage />,
+    children: [
+      {
+        index: true,
+        element: <JobPostingsPage />,
+      },
+      {
+        path: "new",
+        element: <CreateJobPostingPage />,
+      },
+    ],
   },
 ];
