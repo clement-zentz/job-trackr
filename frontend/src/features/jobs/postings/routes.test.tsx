@@ -1,0 +1,48 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// File: frontend/src/features/jobs/postings/routes.test.tsx
+
+import { screen } from "@testing-library/react";
+import { createMemoryRouter, RouterProvider } from "react-router-dom";
+import { describe, expect, it } from "vitest";
+
+import { renderWithQueryClient } from "@/tests/utils";
+
+import { jobPostingsRoutes } from "./routes";
+
+function renderJobPostingsRoute(initialEntry: string) {
+  const router = createMemoryRouter(
+    [
+      {
+        path: "/jobs",
+        children: jobPostingsRoutes,
+      },
+    ],
+    {
+      initialEntries: [initialEntry],
+    },
+  );
+
+  return renderWithQueryClient(<RouterProvider router={router} />);
+}
+
+describe("jobPostingsRoutes", () => {
+  it("renders the job postings page at /jobs/postings", async () => {
+    renderJobPostingsRoute("/jobs/postings");
+
+    expect(
+      await screen.findByRole("heading", { name: "Job Postings" }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole("link", { name: "Create job posting" }),
+    ).toHaveAttribute("href", "/jobs/postings/new");
+  });
+
+  it("renders the create job posting page at /jobs/postings/new", async () => {
+    renderJobPostingsRoute("/jobs/postings/new");
+
+    expect(
+      await screen.findByRole("heading", { name: "Create Job Posting" }),
+    ).toBeInTheDocument();
+  });
+});

@@ -17,7 +17,10 @@ export const router = createBrowserRouter([
         path: "settings",
         element: <div className="p-6">Settings</div>,
       },
-      ...jobPostingsRoutes,
+      {
+        path: "jobs",
+        children: jobPostingsRoutes,
+      },
     ],
   },
 ]);
