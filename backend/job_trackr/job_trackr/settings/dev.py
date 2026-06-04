@@ -19,6 +19,10 @@ env = environ.Env(
         str,
         "postgres://dev_user:dev_password@database:5432/dev_database",
     ),
+    CSRF_TRUSTED_ORIGINS=(
+        list,
+        ["http://localhost:5173", "http://127.0.0.1:5173"],
+    ),
 )
 
 DEBUG = True
@@ -33,3 +37,5 @@ if not ALLOWED_HOSTS:
 DATABASES = {
     "default": env.db("DATABASE_URL"),
 }
+
+CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS")
