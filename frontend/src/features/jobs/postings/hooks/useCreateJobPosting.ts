@@ -2,7 +2,7 @@
 // File: frontend/src/features/jobs/postings/hooks/useCreateJobPosting.ts
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createJobPosting } from "../api/createJobPosting";
+import { createJobPosting } from "../api/jobPostingsApi";
 import type { JobPostingCreatePayload } from "../types";
 
 export const useCreateJobPosting = () => {
