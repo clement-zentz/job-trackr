@@ -16,30 +16,41 @@ def job_posting():
     return JobPostingFactory()
 
 
-def assert_job_posting_read_shape(data: dict) -> None:
-    expected_keys = {
-        "id",
-        "title",
-        "company",
-        "location",
-        "url",
-        "description",
-        "description_preview",
-        "salary",
-        "easy_apply",
-        "active_hiring",
-        "platform",
-        "platform_label",
-        "employment_type",
-        "employment_type_label",
-        "work_mode",
-        "work_mode_label",
-        "candidacy_id",
-        "posted_at",
-        "created_at",
-        "updated_at",
-    }
-    assert expected_keys <= data.keys()
+JOB_POSTING_LIST_KEYS = {
+    "id",
+    "title",
+    "company",
+    "location",
+    "url",
+    "description_preview",
+    "salary",
+    "easy_apply",
+    "active_hiring",
+    "platform",
+    "platform_label",
+    "employment_type",
+    "employment_type_label",
+    "work_mode",
+    "work_mode_label",
+    "candidacy_id",
+    "posted_at",
+    "created_at",
+    "updated_at",
+}
+
+
+JOB_POSTING_DETAIL_KEYS = JOB_POSTING_LIST_KEYS | {
+    "description",
+}
+
+
+def assert_job_posting_list_shape(data: dict) -> None:
+    assert data.keys() == JOB_POSTING_LIST_KEYS
+    assert "description" not in data
+
+
+def assert_job_posting_detail_shape(data: dict) -> None:
+    assert data.keys() == JOB_POSTING_DETAIL_KEYS
 
 
 def test_list_job_postings(authenticated_client, job_posting):
@@ -66,7 +77,7 @@ def test_list_job_postings(authenticated_client, job_posting):
     )
 
     assert item is not None
-    assert_job_posting_read_shape(item)
+    assert_job_posting_list_shape(item)
 
 
 def test_retrieve_job_posting(authenticated_client):
@@ -89,7 +100,7 @@ def test_retrieve_job_posting(authenticated_client):
     response = authenticated_client.get(url)
 
     assert response.status_code == status.HTTP_200_OK
-    assert_job_posting_read_shape(response.data)
+    assert_job_posting_detail_shape(response.data)
 
     assert response.data["id"] == str(job_posting.id)
     assert response.data["title"] == job_posting.title
@@ -120,7 +131,7 @@ def test_create_job_posting(authenticated_client):
     response = authenticated_client.post(url, payload, format="json")
 
     assert response.status_code == status.HTTP_201_CREATED
-    assert_job_posting_read_shape(response.data)
+    assert_job_posting_detail_shape(response.data)
 
     assert JobPosting.objects.filter(title="Frontend Engineer").exists()
     assert response.data["title"] == "Frontend Engineer"
@@ -136,7 +147,7 @@ def test_partial_update_job_posting(authenticated_client, job_posting):
     response = authenticated_client.patch(url, payload, format="json")
 
     assert response.status_code == status.HTTP_200_OK
-    assert_job_posting_read_shape(response.data)
+    assert_job_posting_detail_shape(response.data)
 
     job_posting.refresh_from_db()
     assert job_posting.title == "Senior Backend Engineer"
@@ -156,7 +167,7 @@ def test_full_update_job_posting(authenticated_client, job_posting):
     response = authenticated_client.put(url, payload, format="json")
 
     assert response.status_code == status.HTTP_200_OK
-    assert_job_posting_read_shape(response.data)
+    assert_job_posting_detail_shape(response.data)
 
     job_posting.refresh_from_db()
     assert job_posting.title == "Full Stack Engineer"

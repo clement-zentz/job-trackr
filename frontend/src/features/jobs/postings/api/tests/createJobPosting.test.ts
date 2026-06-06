@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { api } from "@/api/client";
 import {
   createJobPostingCreatePayload,
-  createJobPostingRead,
+  createJobPostingDetailRead,
 } from "@/tests/factories/jobPosting";
 import { createJobPosting } from "../createJobPosting";
 
@@ -26,7 +26,7 @@ describe("createJobPosting", () => {
   it("posts the payload to the job postings endpoint", async () => {
     const payload = createJobPostingCreatePayload();
 
-    const jobPosting = createJobPostingRead();
+    const jobPosting = createJobPostingDetailRead();
 
     mockedApiPost.mockResolvedValueOnce({
       data: jobPosting,

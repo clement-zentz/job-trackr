@@ -5,10 +5,10 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { JobPostingList } from "../JobPostingList";
 import * as hook from "../../hooks/useJobPostings";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { createJobPostingRead } from "@/tests/factories/jobPosting";
+import { createJobPostingListItemRead } from "@/tests/factories/jobPosting";
 import { createPaginatedResponse } from "@/tests/factories/paginatedResponse";
 import type { PaginatedResponse } from "@/types/pagination";
-import type { JobPostingRead, JobPostingListParams } from "../../types";
+import type { JobPostingListItemRead, JobPostingListParams } from "../../types";
 import { DEFAULT_JOB_POSTINGS_PAGE_SIZE } from "../../constants";
 
 const defaultParams: JobPostingListParams = {
@@ -55,7 +55,7 @@ describe("JobPostingList", () => {
 
   it("renders job list", () => {
     vi.spyOn(hook, "useJobPostings").mockReturnValue({
-      data: createPaginatedResponse([createJobPostingRead()]),
+      data: createPaginatedResponse([createJobPostingListItemRead()]),
       isLoading: false,
       isError: false,
       isFetching: false,
@@ -71,7 +71,7 @@ describe("JobPostingList", () => {
 
   it("shows non-blocking error banner while keeping previous results", () => {
     vi.spyOn(hook, "useJobPostings").mockReturnValue({
-      data: createPaginatedResponse([createJobPostingRead()]),
+      data: createPaginatedResponse([createJobPostingListItemRead()]),
       isLoading: false,
       isError: true,
       isFetching: false,
@@ -89,7 +89,7 @@ describe("JobPostingList", () => {
 
   it("shows non-blocking error banner with empty state", () => {
     vi.spyOn(hook, "useJobPostings").mockReturnValue({
-      data: createPaginatedResponse<JobPostingRead>([], { count: 0 }),
+      data: createPaginatedResponse<JobPostingListItemRead>([], { count: 0 }),
       isLoading: false,
       isError: true,
       isFetching: false,
@@ -125,11 +125,14 @@ describe("JobPostingList pagination", () => {
   }
 
   function mockSuccessPagination(
-    overrides: Partial<PaginatedResponse<JobPostingRead>> = {},
+    overrides: Partial<PaginatedResponse<JobPostingListItemRead>> = {},
     options?: { isFetching?: boolean },
   ) {
     vi.spyOn(hook, "useJobPostings").mockReturnValue({
-      data: createPaginatedResponse([createJobPostingRead()], overrides),
+      data: createPaginatedResponse(
+        [createJobPostingListItemRead()],
+        overrides,
+      ),
       isLoading: false,
       isError: false,
       isFetching: options?.isFetching ?? false,

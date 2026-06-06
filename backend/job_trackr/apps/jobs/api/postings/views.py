@@ -15,7 +15,8 @@ from apps.jobs.postings.models import JobPosting
 
 from .filters import JobPostingFilter
 from .serializers import (
-    JobPostingReadSerializer,
+    JobPostingDetailSerializer,
+    JobPostingListSerializer,
     JobPostingWriteSerializer,
 )
 
@@ -74,7 +75,11 @@ class JobPostingViewSet(viewsets.ModelViewSet[JobPosting]):
     def get_serializer_class(self) -> type[serializers.BaseSerializer[Any]]:
         if self.action in ("create", "update", "partial_update"):
             return JobPostingWriteSerializer
-        return JobPostingReadSerializer
+
+        if self.action == "list":
+            return JobPostingListSerializer
+
+        return JobPostingDetailSerializer
 
     def _serialize_read_response(
         self,
@@ -85,7 +90,7 @@ class JobPostingViewSet(viewsets.ModelViewSet[JobPosting]):
         # Re-fetch with enriched queryset
         instance = self.get_queryset().get(pk=instance.pk)
 
-        serializer = JobPostingReadSerializer(
+        serializer = JobPostingDetailSerializer(
             instance,
             context=self.get_serializer_context(),
         )
