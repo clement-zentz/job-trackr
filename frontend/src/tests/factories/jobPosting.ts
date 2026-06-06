@@ -2,20 +2,20 @@
 // File: frontend/src/tests/factories/jobPosting.ts
 
 import type {
-  JobPostingRead,
+  JobPostingDetailRead,
+  JobPostingListItemRead,
   JobPostingCreatePayload,
 } from "@/features/jobs/postings/types";
 
-export function createJobPostingRead(
-  overrides: Partial<JobPostingRead> = {},
-): JobPostingRead {
+export function createJobPostingListItemRead(
+  overrides: Partial<JobPostingListItemRead> = {},
+): JobPostingListItemRead {
   return {
     id: "job-123",
     title: "Backend Engineer",
     company: "Acme",
     location: "Paris",
     url: "",
-    description: "",
     description_preview: "",
     salary: "",
     easy_apply: false,
@@ -31,7 +31,18 @@ export function createJobPostingRead(
     created_at: "2025-01-01T10:00:00Z",
     updated_at: "2025-01-01T10:00:00Z",
     ...overrides,
-  } satisfies JobPostingRead;
+  } satisfies JobPostingListItemRead;
+}
+
+export function createJobPostingDetailRead(
+  overrides: Partial<JobPostingDetailRead> = {},
+): JobPostingDetailRead {
+  const { description, ...listOverrides } = overrides;
+
+  return {
+    ...createJobPostingListItemRead(listOverrides),
+    description: description ?? "Full job posting description.",
+  } satisfies JobPostingDetailRead;
 }
 
 export function createJobPostingCreatePayload(

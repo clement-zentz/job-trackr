@@ -10,7 +10,7 @@ import { createJobPosting } from "../../api/createJobPosting";
 import { useCreateJobPosting } from "../useCreateJobPosting";
 import {
   createJobPostingCreatePayload,
-  createJobPostingRead,
+  createJobPostingDetailRead,
 } from "@/tests/factories/jobPosting";
 import { createTestQueryClient } from "@/tests/utils";
 
@@ -31,7 +31,7 @@ function createWrapperWithClient(
 describe("useCreateJobPosting", () => {
   it("calls createJobPosting with the creation payload", async () => {
     const client = createTestQueryClient();
-    const createdJobPosting = createJobPostingRead();
+    const createdJobPosting = createJobPostingDetailRead();
     const payload = createJobPostingCreatePayload();
 
     mockedCreateJobPosting.mockResolvedValueOnce(createdJobPosting);
@@ -51,7 +51,7 @@ describe("useCreateJobPosting", () => {
 
   it("returns the created job posting on success", async () => {
     const client = createTestQueryClient();
-    const createdJobPosting = createJobPostingRead({
+    const createdJobPosting = createJobPostingDetailRead({
       id: "job-456",
       title: "Frontend Engineer",
       company: "Globex",
@@ -80,7 +80,7 @@ describe("useCreateJobPosting", () => {
     const client = createTestQueryClient();
     const invalidateQueriesSpy = vi.spyOn(client, "invalidateQueries");
 
-    const createdJobPosting = createJobPostingRead();
+    const createdJobPosting = createJobPostingDetailRead();
     const payload = createJobPostingCreatePayload();
 
     mockedCreateJobPosting.mockResolvedValueOnce(createdJobPosting);

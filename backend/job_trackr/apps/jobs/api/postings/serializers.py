@@ -7,7 +7,7 @@ from rest_framework import serializers
 from apps.jobs.postings.models import JobPosting
 
 
-class JobPostingReadSerializer(serializers.ModelSerializer[JobPosting]):
+class JobPostingListSerializer(serializers.ModelSerializer[JobPosting]):
     description_preview = serializers.SerializerMethodField()
     candidacy_id = serializers.SerializerMethodField()
 
@@ -32,7 +32,6 @@ class JobPostingReadSerializer(serializers.ModelSerializer[JobPosting]):
             "company",
             "location",
             "url",
-            "description",
             "description_preview",
             "salary",
             "easy_apply",
@@ -60,6 +59,15 @@ class JobPostingReadSerializer(serializers.ModelSerializer[JobPosting]):
             return None
 
         return str(candidacy.id)
+
+
+class JobPostingDetailSerializer(JobPostingListSerializer):
+    class Meta(JobPostingListSerializer.Meta):
+        fields = [
+            *JobPostingListSerializer.Meta.fields,
+            "description",
+        ]
+        read_only_fields = tuple(fields)
 
 
 class JobPostingWriteSerializer(serializers.ModelSerializer[JobPosting]):

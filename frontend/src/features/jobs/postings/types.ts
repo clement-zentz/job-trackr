@@ -6,7 +6,7 @@ import type { Platform, EmploymentType, WorkMode } from "./choices";
 // --- API READ MODELS ---
 
 // API response body returned by job posting endpoints.
-export interface JobPostingRead {
+export interface JobPostingListItemRead {
   id: string;
 
   title: string;
@@ -14,7 +14,6 @@ export interface JobPostingRead {
   location: string;
 
   url: string;
-  description: string;
   description_preview: string;
   salary: string;
 
@@ -35,6 +34,10 @@ export interface JobPostingRead {
   posted_at: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface JobPostingDetailRead extends JobPostingListItemRead {
+  description: string;
 }
 
 // --- API WRITE MODELS ---

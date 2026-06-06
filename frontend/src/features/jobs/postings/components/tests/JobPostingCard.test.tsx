@@ -4,9 +4,9 @@
 import { render, screen } from "@testing-library/react";
 import { JobPostingCard } from "../JobPostingCard";
 import { describe, it, expect } from "vitest";
-import { createJobPostingRead } from "@/tests/factories/jobPosting";
+import { createJobPostingListItemRead } from "@/tests/factories/jobPosting";
 
-const baseJob = createJobPostingRead();
+const baseJob = createJobPostingListItemRead();
 
 describe("JobPostingCard", () => {
   it("renders job information", () => {

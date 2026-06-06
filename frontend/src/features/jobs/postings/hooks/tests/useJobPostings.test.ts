@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from "vitest";
 import { useJobPostings } from "../useJobPostings";
 import * as api from "../../api/listJobPostings";
 import { createWrapper } from "@/tests/utils";
-import { createJobPostingRead } from "@/tests/factories/jobPosting";
+import { createJobPostingListItemRead } from "@/tests/factories/jobPosting";
 import { createPaginatedResponse } from "@/tests/factories/paginatedResponse";
 import type { JobPostingListParams } from "../../types";
 import { DEFAULT_JOB_POSTINGS_PAGE_SIZE } from "../../constants";
@@ -19,7 +19,7 @@ const defaultParams: JobPostingListParams = {
 
 describe("useJobPostings", () => {
   it("returns data on success", async () => {
-    const mockData = createPaginatedResponse([createJobPostingRead()]);
+    const mockData = createPaginatedResponse([createJobPostingListItemRead()]);
 
     vi.spyOn(api, "listJobPostings").mockResolvedValue(mockData);
 
