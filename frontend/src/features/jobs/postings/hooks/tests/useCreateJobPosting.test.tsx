@@ -6,7 +6,7 @@ import { renderHook, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
-import { createJobPosting } from "../../api/createJobPosting";
+import { createJobPosting } from "../../api/jobPostingsApi";
 import { useCreateJobPosting } from "../useCreateJobPosting";
 import {
   createJobPostingCreatePayload,
@@ -14,7 +14,7 @@ import {
 } from "@/tests/factories/jobPosting";
 import { createTestQueryClient } from "@/tests/utils";
 
-vi.mock("../../api/createJobPosting", () => ({
+vi.mock("../../api/jobPostingsApi", () => ({
   createJobPosting: vi.fn(),
 }));
 

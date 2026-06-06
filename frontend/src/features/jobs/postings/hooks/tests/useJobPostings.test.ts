@@ -4,7 +4,7 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { useJobPostings } from "../useJobPostings";
-import * as api from "../../api/listJobPostings";
+import * as api from "../../api/jobPostingsApi";
 import { createWrapper } from "@/tests/utils";
 import { createJobPostingListItemRead } from "@/tests/factories/jobPosting";
 import { createPaginatedResponse } from "@/tests/factories/paginatedResponse";
