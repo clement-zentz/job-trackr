@@ -6,7 +6,7 @@ import { getJobPosting } from "../api/jobPostingsApi";
 
 export function useJobPosting(id: string | undefined) {
   return useQuery({
-    queryKey: ["job-postings", id],
+    queryKey: ["job-postings", "detail", id],
     queryFn: () => {
       if (!id) {
         throw new Error("Job posting ID is required");
