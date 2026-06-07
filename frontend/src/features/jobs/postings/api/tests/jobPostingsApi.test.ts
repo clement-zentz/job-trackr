@@ -2,7 +2,11 @@
 // File: frontend/src/features/jobs/postings/api/tests/jobPostingsApi.test.ts
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { listJobPostings, createJobPosting } from "../jobPostingsApi";
+import {
+  listJobPostings,
+  createJobPosting,
+  getJobPosting,
+} from "../jobPostingsApi";
 import { api } from "@/api/client";
 import { createPaginatedResponse } from "@/tests/factories/paginatedResponse";
 import {
@@ -11,6 +15,7 @@ import {
   createJobPostingDetailRead,
 } from "@/tests/factories/jobPosting";
 import { DEFAULT_JOB_POSTINGS_PAGE_SIZE } from "../../constants";
+import type { JobPostingDetailRead } from "../../types";
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -109,5 +114,35 @@ describe("createJobPosting", () => {
     await expect(createJobPosting(payload)).rejects.toThrow("Request failed");
 
     expect(mockedApiPost).toHaveBeenCalledWith("/v1/jobs/postings/", payload);
+  });
+});
+
+describe("getJobPosting", () => {
+  it("calls the job posting detail endpoint with the given id", async () => {
+    const jobPosting: JobPostingDetailRead = createJobPostingDetailRead({
+      id: "1",
+    });
+
+    mockedApiGet.mockResolvedValueOnce({
+      data: jobPosting,
+    });
+
+    await getJobPosting("1");
+
+    expect(mockedApiGet).toHaveBeenCalledWith("/v1/jobs/postings/1/");
+  });
+
+  it("returns the job posting data from the response", async () => {
+    const jobPosting: JobPostingDetailRead = createJobPostingDetailRead({
+      id: "1",
+    });
+
+    mockedApiGet.mockResolvedValueOnce({
+      data: jobPosting,
+    });
+
+    const result = await getJobPosting("1");
+
+    expect(result).toEqual(jobPosting);
   });
 });
