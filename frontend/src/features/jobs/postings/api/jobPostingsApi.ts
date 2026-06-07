@@ -31,3 +31,12 @@ export const createJobPosting = async (
 
   return response.data;
 };
+
+export const getJobPosting = async (
+  id: string,
+): Promise<JobPostingDetailRead> => {
+  const response = await api.get<JobPostingDetailRead>(
+    `/v1/jobs/postings/${id}/`,
+  );
+  return response.data;
+};
