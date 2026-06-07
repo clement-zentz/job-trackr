@@ -2,20 +2,7 @@
 // File: frontend/src/features/jobs/postings/components/JobPostingCard.tsx
 
 import type { JobPostingListItemRead } from "../types";
-
-function formatDate(dateString: string): string {
-  return new Date(dateString).toLocaleString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
-function formatUrlForDisplay(url: string, maxLength = 60): string {
-  return url.length > maxLength ? `${url.slice(0, maxLength)}…` : url;
-}
+import { formatDate, formatUrlForDisplay } from "./utils";
 
 export function JobPostingCard({ job }: { job: JobPostingListItemRead }) {
   const formattedDate = job.posted_at ? formatDate(job.posted_at) : null;
