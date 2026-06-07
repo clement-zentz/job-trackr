@@ -11,7 +11,7 @@ export const useCreateJobPosting = () => {
   return useMutation({
     mutationFn: (payload: JobPostingCreatePayload) => createJobPosting(payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["job-postings"] });
+      queryClient.invalidateQueries({ queryKey: ["job-postings", "list"] });
     },
   });
 };

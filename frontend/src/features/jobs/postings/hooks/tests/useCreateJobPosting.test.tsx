@@ -93,7 +93,7 @@ describe("useCreateJobPosting", () => {
 
     await waitFor(() => {
       expect(invalidateQueriesSpy).toHaveBeenCalledWith({
-        queryKey: ["job-postings"],
+        queryKey: ["job-postings", "list"],
       });
     });
   });
