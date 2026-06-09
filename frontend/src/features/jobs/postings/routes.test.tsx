@@ -45,4 +45,12 @@ describe("jobPostingsRoutes", () => {
       await screen.findByRole("heading", { name: "Create Job Posting" }),
     ).toBeInTheDocument();
   });
+
+  it("renders the job posting detail page for a posting id", async () => {
+    renderJobPostingsRoute("/jobs/postings/1");
+
+    expect(
+      await screen.findByRole("heading", { name: "Job Posting Detail" }),
+    ).toBeInTheDocument();
+  });
 });
