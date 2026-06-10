@@ -2,7 +2,8 @@
 // File: frontend/src/features/jobs/postings/components/tests/JobPostingList.test.tsx
 
 import { fireEvent, render, screen } from "@testing-library/react";
-import { JobPostingList } from "../JobPostingList";
+import { MemoryRouter } from "react-router-dom";
+import { JobPostingList, type JobPostingListProps } from "../JobPostingList";
 import * as hook from "../../hooks/useJobPostings";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { createJobPostingListItemRead } from "@/tests/factories/jobPosting";
@@ -18,10 +19,23 @@ const defaultParams: JobPostingListParams = {
 };
 
 describe("JobPostingList", () => {
-  const defaultProps = {
+  const defaultProps: JobPostingListProps = {
     params: defaultParams,
     onPageChange: vi.fn(),
   };
+
+  function renderJobPostingList(props: Partial<JobPostingListProps> = {}) {
+    const mergedProps: JobPostingListProps = {
+      ...defaultProps,
+      ...props,
+    };
+
+    return render(
+      <MemoryRouter>
+        <JobPostingList {...mergedProps} />
+      </MemoryRouter>,
+    );
+  }
 
   it("renders loading state", () => {
     vi.spyOn(hook, "useJobPostings").mockReturnValue({
@@ -33,7 +47,7 @@ describe("JobPostingList", () => {
       status: "pending",
     } as ReturnType<typeof hook.useJobPostings>);
 
-    render(<JobPostingList {...defaultProps} />);
+    renderJobPostingList();
 
     expect(screen.getByText(/loading/i)).toBeInTheDocument();
   });
@@ -48,7 +62,7 @@ describe("JobPostingList", () => {
       status: "error",
     } as ReturnType<typeof hook.useJobPostings>);
 
-    render(<JobPostingList {...defaultProps} />);
+    renderJobPostingList();
 
     expect(screen.getByText(/error loading jobs/i)).toBeInTheDocument();
   });
@@ -63,7 +77,7 @@ describe("JobPostingList", () => {
       status: "success",
     } as ReturnType<typeof hook.useJobPostings>);
 
-    render(<JobPostingList {...defaultProps} />);
+    renderJobPostingList();
 
     expect(screen.getByText("Backend Engineer")).toBeInTheDocument();
     expect(screen.getByText("Acme")).toBeInTheDocument();
@@ -79,7 +93,7 @@ describe("JobPostingList", () => {
       status: "error",
     } as ReturnType<typeof hook.useJobPostings>);
 
-    render(<JobPostingList {...defaultProps} />);
+    renderJobPostingList();
 
     expect(screen.getByText(/failed to refresh results/i)).toBeInTheDocument();
 
@@ -97,11 +111,38 @@ describe("JobPostingList", () => {
       status: "error",
     } as ReturnType<typeof hook.useJobPostings>);
 
-    render(<JobPostingList {...defaultProps} />);
+    renderJobPostingList();
 
     expect(screen.getByText(/failed to refresh results/i)).toBeInTheDocument();
 
     expect(screen.getByText(/no job postings found/i)).toBeInTheDocument();
+  });
+
+  it("wraps each job posting card with a detail link", () => {
+    const job = createJobPostingListItemRead({
+      id: "job-123",
+      title: "Backend Engineer",
+      company: "Acme",
+    });
+
+    vi.spyOn(hook, "useJobPostings").mockReturnValue({
+      data: createPaginatedResponse([job]),
+      isLoading: false,
+      isError: false,
+      error: null,
+      status: "success",
+    } as ReturnType<typeof hook.useJobPostings>);
+
+    renderJobPostingList();
+
+    const detailLink = screen.getByRole("link", {
+      name: /view details for backend engineer at acme/i,
+    });
+
+    expect(detailLink).toHaveAttribute("href", "/job-123");
+    expect(detailLink).toContainElement(
+      screen.getByRole("heading", { name: /backend engineer/i }),
+    );
   });
 });
 
@@ -120,7 +161,9 @@ describe("JobPostingList pagination", () => {
     };
 
     return render(
-      <JobPostingList params={params} onPageChange={onPageChange} />,
+      <MemoryRouter>
+        <JobPostingList params={params} onPageChange={onPageChange} />
+      </MemoryRouter>,
     );
   }
 
