@@ -2,7 +2,7 @@
 // File: frontend/src/features/jobs/postings/components/tests/JobPostingList.test.tsx
 
 import { fireEvent, render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { JobPostingList, type JobPostingListProps } from "../JobPostingList";
 import * as hook from "../../hooks/useJobPostings";
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -31,8 +31,13 @@ describe("JobPostingList", () => {
     };
 
     return render(
-      <MemoryRouter>
-        <JobPostingList {...mergedProps} />
+      <MemoryRouter initialEntries={["/jobs/postings"]}>
+        <Routes>
+          <Route
+            path="/jobs/postings"
+            element={<JobPostingList {...mergedProps} />}
+          />
+        </Routes>
       </MemoryRouter>,
     );
   }
@@ -139,7 +144,7 @@ describe("JobPostingList", () => {
       name: /view details for backend engineer at acme/i,
     });
 
-    expect(detailLink).toHaveAttribute("href", "/job-123");
+    expect(detailLink).toHaveAttribute("href", "/jobs/postings/job-123");
     expect(detailLink).toContainElement(
       screen.getByRole("heading", { name: /backend engineer/i }),
     );
@@ -161,8 +166,15 @@ describe("JobPostingList pagination", () => {
     };
 
     return render(
-      <MemoryRouter>
-        <JobPostingList params={params} onPageChange={onPageChange} />
+      <MemoryRouter initialEntries={["/jobs/postings"]}>
+        <Routes>
+          <Route
+            path="/jobs/postings"
+            element={
+              <JobPostingList params={params} onPageChange={onPageChange} />
+            }
+          />
+        </Routes>
       </MemoryRouter>,
     );
   }
