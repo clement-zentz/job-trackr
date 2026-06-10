@@ -4,7 +4,11 @@
 import type { JobPostingListItemRead } from "../types";
 import { formatDate, formatUrlForDisplay } from "./utils";
 
-export function JobPostingCard({ job }: { job: JobPostingListItemRead }) {
+interface JobPostingCardProps {
+  job: JobPostingListItemRead;
+}
+
+export function JobPostingCard({ job }: JobPostingCardProps) {
   const formattedDate = job.posted_at ? formatDate(job.posted_at) : null;
   const formattedUrl = job.url ? formatUrlForDisplay(job.url) : null;
 
@@ -19,16 +23,9 @@ export function JobPostingCard({ job }: { job: JobPostingListItemRead }) {
       <p className="text-gray-500">{job.platform_label}</p>
 
       {formattedUrl && (
-        <a
-          href={job.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          title={job.url}
-          data-testid="job-posting-url"
-          className="inline-block max-w-full truncate rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"
-        >
+        <p title={job.url} data-testid="job-posting-url">
           {formattedUrl}
-        </a>
+        </p>
       )}
 
       {formattedDate && (

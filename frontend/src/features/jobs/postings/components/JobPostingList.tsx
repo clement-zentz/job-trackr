@@ -5,8 +5,9 @@ import { useJobPostings } from "../hooks/useJobPostings";
 import { JobPostingCard } from "./JobPostingCard";
 import { DEFAULT_JOB_POSTINGS_PAGE_SIZE } from "../constants";
 import type { JobPostingListParams } from "../types";
+import { Link } from "react-router-dom";
 
-interface JobPostingListProps {
+export interface JobPostingListProps {
   params: JobPostingListParams;
   onPageChange: (page: number) => void;
 }
@@ -45,7 +46,14 @@ export function JobPostingList({ params, onPageChange }: JobPostingListProps) {
         <>
           {/* 📋 Job list */}
           {data?.results.map((job) => (
-            <JobPostingCard key={job.id} job={job} />
+            <Link
+              key={job.id}
+              to={job.id}
+              aria-label={`View details for ${job.title} at ${job.company}`}
+              className="block rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600"
+            >
+              <JobPostingCard job={job} />
+            </Link>
           ))}
 
           {/* 📄 Pagination */}
