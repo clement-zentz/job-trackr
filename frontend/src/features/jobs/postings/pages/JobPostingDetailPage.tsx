@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/features/jobs/postings/pages/JobPostingDetailPage.tsx
 
+import axios from "axios";
 import { Link, useParams } from "react-router-dom";
 import { JobPostingDetail } from "../components/JobPostingDetail";
 import { useJobPosting } from "../hooks/useJobPosting";
@@ -30,13 +31,31 @@ export function JobPostingDetailPage() {
   }
 
   if (jobPostingQuery.isError) {
+    const isNotFound =
+      axios.isAxiosError(jobPostingQuery.error) &&
+      jobPostingQuery.error.response?.status === 404;
+
     return (
       <main className={mainClassName}>
-        <div className="rounded-lg border border-red-200 bg-red-50 p-6">
+        <div
+          className={
+            isNotFound
+              ? "rounded-lg border border-gray-200 bg-white p-6 shadow-sm"
+              : "rounded-lg border border-red-200 bg-red-50 p-6"
+          }
+        >
           <h1 className={h1ClassName}>{pageTitle}</h1>
 
-          <p className={`${pClassName} text-red-700`}>
-            Could not load job posting.
+          <p
+            className={
+              isNotFound
+                ? `${pClassName} text-gray-600`
+                : `${pClassName} text-red-700`
+            }
+          >
+            {isNotFound
+              ? "Job posting not found."
+              : "Could not load job posting."}
           </p>
 
           <Link to=".." className={`mt-6 inline-flex ${linkClassName}`}>
