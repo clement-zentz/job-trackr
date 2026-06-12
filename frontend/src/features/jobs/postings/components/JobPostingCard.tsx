@@ -2,14 +2,16 @@
 // File: frontend/src/features/jobs/postings/components/JobPostingCard.tsx
 
 import type { JobPostingListItemRead } from "../types";
-import { formatDate, formatUrlForDisplay } from "./utils";
+import { formatDateTimeForDisplay, formatUrlForDisplay } from "./utils";
 
 interface JobPostingCardProps {
   job: JobPostingListItemRead;
 }
 
 export function JobPostingCard({ job }: JobPostingCardProps) {
-  const formattedDate = job.posted_at ? formatDate(job.posted_at) : null;
+  const formattedDate = job.posted_at
+    ? formatDateTimeForDisplay(job.posted_at)
+    : null;
   const formattedUrl = job.url ? formatUrlForDisplay(job.url) : null;
 
   return (
