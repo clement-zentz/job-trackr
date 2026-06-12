@@ -2,7 +2,7 @@
 // File: frontend/src/features/jobs/postings/components/JobPostingDetail.tsx
 
 import type { JobPostingDetailRead } from "../types";
-import { formatDate, formatUrlForDisplay } from "./utils";
+import { formatDateTimeForDisplay, formatUrlForDisplay } from "./utils";
 
 const dtClassName = "text-sm font-medium text-gray-500";
 const ddClassName = "mt-1 text-sm text-gray-900";
@@ -13,7 +13,7 @@ type JobPostingDetailProps = {
 
 export function JobPostingDetail({ jobPosting }: JobPostingDetailProps) {
   const formattedDate = jobPosting.posted_at
-    ? formatDate(jobPosting.posted_at)
+    ? formatDateTimeForDisplay(jobPosting.posted_at)
     : null;
 
   const formattedUrl = jobPosting.url

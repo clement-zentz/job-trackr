@@ -3,8 +3,20 @@
 
 import { render, screen } from "@testing-library/react";
 import { JobPostingCard } from "../JobPostingCard";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { createJobPostingListItemRead } from "@/tests/factories/jobPosting";
+
+type UtilsModule = typeof import("../utils");
+
+vi.mock("../utils", async () => {
+  const actual = await vi.importActual<UtilsModule>("../utils");
+
+  return {
+    ...actual,
+    formatDateTimeForDisplay: vi.fn(() => "Formatted date"),
+    formatUrlForDisplay: vi.fn(() => "example.com/1"),
+  };
+});
 
 const baseJob = createJobPostingListItemRead();
 
@@ -26,7 +38,10 @@ describe("JobPostingCard", () => {
     expect(screen.getByText("Paris")).toBeInTheDocument();
     expect(screen.getByText("LinkedIn")).toBeInTheDocument();
     expect(screen.getByTestId("job-posting-url")).toHaveTextContent(
-      "example.com",
+      /^example\.com\/1$/,
+    );
+    expect(screen.getByTestId("job-posting-date")).toHaveTextContent(
+      "Formatted date",
     );
   });
 

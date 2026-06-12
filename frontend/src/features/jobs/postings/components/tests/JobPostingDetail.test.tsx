@@ -9,10 +9,17 @@ import type { JobPostingDetailRead } from "../../types";
 
 import { createJobPostingDetailRead } from "@/tests/factories/jobPosting";
 
-vi.mock("../utils", () => ({
-  formatDate: vi.fn(() => "June 7, 2026, 14:30"),
-  formatUrlForDisplay: vi.fn(() => "linkedin.com/jobs/view/123"),
-}));
+type UtilsModule = typeof import("../utils");
+
+vi.mock("../utils", async () => {
+  const actual = await vi.importActual<UtilsModule>("../utils");
+
+  return {
+    ...actual,
+    formatDateTimeForDisplay: vi.fn(() => "Formatted date"),
+    formatUrlForDisplay: vi.fn(() => "linkedin.com/jobs/view/123"),
+  };
+});
 
 const baseJobPosting: JobPostingDetailRead = createJobPostingDetailRead({
   id: "1",
@@ -64,7 +71,7 @@ describe("JobPostingDetail", () => {
     expect(screen.getByText("€45,000 - €55,000")).toBeInTheDocument();
 
     expect(screen.getByText("Posted at")).toBeInTheDocument();
-    expect(screen.getByText("June 7, 2026, 14:30")).toBeInTheDocument();
+    expect(screen.getByText("Formatted date")).toBeInTheDocument();
   });
 
   it("renders the job posting URL as an external link", () => {
@@ -84,6 +91,7 @@ describe("JobPostingDetail", () => {
       "title",
       "https://www.linkedin.com/jobs/view/123",
     );
+    expect(link).toHaveTextContent("linkedin.com/jobs/view/123");
   });
 
   it("renders boolean fields as human-readable values", () => {
