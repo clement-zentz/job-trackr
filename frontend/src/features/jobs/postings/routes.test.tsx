@@ -2,28 +2,8 @@
 // File: frontend/src/features/jobs/postings/routes.test.tsx
 
 import { screen } from "@testing-library/react";
-import { createMemoryRouter, RouterProvider } from "react-router-dom";
 import { describe, expect, it } from "vitest";
-
-import { renderWithQueryClient } from "@/tests/utils";
-
-import { jobPostingsRoutes } from "./routes";
-
-function renderJobPostingsRoute(initialEntry: string) {
-  const router = createMemoryRouter(
-    [
-      {
-        path: "/jobs",
-        children: jobPostingsRoutes,
-      },
-    ],
-    {
-      initialEntries: [initialEntry],
-    },
-  );
-
-  return renderWithQueryClient(<RouterProvider router={router} />);
-}
+import { renderJobPostingsRoute } from "./tests/utils";
 
 describe("jobPostingsRoutes", () => {
   it("renders the job postings page at /jobs/postings", async () => {
