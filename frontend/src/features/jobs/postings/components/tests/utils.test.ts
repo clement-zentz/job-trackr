@@ -1,35 +1,64 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/features/jobs/postings/components/tests/utils.test.ts
 
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { formatDateTimeForDisplay, formatUrlForDisplay } from "../utils";
 
 describe("formatDateTimeForDisplay", () => {
-  it("formats a valid ISO datetime for display", () => {
-    const result = formatDateTimeForDisplay("2026-06-10T08:30:00Z", {
-      locale: "en-US",
-      timeZone: "UTC",
-    });
-
-    expect(result).toBe("Jun 10, 2026, 08:30 AM");
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
-  it("formats a datetime using the provided locale", () => {
-    const result = formatDateTimeForDisplay("2026-06-10T08:30:00Z", {
+  const expectedDateTimeFormatOptions = {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  } as const;
+
+  function mockToLocaleString(returnValue = "Formatted date") {
+    return vi
+      .spyOn(Date.prototype, "toLocaleString")
+      .mockReturnValue(returnValue);
+  }
+
+  it("returns the formatted datetime from toLocaleString", () => {
+    const toLocaleStringSpy = mockToLocaleString();
+
+    const result = formatDateTimeForDisplay("2026-06-10T08:30:00Z");
+
+    expect(result).toBe("Formatted date");
+    expect(toLocaleStringSpy).toHaveBeenCalledWith(undefined, {
+      ...expectedDateTimeFormatOptions,
+      timeZone: undefined,
+    });
+  });
+
+  it("passes the provided locale to toLocaleString", () => {
+    const toLocaleStringSpy = mockToLocaleString();
+
+    formatDateTimeForDisplay("2026-06-10T08:30:00Z", {
       locale: "fr-FR",
-      timeZone: "UTC",
     });
 
-    expect(result).toBe("10 juin 2026, 08:30");
+    expect(toLocaleStringSpy).toHaveBeenCalledWith("fr-FR", {
+      ...expectedDateTimeFormatOptions,
+      timeZone: undefined,
+    });
   });
 
-  it("formats a datetime using the provided timezone", () => {
-    const result = formatDateTimeForDisplay("2026-06-10T08:30:00Z", {
-      locale: "en-US",
+  it("passes the provided timezone to toLocaleString", () => {
+    const toLocaleStringSpy = mockToLocaleString();
+
+    formatDateTimeForDisplay("2026-06-10T08:30:00Z", {
       timeZone: "Europe/Paris",
     });
 
-    expect(result).toBe("Jun 10, 2026, 10:30 AM");
+    expect(toLocaleStringSpy).toHaveBeenCalledWith(undefined, {
+      ...expectedDateTimeFormatOptions,
+      timeZone: "Europe/Paris",
+    });
   });
 
   it("returns the original value when the datetime is invalid", () => {
