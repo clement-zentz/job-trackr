@@ -38,10 +38,13 @@ export function createJobPostingDetailRead(
   overrides: Partial<JobPostingDetailRead> = {},
 ): JobPostingDetailRead {
   const { description, ...listOverrides } = overrides;
+  const resolvedDescription = description ?? "Full job posting description.";
+  const base = createJobPostingListItemRead(listOverrides);
 
   return {
-    ...createJobPostingListItemRead(listOverrides),
-    description: description ?? "Full job posting description.",
+    ...base,
+    description: resolvedDescription,
+    description_preview: base.description_preview || resolvedDescription,
   } satisfies JobPostingDetailRead;
 }
 
