@@ -22,7 +22,9 @@ export function JobPostingCard({ job }: JobPostingCardProps) {
 
       <p>{job.location}</p>
 
-      <p className="text-gray-500">{job.platform_label}</p>
+      {job.platform_label && (
+        <p className="text-gray-500">{job.platform_label}</p>
+      )}
 
       {formattedUrl && (
         <p title={job.url} data-testid="job-posting-url">
