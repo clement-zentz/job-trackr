@@ -221,10 +221,7 @@ export function JobPostingCreateForm({
           className={fieldClassName}
           value={form.platform ?? ""}
           onChange={(event) =>
-            updateField(
-              "platform",
-              event.target.value ? (event.target.value as Platform) : undefined,
-            )
+            updateField("platform", event.target.value as Platform)
           }
           disabled={isSubmitting}
         >
@@ -233,7 +230,6 @@ export function JobPostingCreateForm({
           <option value={"indeed"}>Indeed</option>
           <option value={"wttj"}>Welcome To The Jungle</option>
           <option value={"career_page"}>Career Page</option>
-          <option value={"unknown"}>Unknown</option>
         </select>
       </div>
 
@@ -246,12 +242,7 @@ export function JobPostingCreateForm({
           className={fieldClassName}
           value={form.employment_type ?? ""}
           onChange={(event) =>
-            updateField(
-              "employment_type",
-              event.target.value
-                ? (event.target.value as EmploymentType)
-                : undefined,
-            )
+            updateField("employment_type", event.target.value as EmploymentType)
           }
           disabled={isSubmitting}
         >
@@ -262,7 +253,6 @@ export function JobPostingCreateForm({
           <option value={"apprenticeship"}>Apprenticeship</option>
           <option value={"fixed_term"}>Fixed Term</option>
           <option value={"freelance"}>Freelance</option>
-          <option value={"unknown"}>Unknown</option>
         </select>
       </div>
 
@@ -275,10 +265,7 @@ export function JobPostingCreateForm({
           className={fieldClassName}
           value={form.work_mode ?? ""}
           onChange={(event) =>
-            updateField(
-              "work_mode",
-              event.target.value ? (event.target.value as WorkMode) : undefined,
-            )
+            updateField("work_mode", event.target.value as WorkMode)
           }
           disabled={isSubmitting}
         >
@@ -286,7 +273,6 @@ export function JobPostingCreateForm({
           <option value={"on_site"}>On-site</option>
           <option value={"hybrid"}>Hybrid</option>
           <option value={"remote"}>Remote</option>
-          <option value={"unknown"}>Unknown</option>
         </select>
       </div>
 

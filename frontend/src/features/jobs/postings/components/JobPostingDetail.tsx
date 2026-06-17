@@ -58,20 +58,26 @@ export function JobPostingDetail({ jobPosting }: JobPostingDetailProps) {
           </div>
         )}
 
-        <div>
-          <dt className={dtClassName}>Platform</dt>
-          <dd className={ddClassName}>{jobPosting.platform_label}</dd>
-        </div>
+        {jobPosting.platform_label && (
+          <div>
+            <dt className={dtClassName}>Platform</dt>
+            <dd className={ddClassName}>{jobPosting.platform_label}</dd>
+          </div>
+        )}
 
-        <div>
-          <dt className={dtClassName}>Employment type</dt>
-          <dd className={ddClassName}>{jobPosting.employment_type_label}</dd>
-        </div>
+        {jobPosting.employment_type_label && (
+          <div>
+            <dt className={dtClassName}>Employment type</dt>
+            <dd className={ddClassName}>{jobPosting.employment_type_label}</dd>
+          </div>
+        )}
 
-        <div>
-          <dt className={dtClassName}>Work mode</dt>
-          <dd className={ddClassName}>{jobPosting.work_mode_label}</dd>
-        </div>
+        {jobPosting.work_mode_label && (
+          <div>
+            <dt className={dtClassName}>Work mode</dt>
+            <dd className={ddClassName}>{jobPosting.work_mode_label}</dd>
+          </div>
+        )}
 
         <div>
           <dt className={dtClassName}>Easy apply</dt>

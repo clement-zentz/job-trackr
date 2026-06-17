@@ -28,17 +28,17 @@ class JobPosting(models.Model):
     platform = models.CharField(
         max_length=50,
         choices=Platforms.choices,
-        default=Platforms.UNKNOWN,
+        blank=True,
     )
     employment_type = models.CharField(
         max_length=50,
         choices=EmploymentType.choices,
-        default=EmploymentType.UNKNOWN,
+        blank=True,
     )
     work_mode = models.CharField(
         max_length=50,
         choices=WorkMode.choices,
-        default=WorkMode.UNKNOWN,
+        blank=True,
     )
 
     created_at = models.DateTimeField(auto_now_add=True)

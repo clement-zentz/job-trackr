@@ -9,7 +9,6 @@ class Platforms(models.TextChoices):
     INDEED = "indeed", "Indeed"
     WTTJ = "wttj", "Welcome to the jungle"
     CAREER_PAGE = "career_page", "Career page"
-    UNKNOWN = "unknown", "Unknown"
 
 
 class EmploymentType(models.TextChoices):
@@ -19,11 +18,9 @@ class EmploymentType(models.TextChoices):
     APPRENTICESHIP = "apprenticeship", "Apprenticeship"
     FIXED_TERM = "fixed_term", "Fixed-term"
     FREELANCE = "freelance", "Freelance"
-    UNKNOWN = "unknown", "Unknown"
 
 
 class WorkMode(models.TextChoices):
     ON_SITE = "on_site", "On-site"
     HYBRID = "hybrid", "Hybrid"
     REMOTE = "remote", "Remote"
-    UNKNOWN = "unknown", "Unknown"
