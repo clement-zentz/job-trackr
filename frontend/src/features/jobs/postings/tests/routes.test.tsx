@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/postings/routes.test.tsx
+// File: frontend/src/features/jobs/postings/tests/routes.test.tsx
 
 import { screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { renderJobPostingsRoute } from "./tests/utils";
+import { renderJobPostingsRoute } from "./utils";
 
 describe("jobPostingsRoutes", () => {
   it("renders the job postings page at /jobs/postings", async () => {

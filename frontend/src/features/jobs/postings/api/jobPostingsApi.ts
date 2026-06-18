@@ -21,6 +21,15 @@ export const listJobPostings = async (
   return response.data;
 };
 
+export const getJobPosting = async (
+  id: string,
+): Promise<JobPostingDetailRead> => {
+  const response = await api.get<JobPostingDetailRead>(
+    `/v1/jobs/postings/${id}/`,
+  );
+  return response.data;
+};
+
 export const createJobPosting = async (
   payload: JobPostingCreatePayload,
 ): Promise<JobPostingDetailRead> => {
@@ -29,14 +38,5 @@ export const createJobPosting = async (
     payload,
   );
 
-  return response.data;
-};
-
-export const getJobPosting = async (
-  id: string,
-): Promise<JobPostingDetailRead> => {
-  const response = await api.get<JobPostingDetailRead>(
-    `/v1/jobs/postings/${id}/`,
-  );
   return response.data;
 };
