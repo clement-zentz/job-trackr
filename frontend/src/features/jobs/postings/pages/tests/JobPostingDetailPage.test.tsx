@@ -1,23 +1,15 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/postings/pages/JobPostingDetailPage.test.tsx
+// File: frontend/src/features/jobs/postings/pages/tests/JobPostingDetailPage.test.tsx
 
 import { screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { useJobPosting } from "../hooks/useJobPosting";
+import { useJobPosting } from "../../hooks/useJobPosting";
 import { createJobPostingDetailRead } from "@/tests/factories/jobPosting";
-import { renderJobPostingsRoute } from "../tests/utils";
+import { renderJobPostingsRoute } from "../../tests/utils";
 
-vi.mock("../hooks/useJobPosting", () => ({
+vi.mock("../../hooks/useJobPosting", () => ({
   useJobPosting: vi.fn(),
-}));
-
-vi.mock("../components/JobPostingDetail", () => ({
-  JobPostingDetail: ({ jobPosting }: { jobPosting: { title?: string } }) => (
-    <section aria-label="job posting detail content">
-      {jobPosting.title ?? "Mocked job posting detail"}
-    </section>
-  ),
 }));
 
 const useJobPostingMock = vi.mocked(useJobPosting);
@@ -152,7 +144,7 @@ describe("JobPostingDetailPage", () => {
     ).toHaveAttribute("href", "/jobs/postings");
 
     expect(
-      screen.getByRole("region", { name: "job posting detail content" }),
-    ).toHaveTextContent("Backend Developer");
+      screen.getByRole("heading", { name: "Backend Developer" }),
+    ).toBeInTheDocument();
   });
 });

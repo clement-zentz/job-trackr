@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/postings/pages/CreateJobPostingPage.tsx
+// File: frontend/src/features/jobs/postings/pages/JobPostingCreatePage.tsx
 
 import { useNavigate } from "react-router-dom";
 import { BackToJobPostingsLink } from "../components/BackToJobPostingsLink";
 import { JobPostingCreateForm } from "../components/JobPostingCreateForm";
 import { useCreateJobPosting } from "../hooks/useCreateJobPosting";
 
-export function CreateJobPostingPage() {
+export function JobPostingCreatePage() {
   const navigate = useNavigate();
   const createJobPosting = useCreateJobPosting();
 

@@ -2,8 +2,8 @@
 // File: frontend/src/features/jobs/postings/routes.tsx
 
 import type { RouteObject } from "react-router-dom";
-import { JobPostingsPage } from "./pages/JobPostingsPage";
-import { CreateJobPostingPage } from "./pages/CreateJobPostingPage";
+import { JobPostingListPage } from "./pages/JobPostingListPage";
+import { JobPostingCreatePage } from "./pages/JobPostingCreatePage";
 import { JobPostingDetailPage } from "./pages/JobPostingDetailPage";
 
 export const jobPostingsRoutes: RouteObject[] = [
@@ -12,11 +12,11 @@ export const jobPostingsRoutes: RouteObject[] = [
     children: [
       {
         index: true,
-        element: <JobPostingsPage />,
+        element: <JobPostingListPage />,
       },
       {
         path: "new",
-        element: <CreateJobPostingPage />,
+        element: <JobPostingCreatePage />,
       },
       {
         path: ":id",

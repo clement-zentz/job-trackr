@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/postings/pages/JobPostingsPage.tsx
+// File: frontend/src/features/jobs/postings/pages/JobPostingListPage.tsx
 
 import { Link } from "react-router-dom";
 
@@ -13,7 +13,7 @@ const createJobPostingLinkClassName = `
   focus:ring-blue-500 focus:ring-offset-2
 `.trim();
 
-export function JobPostingsPage() {
+export function JobPostingListPage() {
   const { filters, page, pageSize, setPage, updateFilter, resetFilters } =
     useJobPostingFilters();
 
