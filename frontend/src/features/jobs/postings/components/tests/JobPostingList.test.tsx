@@ -4,7 +4,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { JobPostingList, type JobPostingListProps } from "../JobPostingList";
-import * as hook from "../../hooks/useJobPostings";
+import { useJobPostings } from "../../hooks/useJobPostings";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { createJobPostingListItemRead } from "@/tests/factories/jobPosting";
 import { createPaginatedResponse } from "@/tests/factories/paginatedResponse";
@@ -12,21 +12,68 @@ import type { PaginatedResponse } from "@/types/pagination";
 import type { JobPostingListItemRead, JobPostingListParams } from "../../types";
 import { DEFAULT_JOB_POSTINGS_PAGE_SIZE } from "../../constants";
 
-const defaultParams: JobPostingListParams = {
-  page: 1,
-  pageSize: DEFAULT_JOB_POSTINGS_PAGE_SIZE,
-  ordering: "-posted_at",
+vi.mock("../../hooks/useJobPostings", () => ({
+  useJobPostings: vi.fn(),
+}));
+
+const useJobPostingsMock = vi.mocked(useJobPostings);
+
+type MockUseJobPostingsState = {
+  data?: PaginatedResponse<JobPostingListItemRead>;
+  isLoading?: boolean;
+  isError?: boolean;
+  isFetching?: boolean;
+  error?: Error | null;
+  status?: ReturnType<typeof useJobPostings>["status"];
 };
 
+function mockUseJobPostings(queryState: MockUseJobPostingsState) {
+  useJobPostingsMock.mockReturnValue({
+    data: undefined,
+    isLoading: false,
+    isError: false,
+    isFetching: false,
+    error: null,
+    status: "success",
+    ...queryState,
+  } as ReturnType<typeof useJobPostings>);
+}
+
+type MockJobPostingsDataOptions = {
+  results?: JobPostingListItemRead[];
+  paginationOverrides?: Partial<PaginatedResponse<JobPostingListItemRead>>;
+  queryOverrides?: Omit<MockUseJobPostingsState, "data">;
+};
+
+function mockJobPostingsData({
+  results = [createJobPostingListItemRead()],
+  paginationOverrides = {},
+  queryOverrides = {},
+}: MockJobPostingsDataOptions = {}) {
+  mockUseJobPostings({
+    data: createPaginatedResponse(results, paginationOverrides),
+    ...queryOverrides,
+  });
+}
+
 describe("JobPostingList", () => {
-  const defaultProps: JobPostingListProps = {
-    params: defaultParams,
-    onPageChange: vi.fn(),
+  let onPageChange: (page: number) => void;
+
+  beforeEach(() => {
+    onPageChange = vi.fn();
+    useJobPostingsMock.mockReset();
+  });
+
+  const defaultParams: JobPostingListParams = {
+    page: 1,
+    pageSize: DEFAULT_JOB_POSTINGS_PAGE_SIZE,
+    ordering: "-posted_at",
   };
 
   function renderJobPostingList(props: Partial<JobPostingListProps> = {}) {
     const mergedProps: JobPostingListProps = {
-      ...defaultProps,
+      params: defaultParams,
+      onPageChange,
       ...props,
     };
 
@@ -42,15 +89,20 @@ describe("JobPostingList", () => {
     );
   }
 
+  function renderWithParams(overrides: Partial<JobPostingListParams> = {}) {
+    renderJobPostingList({
+      params: {
+        ...defaultParams,
+        ...overrides,
+      },
+    });
+  }
+
   it("renders loading state", () => {
-    vi.spyOn(hook, "useJobPostings").mockReturnValue({
-      data: undefined,
+    mockUseJobPostings({
       isLoading: true,
-      isError: false,
-      isFetching: false,
-      error: null,
       status: "pending",
-    } as ReturnType<typeof hook.useJobPostings>);
+    });
 
     renderJobPostingList();
 
@@ -58,14 +110,11 @@ describe("JobPostingList", () => {
   });
 
   it("renders error state", () => {
-    vi.spyOn(hook, "useJobPostings").mockReturnValue({
-      data: undefined,
-      isLoading: false,
+    mockUseJobPostings({
       isError: true,
-      isFetching: false,
       error: new Error("Test error"),
       status: "error",
-    } as ReturnType<typeof hook.useJobPostings>);
+    });
 
     renderJobPostingList();
 
@@ -73,14 +122,12 @@ describe("JobPostingList", () => {
   });
 
   it("renders job list", () => {
-    vi.spyOn(hook, "useJobPostings").mockReturnValue({
-      data: createPaginatedResponse([createJobPostingListItemRead()]),
-      isLoading: false,
-      isError: false,
-      isFetching: false,
-      error: null,
-      status: "success",
-    } as ReturnType<typeof hook.useJobPostings>);
+    const jobPosting = createJobPostingListItemRead({
+      title: "Backend Engineer",
+      company: "Acme",
+    });
+
+    mockJobPostingsData({ results: [jobPosting] });
 
     renderJobPostingList();
 
@@ -89,14 +136,18 @@ describe("JobPostingList", () => {
   });
 
   it("shows non-blocking error banner while keeping previous results", () => {
-    vi.spyOn(hook, "useJobPostings").mockReturnValue({
-      data: createPaginatedResponse([createJobPostingListItemRead()]),
-      isLoading: false,
-      isError: true,
-      isFetching: false,
-      error: new Error("Refetch failed"),
-      status: "error",
-    } as ReturnType<typeof hook.useJobPostings>);
+    const jobPosting = createJobPostingListItemRead({
+      title: "Backend Engineer",
+    });
+
+    mockJobPostingsData({
+      results: [jobPosting],
+      queryOverrides: {
+        isError: true,
+        error: new Error("Refetch failed"),
+        status: "error",
+      },
+    });
 
     renderJobPostingList();
 
@@ -107,14 +158,15 @@ describe("JobPostingList", () => {
   });
 
   it("shows non-blocking error banner with empty state", () => {
-    vi.spyOn(hook, "useJobPostings").mockReturnValue({
-      data: createPaginatedResponse<JobPostingListItemRead>([], { count: 0 }),
-      isLoading: false,
-      isError: true,
-      isFetching: false,
-      error: new Error("Refetch failed"),
-      status: "error",
-    } as ReturnType<typeof hook.useJobPostings>);
+    mockJobPostingsData({
+      results: [],
+      paginationOverrides: { count: 0 },
+      queryOverrides: {
+        isError: true,
+        error: new Error("Refetch failed"),
+        status: "error",
+      },
+    });
 
     renderJobPostingList();
 
@@ -130,13 +182,7 @@ describe("JobPostingList", () => {
       company: "Acme",
     });
 
-    vi.spyOn(hook, "useJobPostings").mockReturnValue({
-      data: createPaginatedResponse([job]),
-      isLoading: false,
-      isError: false,
-      error: null,
-      status: "success",
-    } as ReturnType<typeof hook.useJobPostings>);
+    mockJobPostingsData({ results: [job] });
 
     renderJobPostingList();
 
@@ -149,147 +195,117 @@ describe("JobPostingList", () => {
       screen.getByRole("heading", { name: /backend engineer/i }),
     );
   });
-});
 
-describe("JobPostingList pagination", () => {
-  let onPageChange: (page: number) => void;
+  describe("pagination", () => {
+    it("disables previous button when there is no previous page", () => {
+      mockJobPostingsData({
+        paginationOverrides: {
+          previous: null,
+        },
+      });
 
-  beforeEach(() => {
-    onPageChange = vi.fn();
-    vi.clearAllMocks();
-  });
+      renderWithParams({ page: 1 });
 
-  function renderWithParams(overrides: Partial<JobPostingListParams> = {}) {
-    const params: JobPostingListParams = {
-      ...defaultParams,
-      ...overrides,
-    };
-
-    return render(
-      <MemoryRouter initialEntries={["/jobs/postings"]}>
-        <Routes>
-          <Route
-            path="/jobs/postings"
-            element={
-              <JobPostingList params={params} onPageChange={onPageChange} />
-            }
-          />
-        </Routes>
-      </MemoryRouter>,
-    );
-  }
-
-  function mockSuccessPagination(
-    overrides: Partial<PaginatedResponse<JobPostingListItemRead>> = {},
-    options?: { isFetching?: boolean },
-  ) {
-    vi.spyOn(hook, "useJobPostings").mockReturnValue({
-      data: createPaginatedResponse(
-        [createJobPostingListItemRead()],
-        overrides,
-      ),
-      isLoading: false,
-      isError: false,
-      isFetching: options?.isFetching ?? false,
-      error: null,
-      status: "success",
-    } as ReturnType<typeof hook.useJobPostings>);
-  }
-
-  it("disables previous button when there is no previous page", () => {
-    mockSuccessPagination({
-      previous: null,
+      expect(screen.getByRole("button", { name: /previous/i })).toBeDisabled();
     });
 
-    renderWithParams({ page: 1 });
+    it("disables next button when there is no next page", () => {
+      mockJobPostingsData({
+        paginationOverrides: {
+          next: null,
+        },
+      });
 
-    expect(screen.getByRole("button", { name: /previous/i })).toBeDisabled();
-  });
+      renderWithParams({ page: 2 });
 
-  it("disables next button when there is no next page", () => {
-    mockSuccessPagination({
-      next: null,
+      expect(screen.getByRole("button", { name: /next/i })).toBeDisabled();
     });
 
-    renderWithParams({ page: 2 });
+    it("calls onPageChange with next page when next is clicked", () => {
+      mockJobPostingsData({
+        paginationOverrides: {
+          next: "http://api.test?page=2",
+        },
+      });
 
-    expect(screen.getByRole("button", { name: /next/i })).toBeDisabled();
-  });
+      renderWithParams({ page: 1 });
 
-  it("calls onPageChange with next page when next is clicked", () => {
-    mockSuccessPagination({
-      next: "http://api.test?page=2",
+      fireEvent.click(screen.getByRole("button", { name: /next/i }));
+
+      expect(onPageChange).toHaveBeenCalledWith(2);
     });
 
-    renderWithParams({ page: 1 });
+    it("calls onPageChange with previous page when previous is clicked", () => {
+      mockJobPostingsData({
+        paginationOverrides: {
+          previous: "http://api.test?page=1",
+        },
+      });
 
-    fireEvent.click(screen.getByRole("button", { name: /next/i }));
+      renderWithParams({ page: 2 });
 
-    expect(onPageChange).toHaveBeenCalledWith(2);
-  });
+      fireEvent.click(screen.getByRole("button", { name: /previous/i }));
 
-  it("calls onPageChange with previous page when previous is clicked", () => {
-    mockSuccessPagination({
-      previous: "http://api.test?page=1",
+      expect(onPageChange).toHaveBeenCalledWith(1);
     });
 
-    renderWithParams({ page: 2 });
+    it("renders current page indicator", () => {
+      mockJobPostingsData({
+        paginationOverrides: {
+          count: 45,
+        },
+      });
 
-    fireEvent.click(screen.getByRole("button", { name: /previous/i }));
+      renderWithParams({ page: 2, pageSize: 20 });
 
-    expect(onPageChange).toHaveBeenCalledWith(1);
-  });
-
-  it("renders current page indicator", () => {
-    mockSuccessPagination({
-      count: 45,
+      expect(screen.getByText("Page 2 / 3")).toBeInTheDocument();
     });
 
-    renderWithParams({ page: 2, pageSize: 20 });
+    it("hides pagination and shows empty state when the list is empty", () => {
+      mockJobPostingsData({
+        paginationOverrides: {
+          count: 0,
+        },
+        results: [],
+      });
 
-    expect(screen.getByText("Page 2 / 3")).toBeInTheDocument();
-  });
+      renderWithParams({ page: 1 });
 
-  it("hides pagination and shows empty state when the list is empty", () => {
-    mockSuccessPagination({
-      count: 0,
-      results: [],
+      expect(screen.getByText("No job postings found.")).toBeInTheDocument();
+
+      expect(
+        screen.queryByRole("button", { name: /previous/i }),
+      ).not.toBeInTheDocument();
+
+      expect(
+        screen.queryByRole("button", { name: /next/i }),
+      ).not.toBeInTheDocument();
     });
 
-    renderWithParams({ page: 1 });
+    it("shows loading indicator while fetching a new page", () => {
+      mockJobPostingsData({
+        queryOverrides: { isFetching: true },
+      });
 
-    expect(screen.getByText("No job postings found.")).toBeInTheDocument();
+      renderWithParams({ page: 2 });
 
-    expect(
-      screen.queryByRole("button", { name: /previous/i }),
-    ).not.toBeInTheDocument();
+      expect(screen.getByText(/loading page/i)).toBeInTheDocument();
+    });
 
-    expect(
-      screen.queryByRole("button", { name: /next/i }),
-    ).not.toBeInTheDocument();
-  });
+    it("disables pagination buttons while fetching a new page", () => {
+      mockJobPostingsData({
+        paginationOverrides: {
+          previous: "http://api.test?page=1",
+          next: "http://api.test?page=3",
+        },
+        queryOverrides: { isFetching: true },
+      });
 
-  it("shows loading indicator while fetching a new page", () => {
-    mockSuccessPagination({}, { isFetching: true });
+      renderWithParams({ page: 2 });
 
-    renderWithParams({ page: 2 });
+      expect(screen.getByRole("button", { name: /previous/i })).toBeDisabled();
 
-    expect(screen.getByText(/loading page/i)).toBeInTheDocument();
-  });
-
-  it("disables pagination buttons while fetching a new page", () => {
-    mockSuccessPagination(
-      {
-        previous: "http://api.test?page=1",
-        next: "http://api.test?page=3",
-      },
-      { isFetching: true },
-    );
-
-    renderWithParams({ page: 2 });
-
-    expect(screen.getByRole("button", { name: /previous/i })).toBeDisabled();
-
-    expect(screen.getByRole("button", { name: /next/i })).toBeDisabled();
+      expect(screen.getByRole("button", { name: /next/i })).toBeDisabled();
+    });
   });
 });
