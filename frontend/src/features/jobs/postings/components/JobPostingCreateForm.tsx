@@ -3,7 +3,16 @@
 
 import { type SubmitEventHandler, useState } from "react";
 import type { JobPostingCreatePayload } from "../types";
-import type { EmploymentType, Platform, WorkMode } from "../choices";
+import { labelClassName, fieldClassName } from "./formStyles";
+import { SelectField } from "./SelectField";
+import {
+  platformOptions,
+  employmentTypeOptions,
+  workModeOptions,
+  type EmploymentType,
+  type Platform,
+  type WorkMode,
+} from "../choices";
 
 const formClassName = `
   space-y-6 rounded-lg border border-slate-200 bg-white p-6 shadow-sm
@@ -13,17 +22,7 @@ const errorClassName = `
   rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700
 `.trim();
 
-const fieldClassName = `
-  w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm
-  placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-blue-500/20
-  disabled:cursor-not-allowed disabled:bg-slate-100
-`.trim();
-
 const textareaClassName = `${fieldClassName} min-h-32 resize-y`;
-
-const labelClassName = `
-  block text-sm font-medium text-slate-700
-`.trim();
 
 const fieldWrapperClassName = `
   space-y-1.5
@@ -212,69 +211,37 @@ export function JobPostingCreateForm({
         Active Hiring
       </label>
 
-      <div>
-        <label htmlFor="platform" className={labelClassName}>
-          Platform
-        </label>
-        <select
-          id="platform"
-          className={fieldClassName}
-          value={form.platform ?? ""}
-          onChange={(event) =>
-            updateField("platform", event.target.value as Platform)
-          }
-          disabled={isSubmitting}
-        >
-          <option value={""}>Select a platform</option>
-          <option value={"linkedin"}>LinkedIn</option>
-          <option value={"indeed"}>Indeed</option>
-          <option value={"wttj"}>Welcome To The Jungle</option>
-          <option value={"career_page"}>Career Page</option>
-        </select>
-      </div>
+      <SelectField
+        id="platform"
+        label="Platform"
+        value={form.platform ?? ""}
+        placeholder="Select a platform"
+        options={platformOptions}
+        disabled={isSubmitting}
+        onChange={(value: Platform) => updateField("platform", value)}
+      />
 
-      <div>
-        <label htmlFor="employment_type" className={labelClassName}>
-          Employment Type
-        </label>
-        <select
-          id="employment_type"
-          className={fieldClassName}
-          value={form.employment_type ?? ""}
-          onChange={(event) =>
-            updateField("employment_type", event.target.value as EmploymentType)
-          }
-          disabled={isSubmitting}
-        >
-          <option value={""}>Select an employment type</option>
-          <option value={"full_time"}>Full Time</option>
-          <option value={"part_time"}>Part Time</option>
-          <option value={"internship"}>Internship</option>
-          <option value={"apprenticeship"}>Apprenticeship</option>
-          <option value={"fixed_term"}>Fixed Term</option>
-          <option value={"freelance"}>Freelance</option>
-        </select>
-      </div>
+      <SelectField
+        id="employment_type"
+        label="Employment Type"
+        value={form.employment_type ?? ""}
+        placeholder="Select an employment type"
+        options={employmentTypeOptions}
+        disabled={isSubmitting}
+        onChange={(value: EmploymentType) =>
+          updateField("employment_type", value)
+        }
+      />
 
-      <div>
-        <label htmlFor="work_mode" className={labelClassName}>
-          Work Mode
-        </label>
-        <select
-          id="work_mode"
-          className={fieldClassName}
-          value={form.work_mode ?? ""}
-          onChange={(event) =>
-            updateField("work_mode", event.target.value as WorkMode)
-          }
-          disabled={isSubmitting}
-        >
-          <option value={""}>Select a work mode</option>
-          <option value={"on_site"}>On-site</option>
-          <option value={"hybrid"}>Hybrid</option>
-          <option value={"remote"}>Remote</option>
-        </select>
-      </div>
+      <SelectField
+        id="work_mode"
+        label="Work Mode"
+        value={form.work_mode ?? ""}
+        placeholder="Select a work mode"
+        options={workModeOptions}
+        disabled={isSubmitting}
+        onChange={(value: WorkMode) => updateField("work_mode", value)}
+      />
 
       <button
         type="submit"
