@@ -3,9 +3,9 @@
 
 import { type SubmitEventHandler, useState } from "react";
 import type { JobPostingCreatePayload } from "../types";
-import { labelClassName, fieldClassName } from "./formStyles";
 import { InputField } from "./InputField";
 import { SelectField } from "./SelectField";
+import { TextareaField } from "./TextareaField";
 import {
   platformOptions,
   employmentTypeOptions,
@@ -22,8 +22,6 @@ const formClassName = `
 const errorClassName = `
   rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700
 `.trim();
-
-const textareaClassName = `${fieldClassName} min-h-32 resize-y`;
 
 const checkboxLabelClassName = `
   flex items-center gap-2 text-sm font-medium text-slate-700
@@ -151,18 +149,14 @@ export function JobPostingCreateForm({
         disabled={isSubmitting}
       />
 
-      <div>
-        <label htmlFor="description" className={labelClassName}>
-          Description
-        </label>
-        <textarea
-          id="description"
-          className={textareaClassName}
-          value={form.description ?? ""}
-          onChange={(event) => updateField("description", event.target.value)}
-          disabled={isSubmitting}
-        />
-      </div>
+      <TextareaField
+        id="description"
+        label="Description"
+        value={form.description ?? ""}
+        onChange={(value) => updateField("description", value)}
+        placeholder="Job description"
+        disabled={isSubmitting}
+      />
 
       <label className={checkboxLabelClassName}>
         <input
