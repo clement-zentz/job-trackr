@@ -4,6 +4,7 @@
 import { type SubmitEventHandler, useState } from "react";
 import type { JobPostingCreatePayload } from "../types";
 import { labelClassName, fieldClassName } from "./formStyles";
+import { InputField } from "./InputField";
 import { SelectField } from "./SelectField";
 import {
   platformOptions,
@@ -23,10 +24,6 @@ const errorClassName = `
 `.trim();
 
 const textareaClassName = `${fieldClassName} min-h-32 resize-y`;
-
-const fieldWrapperClassName = `
-  space-y-1.5
-`.trim();
 
 const checkboxLabelClassName = `
   flex items-center gap-2 text-sm font-medium text-slate-700
@@ -105,74 +102,54 @@ export function JobPostingCreateForm({
     <form onSubmit={handleSubmit} className={formClassName}>
       {error && <p className={errorClassName}>{error}</p>}
 
-      <div className={fieldWrapperClassName}>
-        <label htmlFor="title" className={labelClassName}>
-          Title
-        </label>
-        <input
-          id="title"
-          className={fieldClassName}
-          value={form.title}
-          onChange={(event) => updateField("title", event.target.value)}
-          required
-          disabled={isSubmitting}
-        />
-      </div>
+      <InputField
+        id="title"
+        label="Title"
+        value={form.title}
+        onChange={(value) => updateField("title", value)}
+        placeholder="Job title"
+        required
+        disabled={isSubmitting}
+      />
 
-      <div>
-        <label htmlFor="company" className={labelClassName}>
-          Company
-        </label>
-        <input
-          id="company"
-          className={fieldClassName}
-          value={form.company}
-          onChange={(event) => updateField("company", event.target.value)}
-          required
-          disabled={isSubmitting}
-        />
-      </div>
+      <InputField
+        id="company"
+        label="Company"
+        value={form.company}
+        onChange={(value) => updateField("company", value)}
+        placeholder="Company name"
+        required
+        disabled={isSubmitting}
+      />
 
-      <div>
-        <label htmlFor="location" className={labelClassName}>
-          Location
-        </label>
-        <input
-          id="location"
-          className={fieldClassName}
-          value={form.location}
-          onChange={(event) => updateField("location", event.target.value)}
-          required
-          disabled={isSubmitting}
-        />
-      </div>
+      <InputField
+        id="location"
+        label="Location"
+        value={form.location}
+        onChange={(value) => updateField("location", value)}
+        placeholder="Job location"
+        required
+        disabled={isSubmitting}
+      />
 
-      <div>
-        <label htmlFor="url" className={labelClassName}>
-          URL
-        </label>
-        <input
-          id="url"
-          className={fieldClassName}
-          type="url"
-          value={form.url ?? ""}
-          onChange={(event) => updateField("url", event.target.value)}
-          disabled={isSubmitting}
-        />
-      </div>
+      <InputField
+        id="url"
+        label="URL"
+        type="url"
+        value={form.url ?? ""}
+        onChange={(value) => updateField("url", value)}
+        placeholder="Job posting URL"
+        disabled={isSubmitting}
+      />
 
-      <div>
-        <label htmlFor="salary" className={labelClassName}>
-          Salary
-        </label>
-        <input
-          id="salary"
-          className={fieldClassName}
-          value={form.salary ?? ""}
-          onChange={(event) => updateField("salary", event.target.value)}
-          disabled={isSubmitting}
-        />
-      </div>
+      <InputField
+        id="salary"
+        label="Salary"
+        value={form.salary ?? ""}
+        onChange={(value) => updateField("salary", value)}
+        placeholder="Salary range"
+        disabled={isSubmitting}
+      />
 
       <div>
         <label htmlFor="description" className={labelClassName}>
