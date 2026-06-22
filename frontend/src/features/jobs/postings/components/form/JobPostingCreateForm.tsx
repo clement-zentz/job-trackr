@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/postings/components/JobPostingCreateForm.tsx
+// File: frontend/src/features/jobs/postings/components/form/JobPostingCreateForm.tsx
 
 import { type SubmitEventHandler, useState } from "react";
-import type { JobPostingCreatePayload } from "../types";
+import type { JobPostingCreatePayload } from "../../types";
 import { CheckboxField } from "./CheckboxField";
 import { InputField } from "./InputField";
 import { SelectField } from "./SelectField";
@@ -14,7 +14,7 @@ import {
   type EmploymentType,
   type Platform,
   type WorkMode,
-} from "../choices";
+} from "../../choices";
 
 const formClassName = `
   space-y-6 rounded-lg border border-slate-200 bg-white p-6 shadow-sm

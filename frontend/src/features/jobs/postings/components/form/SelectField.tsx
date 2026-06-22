@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/postings/components/SelectField.tsx
+// File: frontend/src/features/jobs/postings/components/form/SelectField.tsx
 
 import {
   labelClassName,

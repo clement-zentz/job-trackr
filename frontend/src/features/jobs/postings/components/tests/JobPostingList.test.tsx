@@ -3,7 +3,10 @@
 
 import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
-import { JobPostingList, type JobPostingListProps } from "../JobPostingList";
+import {
+  JobPostingList,
+  type JobPostingListProps,
+} from "../list/JobPostingList";
 import { useJobPostings } from "../../hooks/useJobPostings";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { createJobPostingListItemRead } from "@/tests/factories/jobPosting";

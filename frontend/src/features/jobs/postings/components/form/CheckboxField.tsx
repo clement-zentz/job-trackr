@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/postings/components/CheckboxField.tsx
+// File: frontend/src/features/jobs/postings/components/form/CheckboxField.tsx
 
 const checkboxLabelClassName = `
   flex items-center gap-2 text-sm font-medium text-slate-700

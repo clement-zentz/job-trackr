@@ -1,46 +1,40 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/postings/components/InputField.tsx
+// File: frontend/src/features/jobs/postings/components/form/TextareaField.tsx
 
 import {
   labelClassName,
-  fieldClassName,
   fieldWrapperClassName,
+  fieldClassName,
 } from "./formStyles";
 
-export type InputFieldProps = {
+type TextareaFieldProps = {
   id: string;
   label: string;
   value: string;
-  type?: "text" | "url" | "number" | "email" | "password";
   placeholder?: string;
   disabled?: boolean;
-  required?: boolean;
   onChange: (value: string) => void;
 };
 
-export function InputField({
+export function TextareaField({
   id,
   label,
   value,
-  type = "text",
   placeholder,
-  required = false,
   disabled = false,
   onChange,
-}: InputFieldProps) {
+}: TextareaFieldProps) {
   return (
     <div className={fieldWrapperClassName}>
       <label htmlFor={id} className={labelClassName}>
         {label}
       </label>
-      <input
+      <textarea
         id={id}
-        className={fieldClassName}
-        type={type}
+        className={`${fieldClassName} min-h-32 resize-y`}
         value={value}
-        placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
-        required={required}
+        placeholder={placeholder}
         disabled={disabled}
       />
     </div>

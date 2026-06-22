@@ -4,7 +4,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import { JobPostingCreateForm } from "../JobPostingCreateForm";
+import { JobPostingCreateForm } from "../form/JobPostingCreateForm";
 
 describe("JobPostingCreateForm", () => {
   it("renders the create job posting form", () => {

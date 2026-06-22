@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/postings/components/JobPostingList.tsx
+// File: frontend/src/features/jobs/postings/components/list/JobPostingList.tsx
 
-import { useJobPostings } from "../hooks/useJobPostings";
+import { useJobPostings } from "../../hooks/useJobPostings";
 import { JobPostingCard } from "./JobPostingCard";
-import { DEFAULT_JOB_POSTINGS_PAGE_SIZE } from "../constants";
-import type { JobPostingListParams } from "../types";
+import { DEFAULT_JOB_POSTINGS_PAGE_SIZE } from "../../constants";
+import type { JobPostingListParams } from "../../types";
 import { Link } from "react-router-dom";
 
 export interface JobPostingListProps {

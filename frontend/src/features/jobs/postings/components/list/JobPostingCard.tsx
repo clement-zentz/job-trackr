@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/postings/components/JobPostingCard.tsx
+// File: frontend/src/features/jobs/postings/components/list/JobPostingCard.tsx
 
-import type { JobPostingListItemRead } from "../types";
-import { formatDateTimeForDisplay, formatUrlForDisplay } from "./utils";
+import type { JobPostingListItemRead } from "../../types";
+import { formatDateTimeForDisplay, formatUrlForDisplay } from "../utils";
 
 interface JobPostingCardProps {
   job: JobPostingListItemRead;

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/postings/components/formStyles.ts
+// File: frontend/src/features/jobs/postings/components/form/formStyles.ts
 
 export const labelClassName = `
   block text-sm font-medium text-slate-700

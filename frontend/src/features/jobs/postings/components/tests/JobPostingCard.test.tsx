@@ -2,7 +2,7 @@
 // File: frontend/src/features/jobs/postings/components/tests/JobPostingCard.test.tsx
 
 import { render, screen } from "@testing-library/react";
-import { JobPostingCard } from "../JobPostingCard";
+import { JobPostingCard } from "../list/JobPostingCard";
 import { describe, it, expect, vi } from "vitest";
 import { createJobPostingListItemRead } from "@/tests/factories/jobPosting";
 

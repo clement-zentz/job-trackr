@@ -3,7 +3,7 @@
 
 import { useNavigate } from "react-router-dom";
 import { BackToJobPostingsLink } from "../components/BackToJobPostingsLink";
-import { JobPostingCreateForm } from "../components/JobPostingCreateForm";
+import { JobPostingCreateForm } from "../components/form/JobPostingCreateForm";
 import { useCreateJobPosting } from "../hooks/useCreateJobPosting";
 
 export function JobPostingCreatePage() {
