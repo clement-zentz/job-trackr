@@ -3,7 +3,7 @@
 
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import { JobPostingFilters } from "../JobPostingFilters";
+import { JobPostingFilters } from "../list/JobPostingFilters";
 import type { JobPostingFilters as Filters } from "../../types";
 
 const defaultParams: Filters = {

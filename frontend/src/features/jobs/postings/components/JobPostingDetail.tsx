@@ -6,6 +6,7 @@ import { formatDateTimeForDisplay, formatUrlForDisplay } from "./utils";
 
 const dtClassName = "text-sm font-medium text-gray-500";
 const ddClassName = "mt-1 text-sm text-gray-900";
+const pClassName = "font-medium text-gray-700";
 
 type JobPostingDetailProps = {
   jobPosting: JobPostingDetailRead;
@@ -28,8 +29,8 @@ export function JobPostingDetail({ jobPosting }: JobPostingDetailProps) {
         </h2>
 
         <div className="mt-2 space-y-1 text-sm text-gray-600">
-          <p className="font-medium text-gray-700">{jobPosting.company}</p>
-          <p className="font-medium text-gray-700">{jobPosting.location}</p>
+          <p className={pClassName}>{jobPosting.company}</p>
+          <p className={pClassName}>{jobPosting.location}</p>
         </div>
       </header>
 

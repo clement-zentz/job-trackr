@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/postings/components/JobPostingFilters.tsx
+// File: frontend/src/features/jobs/postings/components/list/JobPostingFilters.tsx
 
-import type { JobPostingFilters } from "../types";
+import type { JobPostingFilters } from "../../types";
 
 interface JobPostingFiltersProps {
   params: JobPostingFilters;

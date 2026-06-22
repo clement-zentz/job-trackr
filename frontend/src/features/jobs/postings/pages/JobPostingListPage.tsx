@@ -3,8 +3,8 @@
 
 import { Link } from "react-router-dom";
 
-import { JobPostingList } from "../components/JobPostingList";
-import { JobPostingFilters } from "../components/JobPostingFilters";
+import { JobPostingList } from "../components/list/JobPostingList";
+import { JobPostingFilters } from "../components/list/JobPostingFilters";
 import { useJobPostingFilters } from "../hooks/useJobPostingFilters";
 
 const createJobPostingLinkClassName = `
