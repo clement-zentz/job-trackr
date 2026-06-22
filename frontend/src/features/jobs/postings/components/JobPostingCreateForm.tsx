@@ -3,6 +3,7 @@
 
 import { type SubmitEventHandler, useState } from "react";
 import type { JobPostingCreatePayload } from "../types";
+import { CheckboxField } from "./CheckboxField";
 import { InputField } from "./InputField";
 import { SelectField } from "./SelectField";
 import { TextareaField } from "./TextareaField";
@@ -21,14 +22,6 @@ const formClassName = `
 
 const errorClassName = `
   rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700
-`.trim();
-
-const checkboxLabelClassName = `
-  flex items-center gap-2 text-sm font-medium text-slate-700
-`.trim();
-
-const checkboxClassName = `
-  h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 disabled:cursor-not-allowed
 `.trim();
 
 const submitButtonClassName = `
@@ -158,29 +151,21 @@ export function JobPostingCreateForm({
         disabled={isSubmitting}
       />
 
-      <label className={checkboxLabelClassName}>
-        <input
-          type="checkbox"
-          className={checkboxClassName}
-          checked={form.easy_apply ?? false}
-          onChange={(event) => updateField("easy_apply", event.target.checked)}
-          disabled={isSubmitting}
-        />
-        Easy Apply
-      </label>
+      <CheckboxField
+        id="easy_apply"
+        label="Easy Apply"
+        checked={form.easy_apply ?? false}
+        onChange={(value) => updateField("easy_apply", value)}
+        disabled={isSubmitting}
+      />
 
-      <label className={checkboxLabelClassName}>
-        <input
-          type="checkbox"
-          className={checkboxClassName}
-          checked={form.active_hiring ?? false}
-          onChange={(event) =>
-            updateField("active_hiring", event.target.checked)
-          }
-          disabled={isSubmitting}
-        />
-        Active Hiring
-      </label>
+      <CheckboxField
+        id="active_hiring"
+        label="Active Hiring"
+        checked={form.active_hiring ?? false}
+        onChange={(value) => updateField("active_hiring", value)}
+        disabled={isSubmitting}
+      />
 
       <SelectField
         id="platform"
