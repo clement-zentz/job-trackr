@@ -75,3 +75,13 @@ repos:
         language: system
         pass_filenames: false
         files: ^frontend/.*\.(ts|tsx|js|jsx|css|md|json|html)$
+
+  # --- TypeScript type checking (frontend) ---
+  - repo: local
+    hooks:
+      - id: typecheck
+        name: TypeScript typecheck (frontend)
+        entry: npm --prefix frontend run typecheck
+        language: system
+        pass_filenames: false
+        files: ^frontend/.*\.tsx?$
