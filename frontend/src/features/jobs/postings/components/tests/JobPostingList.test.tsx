@@ -135,7 +135,9 @@ describe("JobPostingList", () => {
     renderJobPostingList();
 
     expect(screen.getByText("Backend Engineer")).toBeInTheDocument();
-    expect(screen.getByText("Acme")).toBeInTheDocument();
+    expect(
+      screen.getByText(`${jobPosting.company} · ${jobPosting.location}`),
+    ).toBeInTheDocument();
   });
 
   it("shows non-blocking error banner while keeping previous results", () => {
