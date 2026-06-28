@@ -10,33 +10,33 @@ import type {
   JobPostingQueryParams,
 } from "../types";
 
-export const listJobPostings = async (
+const JOB_POSTINGS_ENDPOINT = "/v1/jobs/postings/";
+
+export async function listJobPostings(
   params: JobPostingQueryParams,
-): Promise<PaginatedResponse<JobPostingListItemRead>> => {
+): Promise<PaginatedResponse<JobPostingListItemRead>> {
   const response = await api.get<PaginatedResponse<JobPostingListItemRead>>(
-    "/v1/jobs/postings/",
+    JOB_POSTINGS_ENDPOINT,
     { params },
   );
 
   return response.data;
-};
+}
 
-export const getJobPosting = async (
-  id: string,
-): Promise<JobPostingDetailRead> => {
+export async function getJobPosting(id: string): Promise<JobPostingDetailRead> {
   const response = await api.get<JobPostingDetailRead>(
-    `/v1/jobs/postings/${id}/`,
+    `${JOB_POSTINGS_ENDPOINT}${id}/`,
   );
   return response.data;
-};
+}
 
-export const createJobPosting = async (
+export async function createJobPosting(
   payload: JobPostingCreatePayload,
-): Promise<JobPostingDetailRead> => {
+): Promise<JobPostingDetailRead> {
   const response = await api.post<JobPostingDetailRead>(
-    "/v1/jobs/postings/",
+    JOB_POSTINGS_ENDPOINT,
     payload,
   );
 
   return response.data;
-};
+}

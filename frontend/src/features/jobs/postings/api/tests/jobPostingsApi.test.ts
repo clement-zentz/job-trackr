@@ -88,35 +88,6 @@ describe("listJobPostings", () => {
   });
 });
 
-describe("createJobPosting", () => {
-  it("posts the payload to the job postings endpoint", async () => {
-    const payload = createJobPostingCreatePayload();
-
-    const jobPosting = createJobPostingDetailRead();
-
-    mockedApiPost.mockResolvedValueOnce({
-      data: jobPosting,
-    });
-
-    const result = await createJobPosting(payload);
-
-    expect(mockedApiPost).toHaveBeenCalledWith("/v1/jobs/postings/", payload);
-    expect(result).toEqual(jobPosting);
-  });
-
-  it("rejects when the API request fails", async () => {
-    const payload = createJobPostingCreatePayload();
-
-    const error = new Error("Request failed");
-
-    mockedApiPost.mockRejectedValueOnce(error);
-
-    await expect(createJobPosting(payload)).rejects.toThrow("Request failed");
-
-    expect(mockedApiPost).toHaveBeenCalledWith("/v1/jobs/postings/", payload);
-  });
-});
-
 describe("getJobPosting", () => {
   it("calls the job posting detail endpoint with the given id", async () => {
     const jobPosting: JobPostingDetailRead = createJobPostingDetailRead({
@@ -144,5 +115,34 @@ describe("getJobPosting", () => {
     const result = await getJobPosting("1");
 
     expect(result).toEqual(jobPosting);
+  });
+});
+
+describe("createJobPosting", () => {
+  it("posts the payload to the job postings endpoint", async () => {
+    const payload = createJobPostingCreatePayload();
+
+    const jobPosting = createJobPostingDetailRead();
+
+    mockedApiPost.mockResolvedValueOnce({
+      data: jobPosting,
+    });
+
+    const result = await createJobPosting(payload);
+
+    expect(mockedApiPost).toHaveBeenCalledWith("/v1/jobs/postings/", payload);
+    expect(result).toEqual(jobPosting);
+  });
+
+  it("rejects when the API request fails", async () => {
+    const payload = createJobPostingCreatePayload();
+
+    const error = new Error("Request failed");
+
+    mockedApiPost.mockRejectedValueOnce(error);
+
+    await expect(createJobPosting(payload)).rejects.toThrow("Request failed");
+
+    expect(mockedApiPost).toHaveBeenCalledWith("/v1/jobs/postings/", payload);
   });
 });
