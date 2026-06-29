@@ -8,6 +8,7 @@ import type {
   JobPostingDetailRead,
   JobPostingListItemRead,
   JobPostingQueryParams,
+  JobPostingUpdatePayload,
 } from "../types";
 
 const JOB_POSTINGS_ENDPOINT = "/v1/jobs/postings/";
@@ -35,6 +36,18 @@ export async function createJobPosting(
 ): Promise<JobPostingDetailRead> {
   const response = await api.post<JobPostingDetailRead>(
     JOB_POSTINGS_ENDPOINT,
+    payload,
+  );
+
+  return response.data;
+}
+
+export async function updateJobPosting(
+  id: string,
+  payload: JobPostingUpdatePayload,
+): Promise<JobPostingDetailRead> {
+  const response = await api.patch<JobPostingDetailRead>(
+    `${JOB_POSTINGS_ENDPOINT}${id}/`,
     payload,
   );
 
