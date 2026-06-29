@@ -4,8 +4,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
   listJobPostings,
-  createJobPosting,
   getJobPosting,
+  createJobPosting,
+  updateJobPosting,
 } from "../jobPostingsApi";
 import { api } from "@/api/client";
 import { createPaginatedResponse } from "@/tests/factories/paginatedResponse";
@@ -25,11 +26,13 @@ vi.mock("@/api/client", () => ({
   api: {
     get: vi.fn(),
     post: vi.fn(),
+    patch: vi.fn(),
   },
 }));
 
 const mockedApiGet = vi.mocked(api.get);
 const mockedApiPost = vi.mocked(api.post);
+const mockedApiPatch = vi.mocked(api.patch);
 
 describe("listJobPostings", () => {
   it("passes params correctly to API", async () => {
@@ -144,5 +147,53 @@ describe("createJobPosting", () => {
     await expect(createJobPosting(payload)).rejects.toThrow("Request failed");
 
     expect(mockedApiPost).toHaveBeenCalledWith("/v1/jobs/postings/", payload);
+  });
+});
+
+describe("updateJobPosting", () => {
+  it("sends a patch request to the job posting detail endpoint", async () => {
+    const payload = {
+      title: "Senior Backend Engineer",
+      active_hiring: true,
+    };
+
+    const jobPosting = createJobPostingDetailRead({
+      id: "1",
+      title: "Senior Backend Engineer",
+      active_hiring: true,
+    });
+
+    mockedApiPatch.mockResolvedValueOnce({
+      data: jobPosting,
+    });
+
+    const result = await updateJobPosting("1", payload);
+
+    expect(mockedApiPatch).toHaveBeenCalledTimes(1);
+    expect(mockedApiPatch).toHaveBeenCalledWith(
+      "/v1/jobs/postings/1/",
+      payload,
+    );
+    expect(result).toEqual(jobPosting);
+  });
+
+  it("rejects when the API request fails", async () => {
+    const payload = {
+      title: "Senior Backend Engineer",
+    };
+
+    const error = new Error("Request failed");
+
+    mockedApiPatch.mockRejectedValueOnce(error);
+
+    await expect(updateJobPosting("1", payload)).rejects.toThrow(
+      "Request failed",
+    );
+
+    expect(mockedApiPatch).toHaveBeenCalledTimes(1);
+    expect(mockedApiPatch).toHaveBeenCalledWith(
+      "/v1/jobs/postings/1/",
+      payload,
+    );
   });
 });
