@@ -4,6 +4,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createJobPosting } from "../api/jobPostingsApi";
 import type { JobPostingCreatePayload } from "../types";
+import { jobPostingsKeys } from "../keys";
 
 export const useCreateJobPosting = () => {
   const queryClient = useQueryClient();
@@ -11,7 +12,7 @@ export const useCreateJobPosting = () => {
   return useMutation({
     mutationFn: (payload: JobPostingCreatePayload) => createJobPosting(payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["job-postings", "list"] });
+      queryClient.invalidateQueries({ queryKey: jobPostingsKeys.lists() });
     },
   });
 };

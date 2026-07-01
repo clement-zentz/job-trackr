@@ -15,7 +15,10 @@ const pClassName = "mt-3 text-sm";
 
 export function JobPostingDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const jobPostingQuery = useJobPosting(id);
+
+  const jobPostingId = id?.trim() ?? undefined;
+
+  const jobPostingQuery = useJobPosting(jobPostingId);
 
   if (jobPostingQuery.isLoading) {
     return (

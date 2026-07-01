@@ -4,10 +4,11 @@
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { getJobPosting } from "../api/jobPostingsApi";
+import { jobPostingsKeys } from "../keys";
 
 export function useJobPosting(id: string | undefined) {
   return useQuery({
-    queryKey: ["job-postings", "detail", id],
+    queryKey: id ? jobPostingsKeys.detail(id) : jobPostingsKeys.details(),
     queryFn: () => {
       if (!id) {
         throw new Error("Job posting ID is required");

@@ -5,12 +5,13 @@ import { useQuery } from "@tanstack/react-query";
 import { listJobPostings } from "../api/jobPostingsApi";
 import type { JobPostingListParams } from "../types";
 import { normalizeJobPostingParams } from "../api/normalizeJobPostingParams";
+import { jobPostingsKeys } from "../keys";
 
 export const useJobPostings = (params: JobPostingListParams) => {
   const normalizedParams = normalizeJobPostingParams(params);
 
   return useQuery({
-    queryKey: ["job-postings", "list", normalizedParams],
+    queryKey: jobPostingsKeys.list(normalizedParams),
     queryFn: () => listJobPostings(normalizedParams),
     placeholderData: (previousData) => previousData,
   });
