@@ -13,6 +13,7 @@ import {
   createJobPostingDetailRead,
 } from "@/tests/factories/jobPosting";
 import { createTestQueryClient } from "@/tests/utils";
+import { jobPostingsKeys } from "../../keys";
 
 vi.mock("../../api/jobPostingsApi", () => ({
   createJobPosting: vi.fn(),
@@ -93,7 +94,7 @@ describe("useCreateJobPosting", () => {
 
     await waitFor(() => {
       expect(invalidateQueriesSpy).toHaveBeenCalledWith({
-        queryKey: ["job-postings", "list"],
+        queryKey: jobPostingsKeys.lists(),
       });
     });
   });
