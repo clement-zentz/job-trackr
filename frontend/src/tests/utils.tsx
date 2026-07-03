@@ -11,6 +11,9 @@ export function createTestQueryClient() {
       queries: {
         retry: false,
       },
+      mutations: {
+        retry: false,
+      },
     },
   });
 }
@@ -26,6 +29,14 @@ export function renderWithQueryClient(ui: ReactElement) {
 export function createWrapper() {
   const client = createTestQueryClient();
 
+  return ({ children }: { children: ReactNode }) => (
+    <QueryClientProvider client={client}>{children}</QueryClientProvider>
+  );
+}
+
+export function createWrapperWithClient(
+  client: ReturnType<typeof createTestQueryClient>,
+) {
   return ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={client}>{children}</QueryClientProvider>
   );

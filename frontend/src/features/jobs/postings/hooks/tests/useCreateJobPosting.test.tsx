@@ -1,18 +1,15 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/features/jobs/postings/hooks/tests/useCreateJobPosting.test.tsx
 
-import { QueryClientProvider } from "@tanstack/react-query";
 import { renderHook, waitFor } from "@testing-library/react";
-import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
-
 import { createJobPosting } from "../../api/jobPostingsApi";
 import { useCreateJobPosting } from "../useCreateJobPosting";
 import {
   createJobPostingCreatePayload,
   createJobPostingDetailRead,
 } from "@/tests/factories/jobPosting";
-import { createTestQueryClient } from "@/tests/utils";
+import { createTestQueryClient, createWrapperWithClient } from "@/tests/utils";
 import { jobPostingsKeys } from "../../keys";
 
 vi.mock("../../api/jobPostingsApi", () => ({
@@ -20,14 +17,6 @@ vi.mock("../../api/jobPostingsApi", () => ({
 }));
 
 const mockedCreateJobPosting = vi.mocked(createJobPosting);
-
-function createWrapperWithClient(
-  client: ReturnType<typeof createTestQueryClient>,
-) {
-  return ({ children }: { children: ReactNode }) => (
-    <QueryClientProvider client={client}>{children}</QueryClientProvider>
-  );
-}
 
 describe("useCreateJobPosting", () => {
   it("calls createJobPosting with the creation payload", async () => {
