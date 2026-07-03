@@ -5,6 +5,7 @@ import type {
   JobPostingDetailRead,
   JobPostingListItemRead,
   JobPostingCreatePayload,
+  JobPostingUpdatePayload,
 } from "@/features/jobs/postings/types";
 
 export function createJobPostingListItemRead(
@@ -57,4 +58,13 @@ export function createJobPostingCreatePayload(
     location: "Paris",
     ...overrides,
   } satisfies JobPostingCreatePayload;
+}
+
+export function createJobPostingUpdatePayload(
+  overrides: JobPostingUpdatePayload = {},
+): JobPostingUpdatePayload {
+  return {
+    title: "Updated Backend Engineer",
+    ...overrides,
+  } satisfies JobPostingUpdatePayload;
 }
