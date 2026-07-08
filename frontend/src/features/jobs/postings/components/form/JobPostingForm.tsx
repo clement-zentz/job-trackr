@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/postings/components/form/JobPostingCreateForm.tsx
+// File: frontend/src/features/jobs/postings/components/form/JobPostingForm.tsx
 
 import { type SubmitEventHandler, useState } from "react";
-import type { JobPostingCreatePayload } from "../../types";
+import type { JobPostingFormValues } from "../../types";
 import { CheckboxField } from "./CheckboxField";
 import { InputField } from "./InputField";
 import { SelectField } from "./SelectField";
@@ -30,39 +30,28 @@ const submitButtonClassName = `
   focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-blue-300
 `.trim();
 
-interface JobPostingCreateFormProps {
-  onSubmit: (payload: JobPostingCreatePayload) => void;
+export interface JobPostingFormProps {
+  initialValues: JobPostingFormValues;
+  onSubmit: (values: JobPostingFormValues) => void;
   isSubmitting?: boolean;
   error?: string;
+  submitLabel: string;
+  submittingLabel: string;
 }
 
-export function JobPostingCreateForm({
+export function JobPostingForm({
+  initialValues,
   onSubmit,
   isSubmitting = false,
   error,
-}: JobPostingCreateFormProps) {
-  const [form, setForm] = useState<JobPostingCreatePayload>({
-    title: "",
-    company: "",
-    location: "",
+  submitLabel,
+  submittingLabel,
+}: JobPostingFormProps) {
+  const [form, setForm] = useState<JobPostingFormValues>(initialValues);
 
-    url: "",
-    salary: "",
-    description: "",
-
-    easy_apply: false,
-    active_hiring: false,
-
-    platform: undefined,
-    employment_type: undefined,
-    work_mode: undefined,
-
-    posted_at: null,
-  });
-
-  const updateField = <K extends keyof JobPostingCreatePayload>(
+  const updateField = <K extends keyof JobPostingFormValues>(
     field: K,
-    value: JobPostingCreatePayload[K],
+    value: JobPostingFormValues[K],
   ) => {
     setForm((current) => ({
       ...current,
@@ -77,16 +66,11 @@ export function JobPostingCreateForm({
       return;
     }
 
-    onSubmit({
-      ...form,
-      url: form.url || undefined,
-      salary: form.salary || undefined,
-      description: form.description || undefined,
-      platform: form.platform || undefined,
-      employment_type: form.employment_type || undefined,
-      work_mode: form.work_mode || undefined,
-      posted_at: form.posted_at || null,
-    });
+    if (!form.title || !form.company || !form.location) {
+      return;
+    }
+
+    onSubmit(form);
   };
 
   return (
@@ -204,7 +188,7 @@ export function JobPostingCreateForm({
         className={submitButtonClassName}
         disabled={isSubmitting}
       >
-        {isSubmitting ? "Creating..." : "Create job posting"}
+        {isSubmitting ? submittingLabel : submitLabel}
       </button>
     </form>
   );

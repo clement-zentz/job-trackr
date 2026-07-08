@@ -3,7 +3,11 @@
 
 import { useNavigate } from "react-router-dom";
 import { BackToJobPostingsLink } from "../components/BackToJobPostingsLink";
-import { JobPostingCreateForm } from "../components/form/JobPostingCreateForm";
+import { JobPostingForm } from "../components/form/JobPostingForm";
+import {
+  emptyJobPostingFormValues,
+  formValuesToCreatePayload,
+} from "../components/form/jobPostingFormMappers";
 import { useCreateJobPosting } from "../hooks/useCreateJobPosting";
 
 export function JobPostingCreatePage() {
@@ -24,13 +28,16 @@ export function JobPostingCreatePage() {
         </p>
       </div>
 
-      <JobPostingCreateForm
+      <JobPostingForm
+        initialValues={emptyJobPostingFormValues}
         isSubmitting={createJobPosting.isPending}
         error={
           createJobPosting.error ? "Could not create job posting." : undefined
         }
-        onSubmit={(payload) => {
-          createJobPosting.mutate(payload, {
+        submitLabel="Create job posting"
+        submittingLabel="Creating..."
+        onSubmit={(values) => {
+          createJobPosting.mutate(formValuesToCreatePayload(values), {
             onSuccess: () => {
               navigate("..");
             },
