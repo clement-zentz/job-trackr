@@ -66,6 +66,27 @@ export type JobPostingCreatePayload = JobPostingWritePayload;
 
 export type JobPostingUpdatePayload = Partial<JobPostingWritePayload>;
 
+// --- FORM MODELS ---
+
+export interface JobPostingFormValues {
+  title: string;
+  company: string;
+  location: string;
+
+  url: string;
+  salary: string;
+  description: string;
+
+  easy_apply: boolean;
+  active_hiring: boolean;
+
+  platform: Platform;
+  employment_type: EmploymentType;
+  work_mode: WorkMode;
+
+  posted_at: string;
+}
+
 // --- API QUERY MODELS ---
 
 /**
