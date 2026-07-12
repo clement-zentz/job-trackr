@@ -128,12 +128,12 @@ describe("JobPostingDetailPage", () => {
   it("renders the job posting detail when the query succeeds", () => {
     mockUseJobPosting({
       data: createJobPostingDetailRead({
-        id: "1",
+        id: "job-123",
         title: "Backend Developer",
       }),
     });
 
-    renderJobPostingsRoute("/jobs/postings/1");
+    renderJobPostingsRoute("/jobs/postings/job-123");
 
     expect(
       screen.getByRole("heading", { name: "Job Posting Detail" }),
@@ -142,6 +142,10 @@ describe("JobPostingDetailPage", () => {
     expect(
       screen.getByRole("link", { name: "Back to job postings" }),
     ).toHaveAttribute("href", "/jobs/postings");
+
+    expect(
+      screen.getByRole("link", { name: "Edit job posting" }),
+    ).toHaveAttribute("href", "/jobs/postings/job-123/edit");
 
     expect(
       screen.getByRole("heading", { name: "Backend Developer" }),

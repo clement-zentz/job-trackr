@@ -123,6 +123,10 @@ describe("JobPostingUpdatePage", () => {
     expect(screen.getByDisplayValue("Acme")).toBeInTheDocument();
     expect(screen.getByDisplayValue("Paris")).toBeInTheDocument();
 
+    expect(
+      screen.getByRole("link", { name: "Back to job posting" }),
+    ).toHaveAttribute("href", "/jobs/postings/job-123");
+
     await user.click(screen.getByRole("button", { name: "Save Job Posting" }));
 
     expect(mocks.mutate).toHaveBeenCalledWith(
@@ -156,7 +160,9 @@ describe("JobPostingUpdatePage", () => {
 
     options.onSuccess();
 
-    expect(mocks.navigate).toHaveBeenCalledWith("..");
+    expect(mocks.navigate).toHaveBeenCalledWith("/jobs/postings/job-123", {
+      replace: true,
+    });
   });
 
   it("shows the update error message", () => {
