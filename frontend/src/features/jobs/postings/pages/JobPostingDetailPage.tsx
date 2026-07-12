@@ -4,6 +4,7 @@
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { BackToJobPostingsLink } from "../components/BackToJobPostingsLink";
+import { EditJobPostingLink } from "../components/EditJobPostingLink";
 import { JobPostingDetail } from "../components/JobPostingDetail";
 import { useJobPosting } from "../hooks/useJobPosting";
 
@@ -84,9 +85,13 @@ export function JobPostingDetailPage() {
       <div className="mb-6">
         <BackToJobPostingsLink />
 
-        <h1 className="mt-4 text-3xl font-bold tracking-tight text-gray-900">
-          {pageTitle}
-        </h1>
+        <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+            {pageTitle}
+          </h1>
+
+          <EditJobPostingLink jobPostingId={jobPostingQuery.data.id} />
+        </div>
       </div>
 
       <JobPostingDetail jobPosting={jobPostingQuery.data} />

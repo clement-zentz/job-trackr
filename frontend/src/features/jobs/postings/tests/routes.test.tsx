@@ -33,4 +33,12 @@ describe("jobPostingsRoutes", () => {
       await screen.findByRole("heading", { name: "Job Posting Detail" }),
     ).toBeInTheDocument();
   });
+
+  it("renders the job posting update page for a posting id", async () => {
+    renderJobPostingsRoute("/jobs/postings/1/edit");
+
+    expect(
+      await screen.findByRole("heading", { name: "Update Job Posting" }),
+    ).toBeInTheDocument();
+  });
 });

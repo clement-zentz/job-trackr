@@ -2,7 +2,7 @@
 // File: frontend/src/features/jobs/postings/pages/JobPostingUpdatePage.tsx
 
 import { useNavigate, useParams } from "react-router-dom";
-import { BackToJobPostingsLink } from "../components/BackToJobPostingsLink";
+import { BackToJobPostingLink } from "../components/BackToJobPostingLink";
 import { JobPostingForm } from "../components/form/JobPostingForm";
 import {
   jobPostingToFormValues,
@@ -10,6 +10,7 @@ import {
 } from "../components/form/jobPostingFormMappers";
 import { useJobPosting } from "../hooks/useJobPosting";
 import { useUpdateJobPosting } from "../hooks/useUpdateJobPosting";
+import { getJobPostingDetailPath } from "../constants";
 
 const h1Text = "Update Job Posting";
 
@@ -46,7 +47,6 @@ export function JobPostingUpdatePage() {
   if (jobPostingQuery.isError || !jobPostingQuery.data) {
     return (
       <main className={mainClassName}>
-        <BackToJobPostingsLink />
         <h1 className={h1ClassName}>{h1Text}</h1>
         <p className="text-red-500">Could not load job posting.</p>
       </main>
@@ -56,7 +56,7 @@ export function JobPostingUpdatePage() {
   return (
     <main className={mainClassName}>
       <div className="mb-6">
-        <BackToJobPostingsLink />
+        <BackToJobPostingLink jobPostingId={jobPostingId} />
 
         <h1 className={h1ClassName}>{h1Text}</h1>
 
@@ -82,7 +82,9 @@ export function JobPostingUpdatePage() {
             },
             {
               onSuccess: () => {
-                navigate("..");
+                navigate(getJobPostingDetailPath(jobPostingId), {
+                  replace: true,
+                });
               },
             },
           );
