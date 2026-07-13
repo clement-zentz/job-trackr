@@ -53,3 +53,7 @@ export async function updateJobPosting(
 
   return response.data;
 }
+
+export async function deleteJobPosting(id: string): Promise<void> {
+  await api.delete(`${JOB_POSTINGS_ENDPOINT}${id}/`);
+}
