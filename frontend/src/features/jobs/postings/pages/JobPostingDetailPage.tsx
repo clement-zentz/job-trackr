@@ -4,6 +4,7 @@
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { BackToJobPostingsLink } from "../components/BackToJobPostingsLink";
+import { DeleteJobPostingButton } from "../components/DeleteJobPostingButton";
 import { EditJobPostingLink } from "../components/EditJobPostingLink";
 import { JobPostingDetail } from "../components/JobPostingDetail";
 import { useJobPosting } from "../hooks/useJobPosting";
@@ -90,7 +91,14 @@ export function JobPostingDetailPage() {
             {pageTitle}
           </h1>
 
-          <EditJobPostingLink jobPostingId={jobPostingQuery.data.id} />
+          <div className="flex flex-wrap items-center gap-3">
+            <EditJobPostingLink jobPostingId={jobPostingQuery.data.id} />
+
+            <DeleteJobPostingButton
+              jobPostingId={jobPostingQuery.data.id}
+              jobPostingTitle={jobPostingQuery.data.title}
+            />
+          </div>
         </div>
       </div>
 
