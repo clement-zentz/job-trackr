@@ -2,9 +2,9 @@
 // File: frontend/src/features/jobs/postings/components/form/jobPostingFormMappers.ts
 
 import type {
+  JobPostingCreatePayload,
   JobPostingDetailRead,
   JobPostingFormValues,
-  JobPostingCreatePayload,
   JobPostingUpdatePayload,
 } from "../../types";
 

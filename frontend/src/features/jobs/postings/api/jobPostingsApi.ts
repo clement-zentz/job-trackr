@@ -3,6 +3,7 @@
 
 import { api } from "@/api/client";
 import type { PaginatedResponse } from "@/types/pagination";
+
 import type {
   JobPostingCreatePayload,
   JobPostingDetailRead,

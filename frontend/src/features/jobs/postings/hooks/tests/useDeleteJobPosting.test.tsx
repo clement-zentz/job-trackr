@@ -4,7 +4,8 @@
 import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { createWrapperWithClient, createTestQueryClient } from "@/tests/utils";
+import { createTestQueryClient, createWrapperWithClient } from "@/tests/utils";
+
 import { deleteJobPosting } from "../../api/jobPostingsApi";
 import { jobPostingsKeys } from "../../keys";
 import { useDeleteJobPosting } from "../useDeleteJobPosting";

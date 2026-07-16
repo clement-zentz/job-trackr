@@ -2,10 +2,11 @@
 // File: frontend/src/features/jobs/postings/hooks/tests/useJobPostingFilters.test.ts
 
 import { renderHook } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
-import { useJobPostingFilters } from "../useJobPostingFilters";
 import { act } from "react";
+import { describe, expect, it } from "vitest";
+
 import { DEFAULT_JOB_POSTINGS_PAGE_SIZE } from "../../constants";
+import { useJobPostingFilters } from "../useJobPostingFilters";
 
 describe("useJobPostingFilters", () => {
   it("initializes with default filters", () => {

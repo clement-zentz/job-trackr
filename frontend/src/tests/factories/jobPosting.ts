@@ -2,9 +2,9 @@
 // File: frontend/src/tests/factories/jobPosting.ts
 
 import type {
+  JobPostingCreatePayload,
   JobPostingDetailRead,
   JobPostingListItemRead,
-  JobPostingCreatePayload,
   JobPostingUpdatePayload,
 } from "@/features/jobs/postings/types";
 

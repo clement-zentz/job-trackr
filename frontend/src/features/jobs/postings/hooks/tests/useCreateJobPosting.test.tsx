@@ -3,14 +3,16 @@
 
 import { renderHook, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { createJobPosting } from "../../api/jobPostingsApi";
-import { useCreateJobPosting } from "../useCreateJobPosting";
+
 import {
   createJobPostingCreatePayload,
   createJobPostingDetailRead,
 } from "@/tests/factories/jobPosting";
 import { createTestQueryClient, createWrapperWithClient } from "@/tests/utils";
+
+import { createJobPosting } from "../../api/jobPostingsApi";
 import { jobPostingsKeys } from "../../keys";
+import { useCreateJobPosting } from "../useCreateJobPosting";
 
 vi.mock("../../api/jobPostingsApi", () => ({
   createJobPosting: vi.fn(),

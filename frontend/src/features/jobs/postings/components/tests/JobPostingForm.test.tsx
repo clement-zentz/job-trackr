@@ -4,12 +4,13 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
+
+import type { JobPostingFormValues } from "../../types";
 import {
   JobPostingForm,
   type JobPostingFormProps,
 } from "../form/JobPostingForm";
 import { emptyJobPostingFormValues } from "../form/jobPostingFormMappers";
-import type { JobPostingFormValues } from "../../types";
 
 function renderJobPostingForm({
   initialValues = emptyJobPostingFormValues,

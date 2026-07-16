@@ -4,8 +4,9 @@
 import { screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { useJobPosting } from "../../hooks/useJobPosting";
 import { createJobPostingDetailRead } from "@/tests/factories/jobPosting";
+
+import { useJobPosting } from "../../hooks/useJobPosting";
 import { renderJobPostingsRoute } from "../../tests/utils";
 
 vi.mock("../../hooks/useJobPosting", () => ({

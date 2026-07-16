@@ -2,14 +2,15 @@
 // File: frontend/src/features/jobs/postings/components/tests/JobPostingCard.test.tsx
 
 import { render, screen } from "@testing-library/react";
-import { JobPostingCard } from "../list/JobPostingCard";
-import { describe, it, expect, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
 import { createJobPostingListItemRead } from "@/tests/factories/jobPosting";
 
-type UtilsModule = typeof import("../utils");
+import { JobPostingCard } from "../list/JobPostingCard";
+import type * as Utils from "../utils";
 
 vi.mock("../utils", async () => {
-  const actual = await vi.importActual<UtilsModule>("../utils");
+  const actual = await vi.importActual<typeof Utils>("../utils");
 
   return {
     ...actual,

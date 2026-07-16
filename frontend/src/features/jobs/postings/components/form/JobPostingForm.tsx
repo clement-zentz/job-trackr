@@ -2,19 +2,20 @@
 // File: frontend/src/features/jobs/postings/components/form/JobPostingForm.tsx
 
 import { type SubmitEventHandler, useState } from "react";
+
+import {
+  type EmploymentType,
+  employmentTypeOptions,
+  type Platform,
+  platformOptions,
+  type WorkMode,
+  workModeOptions,
+} from "../../choices";
 import type { JobPostingFormValues } from "../../types";
 import { CheckboxField } from "./CheckboxField";
 import { InputField } from "./InputField";
 import { SelectField } from "./SelectField";
 import { TextareaField } from "./TextareaField";
-import {
-  platformOptions,
-  employmentTypeOptions,
-  workModeOptions,
-  type EmploymentType,
-  type Platform,
-  type WorkMode,
-} from "../../choices";
 
 const formClassName = `
   space-y-6 rounded-lg border border-slate-200 bg-white p-6 shadow-sm

@@ -2,6 +2,7 @@
 // File: frontend/src/app/App.tsx
 
 import { RouterProvider } from "react-router-dom";
+
 import { router } from "@/router";
 
 export function App() {

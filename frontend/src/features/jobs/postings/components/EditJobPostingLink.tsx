@@ -2,6 +2,7 @@
 // File: frontend/src/features/jobs/postings/components/EditJobPostingLink.tsx
 
 import { Link } from "react-router-dom";
+
 import { getJobPostingEditPath } from "../constants";
 
 const baseLinkClassName = `

@@ -2,9 +2,9 @@
 // File: frontend/src/features/jobs/postings/components/form/InputField.tsx
 
 import {
-  labelClassName,
   fieldClassName,
   fieldWrapperClassName,
+  labelClassName,
 } from "./formStyles";
 
 export type InputFieldProps = {

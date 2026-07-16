@@ -2,6 +2,7 @@
 // File: frontend/src/router.tsx
 
 import { createBrowserRouter } from "react-router-dom";
+
 import { AppLayout } from "@/app";
 import { jobPostingsRoutes } from "@/features/jobs/postings";
 

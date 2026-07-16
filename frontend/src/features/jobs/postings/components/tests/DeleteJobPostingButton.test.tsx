@@ -2,6 +2,7 @@
 // File: frontend/src/features/jobs/postings/components/tests/DeleteJobPostingButton.test.tsx
 
 import { fireEvent, render, screen } from "@testing-library/react";
+import type * as ReactRouterDom from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { JOB_POSTINGS_LIST_PATH } from "../../constants";
@@ -15,9 +16,7 @@ const { mutateMock, navigateMock } = vi.hoisted(() => ({
 
 vi.mock("react-router-dom", async () => {
   const actual =
-    await vi.importActual<typeof import("react-router-dom")>(
-      "react-router-dom",
-    );
+    await vi.importActual<typeof ReactRouterDom>("react-router-dom");
 
   return {
     ...actual,

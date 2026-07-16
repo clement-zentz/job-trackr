@@ -2,18 +2,20 @@
 // File: frontend/src/features/jobs/postings/components/tests/JobPostingList.test.tsx
 
 import { fireEvent, render, screen } from "@testing-library/react";
-import { MemoryRouter, Routes, Route } from "react-router-dom";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { createJobPostingListItemRead } from "@/tests/factories/jobPosting";
+import { createPaginatedResponse } from "@/tests/factories/paginatedResponse";
+import type { PaginatedResponse } from "@/types/pagination";
+
+import { DEFAULT_JOB_POSTINGS_PAGE_SIZE } from "../../constants";
+import { useJobPostings } from "../../hooks/useJobPostings";
+import type { JobPostingListItemRead, JobPostingListParams } from "../../types";
 import {
   JobPostingList,
   type JobPostingListProps,
 } from "../list/JobPostingList";
-import { useJobPostings } from "../../hooks/useJobPostings";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { createJobPostingListItemRead } from "@/tests/factories/jobPosting";
-import { createPaginatedResponse } from "@/tests/factories/paginatedResponse";
-import type { PaginatedResponse } from "@/types/pagination";
-import type { JobPostingListItemRead, JobPostingListParams } from "../../types";
-import { DEFAULT_JOB_POSTINGS_PAGE_SIZE } from "../../constants";
 
 vi.mock("../../hooks/useJobPostings", () => ({
   useJobPostings: vi.fn(),

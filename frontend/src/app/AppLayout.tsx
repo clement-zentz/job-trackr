@@ -2,6 +2,7 @@
 // File: frontend/src/app/AppLayout.tsx
 
 import { Outlet } from "react-router-dom";
+
 import { Sidebar } from "./Sidebar";
 import { TopBar } from "./TopBar";
 

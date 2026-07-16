@@ -4,15 +4,14 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import { JobPostingDetail } from "../JobPostingDetail";
-import type { JobPostingDetailRead } from "../../types";
-
 import { createJobPostingDetailRead } from "@/tests/factories/jobPosting";
 
-type UtilsModule = typeof import("../utils");
+import type { JobPostingDetailRead } from "../../types";
+import { JobPostingDetail } from "../JobPostingDetail";
+import type * as Utils from "../utils";
 
 vi.mock("../utils", async () => {
-  const actual = await vi.importActual<UtilsModule>("../utils");
+  const actual = await vi.importActual<typeof Utils>("../utils");
 
   return {
     ...actual,

@@ -2,6 +2,7 @@
 // File: frontend/src/features/jobs/postings/components/BackToJobPostingsLink.tsx
 
 import { Link } from "react-router-dom";
+
 import { JOB_POSTINGS_LIST_PATH } from "../constants";
 
 const baseLinkClassName = `

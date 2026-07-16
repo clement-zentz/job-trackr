@@ -2,9 +2,10 @@
 // File: frontend/src/features/jobs/postings/routes.tsx
 
 import type { RouteObject } from "react-router-dom";
-import { JobPostingListPage } from "./pages/JobPostingListPage";
+
 import { JobPostingCreatePage } from "./pages/JobPostingCreatePage";
 import { JobPostingDetailPage } from "./pages/JobPostingDetailPage";
+import { JobPostingListPage } from "./pages/JobPostingListPage";
 import { JobPostingUpdatePage } from "./pages/JobPostingUpdatePage";
 
 export const jobPostingsRoutes: RouteObject[] = [

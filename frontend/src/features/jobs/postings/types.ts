@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/features/jobs/postings/types.ts
 
-import type { Platform, EmploymentType, WorkMode } from "./choices";
+import type { EmploymentType, Platform, WorkMode } from "./choices";
 
 // --- API READ MODELS ---
 
