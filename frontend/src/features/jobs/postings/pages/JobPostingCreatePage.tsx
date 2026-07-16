@@ -2,6 +2,7 @@
 // File: frontend/src/features/jobs/postings/pages/JobPostingCreatePage.tsx
 
 import { useNavigate } from "react-router-dom";
+
 import { BackToJobPostingsLink } from "../components/BackToJobPostingsLink";
 import { JobPostingForm } from "../components/form/JobPostingForm";
 import {

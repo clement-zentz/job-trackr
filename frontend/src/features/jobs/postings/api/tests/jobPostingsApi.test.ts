@@ -1,23 +1,25 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/features/jobs/postings/api/tests/jobPostingsApi.test.ts
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import {
-  listJobPostings,
-  getJobPosting,
-  createJobPosting,
-  updateJobPosting,
-  deleteJobPosting,
-} from "../jobPostingsApi";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { api } from "@/api/client";
-import { createPaginatedResponse } from "@/tests/factories/paginatedResponse";
 import {
-  createJobPostingListItemRead,
   createJobPostingCreatePayload,
   createJobPostingDetailRead,
+  createJobPostingListItemRead,
 } from "@/tests/factories/jobPosting";
+import { createPaginatedResponse } from "@/tests/factories/paginatedResponse";
+
 import { DEFAULT_JOB_POSTINGS_PAGE_SIZE } from "../../constants";
 import type { JobPostingDetailRead } from "../../types";
+import {
+  createJobPosting,
+  deleteJobPosting,
+  getJobPosting,
+  listJobPostings,
+  updateJobPosting,
+} from "../jobPostingsApi";
 
 beforeEach(() => {
   vi.clearAllMocks();

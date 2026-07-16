@@ -1,11 +1,14 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/features/jobs/postings/pages/tests/JobPostingUpdatePage.test.tsx
 
-import { createJobPostingDetailRead } from "@/tests/factories/jobPosting";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type * as ReactRouterDom from "react-router-dom";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { createJobPostingDetailRead } from "@/tests/factories/jobPosting";
+
 import { JobPostingUpdatePage } from "../JobPostingUpdatePage";
 
 const mocks = vi.hoisted(() => ({
@@ -18,9 +21,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("react-router-dom", async () => {
   const actual =
-    await vi.importActual<typeof import("react-router-dom")>(
-      "react-router-dom",
-    );
+    await vi.importActual<typeof ReactRouterDom>("react-router-dom");
 
   return {
     ...actual,

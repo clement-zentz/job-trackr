@@ -3,13 +3,15 @@
 
 import { renderHook, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { useJobPostings } from "../useJobPostings";
-import * as api from "../../api/jobPostingsApi";
-import { createWrapper } from "@/tests/utils";
+
 import { createJobPostingListItemRead } from "@/tests/factories/jobPosting";
 import { createPaginatedResponse } from "@/tests/factories/paginatedResponse";
-import type { JobPostingListParams } from "../../types";
+import { createWrapper } from "@/tests/utils";
+
+import * as api from "../../api/jobPostingsApi";
 import { DEFAULT_JOB_POSTINGS_PAGE_SIZE } from "../../constants";
+import type { JobPostingListParams } from "../../types";
+import { useJobPostings } from "../useJobPostings";
 
 const defaultParams: JobPostingListParams = {
   page: 1,

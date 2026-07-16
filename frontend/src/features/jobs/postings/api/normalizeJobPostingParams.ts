@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/features/jobs/postings/api/normalizeJobPostingParams.ts
 
-import type { JobPostingListParams, JobPostingQueryParams } from "../types";
 import { DEFAULT_JOB_POSTINGS_PAGE_SIZE } from "../constants";
+import type { JobPostingListParams, JobPostingQueryParams } from "../types";
 
 export function normalizeJobPostingParams(
   params: JobPostingListParams = {},

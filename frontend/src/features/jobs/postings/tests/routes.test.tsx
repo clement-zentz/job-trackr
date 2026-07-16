@@ -3,6 +3,7 @@
 
 import { screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+
 import { renderJobPostingsRoute } from "./utils";
 
 describe("jobPostingsRoutes", () => {

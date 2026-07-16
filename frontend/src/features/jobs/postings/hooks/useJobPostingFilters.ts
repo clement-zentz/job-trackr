@@ -2,8 +2,9 @@
 // File: frontend/src/features/jobs/postings/hooks/useJobPostingFilters.ts
 
 import { useState } from "react";
-import type { JobPostingFilters } from "../types";
+
 import { DEFAULT_JOB_POSTINGS_PAGE_SIZE } from "../constants";
+import type { JobPostingFilters } from "../types";
 
 const DEFAULT_FILTERS: JobPostingFilters = {};
 

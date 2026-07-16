@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/features/jobs/postings/hooks/useJobPosting.ts
 
-import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+
 import { getJobPosting } from "../api/jobPostingsApi";
 import { jobPostingsKeys } from "../keys";
 

@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/features/jobs/postings/components/tests/JobPostingFormMappers.test.ts
 
-import { createJobPostingDetailRead } from "@/tests/factories/jobPosting";
 import { describe, expect, it } from "vitest";
+
+import { createJobPostingDetailRead } from "@/tests/factories/jobPosting";
+
 import {
   emptyJobPostingFormValues,
   formValuesToCreatePayload,

@@ -2,9 +2,9 @@
 // File: frontend/src/features/jobs/postings/components/form/SelectField.tsx
 
 import {
-  labelClassName,
   fieldClassName,
   fieldWrapperClassName,
+  labelClassName,
 } from "./formStyles";
 
 type SelectOption<T extends string> = {

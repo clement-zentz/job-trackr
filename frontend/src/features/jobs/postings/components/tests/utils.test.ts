@@ -2,6 +2,7 @@
 // File: frontend/src/features/jobs/postings/components/tests/utils.test.ts
 
 import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { formatDateTimeForDisplay, formatUrlForDisplay } from "../utils";
 
 describe("formatDateTimeForDisplay", () => {

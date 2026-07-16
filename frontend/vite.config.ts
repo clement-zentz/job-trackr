@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/vite.config.ts
 
-import react from "@vitejs/plugin-react";
+import path from "node:path";
+
 import tailwindcss from "@tailwindcss/vite";
+import react from "@vitejs/plugin-react";
 import { loadEnv } from "vite";
 import { defineConfig as defineVitestConfig } from "vitest/config";
-import path from "node:path";
 
 // https://vite.dev/config/
 export default defineVitestConfig(({ mode }) => {

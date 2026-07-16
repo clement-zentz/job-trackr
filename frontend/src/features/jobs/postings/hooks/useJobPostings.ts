@@ -2,10 +2,11 @@
 // File: frontend/src/features/jobs/postings/hooks/useJobPostings.ts
 
 import { useQuery } from "@tanstack/react-query";
+
 import { listJobPostings } from "../api/jobPostingsApi";
-import type { JobPostingListParams } from "../types";
 import { normalizeJobPostingParams } from "../api/normalizeJobPostingParams";
 import { jobPostingsKeys } from "../keys";
+import type { JobPostingListParams } from "../types";
 
 export const useJobPostings = (params: JobPostingListParams) => {
   const normalizedParams = normalizeJobPostingParams(params);

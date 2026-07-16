@@ -2,9 +2,9 @@
 // File: frontend/src/features/jobs/postings/components/form/TextareaField.tsx
 
 import {
-  labelClassName,
-  fieldWrapperClassName,
   fieldClassName,
+  fieldWrapperClassName,
+  labelClassName,
 } from "./formStyles";
 
 type TextareaFieldProps = {

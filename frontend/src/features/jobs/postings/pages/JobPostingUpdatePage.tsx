@@ -2,15 +2,16 @@
 // File: frontend/src/features/jobs/postings/pages/JobPostingUpdatePage.tsx
 
 import { useNavigate, useParams } from "react-router-dom";
+
 import { BackToJobPostingLink } from "../components/BackToJobPostingLink";
 import { JobPostingForm } from "../components/form/JobPostingForm";
 import {
-  jobPostingToFormValues,
   formValuesToUpdatePayload,
+  jobPostingToFormValues,
 } from "../components/form/jobPostingFormMappers";
+import { getJobPostingDetailPath } from "../constants";
 import { useJobPosting } from "../hooks/useJobPosting";
 import { useUpdateJobPosting } from "../hooks/useUpdateJobPosting";
-import { getJobPostingDetailPath } from "../constants";
 
 const h1Text = "Update Job Posting";
 

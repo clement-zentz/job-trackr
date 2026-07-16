@@ -4,15 +4,16 @@
 import { renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { updateJobPosting } from "../../api/jobPostingsApi";
-import { jobPostingsKeys } from "../../keys";
-import type { JobPostingUpdatePayload } from "../../types";
-import { useUpdateJobPosting } from "../useUpdateJobPosting";
 import {
   createJobPostingDetailRead,
   createJobPostingUpdatePayload,
 } from "@/tests/factories/jobPosting";
 import { createTestQueryClient, createWrapperWithClient } from "@/tests/utils";
+
+import { updateJobPosting } from "../../api/jobPostingsApi";
+import { jobPostingsKeys } from "../../keys";
+import type { JobPostingUpdatePayload } from "../../types";
+import { useUpdateJobPosting } from "../useUpdateJobPosting";
 
 vi.mock("../../api/jobPostingsApi", () => ({
   updateJobPosting: vi.fn(),
