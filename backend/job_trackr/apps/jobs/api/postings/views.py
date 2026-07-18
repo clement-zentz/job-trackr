@@ -1,16 +1,13 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/job_trackr/apps/jobs/api/postings/views.py
 
-from typing import Any
-
 from django.db.models import QuerySet
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, serializers, status, viewsets
+from rest_framework import filters
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.request import Request
-from rest_framework.response import Response
 
+from apps.jobs.api.base_viewsets import ReadAfterWriteModelViewSet
 from apps.jobs.postings.models import JobPosting
 
 from .filters import JobPostingFilter
@@ -21,7 +18,7 @@ from .serializers import (
 )
 
 
-class JobPostingViewSet(viewsets.ModelViewSet[JobPosting]):
+class JobPostingViewSet(ReadAfterWriteModelViewSet[JobPosting]):
     """
     ModelViewSet automatically provides:
 
@@ -35,6 +32,10 @@ class JobPostingViewSet(viewsets.ModelViewSet[JobPosting]):
 
     authentication_classes = [SessionAuthentication]
     permission_classes = [IsAuthenticated]
+
+    serializer_class = JobPostingDetailSerializer
+    list_serializer_class = JobPostingListSerializer
+    write_serializer_class = JobPostingWriteSerializer
 
     # --- Search, Order, Filter ---
     filter_backends = [
@@ -61,73 +62,5 @@ class JobPostingViewSet(viewsets.ModelViewSet[JobPosting]):
     ]
     ordering = ["-posted_at", "-created_at"]
 
-    # -------------------------
-    # Querysets
-    # -------------------------
-
     def get_queryset(self) -> QuerySet[JobPosting]:
         return JobPosting.objects.select_related("candidacy")
-
-    # -------------------------
-    # Serializers
-    # -------------------------
-
-    def get_serializer_class(self) -> type[serializers.BaseSerializer[Any]]:
-        if self.action in ("create", "update", "partial_update"):
-            return JobPostingWriteSerializer
-
-        if self.action == "list":
-            return JobPostingListSerializer
-
-        return JobPostingDetailSerializer
-
-    def _serialize_read_response(
-        self,
-        instance: JobPosting,
-        *,
-        status_code: int = status.HTTP_200_OK,
-    ) -> Response:
-        # Re-fetch with enriched queryset
-        instance = self.get_queryset().get(pk=instance.pk)
-
-        serializer = JobPostingDetailSerializer(
-            instance,
-            context=self.get_serializer_context(),
-        )
-
-        return Response(serializer.data, status=status_code)
-
-    # -------------------------
-    # Create
-    # -------------------------
-
-    def create(self, request: Request, *args: Any, **kwargs: Any) -> Response:
-        serializer = self.get_serializer(data=request.data)
-
-        serializer.is_valid(raise_exception=True)
-
-        instance = serializer.save()
-
-        return self._serialize_read_response(
-            instance,
-            status_code=status.HTTP_201_CREATED,
-        )
-
-    # -------------------------
-    # Update
-    # -------------------------
-
-    def update(self, request: Request, *args: Any, **kwargs: Any) -> Response:
-        partial = kwargs.pop("partial", False)
-        instance = self.get_object()
-
-        serializer = self.get_serializer(
-            instance,
-            data=request.data,
-            partial=partial,
-        )
-        serializer.is_valid(raise_exception=True)
-
-        instance = serializer.save()
-
-        return self._serialize_read_response(instance)
