@@ -65,7 +65,7 @@ def test_list_job_postings(authenticated_client, job_posting):
     assert "results" in response.data
 
     # Data assertions
-    assert response.data["count"] >= 1
+    assert response.data["count"] == 1
 
     item = next(
         (
@@ -111,9 +111,9 @@ def test_retrieve_job_posting(authenticated_client):
     assert response.data["salary"] == job_posting.salary
     assert response.data["easy_apply"] is True
     assert response.data["active_hiring"] is True
-    assert response.data["platform"] == "linkedin"
-    assert response.data["employment_type"] == "full_time"
-    assert response.data["work_mode"] == "hybrid"
+    assert response.data["platform"] == Platforms.LINKEDIN
+    assert response.data["employment_type"] == EmploymentType.FULL_TIME
+    assert response.data["work_mode"] == WorkMode.HYBRID
     assert response.data["candidacy_id"] is None
 
 
@@ -125,7 +125,7 @@ def test_create_job_posting(authenticated_client):
         "company": "Google",
         "location": "Lyon",
         "url": "https://example.com/job/2",
-        "platform": "linkedin",
+        "platform": Platforms.LINKEDIN,
     }
 
     response = authenticated_client.post(url, payload, format="json")
@@ -133,8 +133,40 @@ def test_create_job_posting(authenticated_client):
     assert response.status_code == status.HTTP_201_CREATED
     assert_job_posting_detail_shape(response.data)
 
-    assert JobPosting.objects.filter(title="Frontend Engineer").exists()
     assert response.data["title"] == "Frontend Engineer"
+    assert response.data["company"] == "Google"
+    assert response.data["location"] == "Lyon"
+    assert response.data["url"] == "https://example.com/job/2"
+    assert response.data["platform"] == Platforms.LINKEDIN
+    assert response.data["platform_label"] == Platforms.LINKEDIN.label
+
+    created_posting = JobPosting.objects.get(
+        pk=response.data["id"],
+    )
+
+    assert created_posting.title == "Frontend Engineer"
+    assert created_posting.company == "Google"
+    assert created_posting.location == "Lyon"
+    assert created_posting.url == "https://example.com/job/2"
+    assert created_posting.platform == Platforms.LINKEDIN
+
+
+def test_create_job_posting_requires_required_fields(
+    authenticated_client,
+):
+    url = reverse("job-posting-list")
+
+    payload = {
+        "title": "Frontend Engineer",
+        # Missing required "company" and "location" fields
+    }
+
+    response = authenticated_client.post(url, payload, format="json")
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "company" in response.data
+    assert "location" in response.data
+    assert JobPosting.objects.count() == 0
 
 
 def test_partial_update_job_posting(authenticated_client, job_posting):
@@ -144,6 +176,8 @@ def test_partial_update_job_posting(authenticated_client, job_posting):
         "title": "Senior Backend Engineer",
     }
 
+    original_company = job_posting.company
+
     response = authenticated_client.patch(url, payload, format="json")
 
     assert response.status_code == status.HTTP_200_OK
@@ -151,6 +185,7 @@ def test_partial_update_job_posting(authenticated_client, job_posting):
 
     job_posting.refresh_from_db()
     assert job_posting.title == "Senior Backend Engineer"
+    assert job_posting.company == original_company  # Unchanged
 
 
 def test_full_update_job_posting(authenticated_client, job_posting):
@@ -161,7 +196,7 @@ def test_full_update_job_posting(authenticated_client, job_posting):
         "company": "Amazon",
         "location": "Lille",
         "url": "https://example.com/job/3",
-        "platform": "indeed",
+        "platform": Platforms.INDEED,
     }
 
     response = authenticated_client.put(url, payload, format="json")
@@ -174,13 +209,39 @@ def test_full_update_job_posting(authenticated_client, job_posting):
     assert job_posting.company == "Amazon"
 
 
+def test_full_update_requires_required_fields(
+    authenticated_client,
+    job_posting,
+):
+    url = reverse("job-posting-detail", args=[job_posting.id])
+
+    payload = {
+        "title": "Full Stack Engineer",
+    }
+
+    original_title = job_posting.title
+    original_company = job_posting.company
+    original_location = job_posting.location
+
+    response = authenticated_client.put(url, payload, format="json")
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "company" in response.data
+    assert "location" in response.data
+
+    job_posting.refresh_from_db()
+    assert job_posting.title == original_title  # Unchanged
+    assert job_posting.company == original_company  # Unchanged
+    assert job_posting.location == original_location  # Unchanged
+
+
 def test_delete_job_posting(authenticated_client, job_posting):
     url = reverse("job-posting-detail", args=[job_posting.id])
 
     response = authenticated_client.delete(url)
 
     assert response.status_code == status.HTTP_204_NO_CONTENT
-    assert not (JobPosting.objects.filter(title="Backend Engineer").exists())
+    assert not JobPosting.objects.filter(pk=job_posting.pk).exists()
 
 
 def test_authentication_required(api_client):
