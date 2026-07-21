@@ -2,11 +2,12 @@
 # File: backend/job_trackr/apps/jobs/tests/api/postings/test_job_posting_api.py
 
 import pytest
+from django.urls import reverse
+from rest_framework import status
+
 from apps.jobs.postings.choices import EmploymentType, Platforms, WorkMode
 from apps.jobs.postings.models import JobPosting
 from apps.jobs.tests.factories.job_posting import JobPostingFactory
-from django.urls import reverse
-from rest_framework import status
 
 pytestmark = pytest.mark.django_db
 

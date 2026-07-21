@@ -4,10 +4,11 @@
 from datetime import timedelta
 
 import pytest
-from apps.jobs.tests.factories.job_candidacy import JobCandidacyFactory
-from apps.jobs.tests.factories.job_posting import JobPostingFactory
 from django.urls import reverse
 from django.utils import timezone
+
+from apps.jobs.tests.factories.job_candidacy import JobCandidacyFactory
+from apps.jobs.tests.factories.job_posting import JobPostingFactory
 
 pytestmark = pytest.mark.django_db
 

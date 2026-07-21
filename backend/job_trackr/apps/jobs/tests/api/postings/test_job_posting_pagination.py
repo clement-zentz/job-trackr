@@ -2,8 +2,9 @@
 # File: backend/job_trackr/apps/jobs/tests/api/postings/test_job_posting_pagination.py
 
 import pytest
-from apps.jobs.tests.factories.job_posting import JobPostingFactory
 from django.urls import reverse
+
+from apps.jobs.tests.factories.job_posting import JobPostingFactory
 
 pytestmark = pytest.mark.django_db
 

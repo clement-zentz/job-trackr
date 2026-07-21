@@ -2,6 +2,8 @@
 # File: backend/job_trackr/apps/jobs/tests/api/postings/test_job_posting_serializers.py
 
 import pytest
+from django.utils.text import Truncator
+
 from apps.jobs.api.postings.serializers import (
     JobPostingDetailSerializer,
     JobPostingListSerializer,
@@ -9,7 +11,6 @@ from apps.jobs.api.postings.serializers import (
 from apps.jobs.postings.choices import EmploymentType, Platforms, WorkMode
 from apps.jobs.tests.factories.job_candidacy import JobCandidacyFactory
 from apps.jobs.tests.factories.job_posting import JobPostingFactory
-from django.utils.text import Truncator
 
 pytestmark = pytest.mark.django_db
 

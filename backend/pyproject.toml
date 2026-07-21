@@ -40,6 +40,7 @@ default-groups = ["dev", "test"]
 
 # --- ruff ---
 [tool.ruff]
+src = ["job_trackr"]
 target-version = "py312"
 line-length = 88
 fix = true
