@@ -4,14 +4,15 @@
 from datetime import date
 
 import pytest
+from django.urls import reverse
+from django.utils.text import Truncator
+from rest_framework import status
+
 from apps.jobs.candidacies.choices import CandidacyStatus
 from apps.jobs.candidacies.models import JobCandidacy
 from apps.jobs.postings.models import JobPosting
 from apps.jobs.tests.factories.job_candidacy import JobCandidacyFactory
 from apps.jobs.tests.factories.job_posting import JobPostingFactory
-from django.urls import reverse
-from django.utils.text import Truncator
-from rest_framework import status
 
 pytestmark = pytest.mark.django_db
 

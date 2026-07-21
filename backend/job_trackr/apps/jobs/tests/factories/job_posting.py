@@ -1,9 +1,10 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/job_trackr/apps/jobs/tests/factories/job_posting.py
 
-from apps.jobs.postings.models import JobPosting
 from factory.declarations import Sequence
 from factory.django import DjangoModelFactory
+
+from apps.jobs.postings.models import JobPosting
 
 
 class JobPostingFactory(DjangoModelFactory[JobPosting]):

@@ -1,11 +1,12 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/job_trackr/apps/jobs/api/candidacies/views.py
 
-from apps.jobs.api.base_viewsets import ReadAfterWriteModelViewSet
-from apps.jobs.candidacies.models import JobCandidacy
 from django.db.models import QuerySet
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
+
+from apps.jobs.api.base_viewsets import ReadAfterWriteModelViewSet
+from apps.jobs.candidacies.models import JobCandidacy
 
 from .serializers import (
     JobCandidacyDetailSerializer,

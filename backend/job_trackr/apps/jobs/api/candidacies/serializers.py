@@ -1,10 +1,11 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/job_trackr/apps/jobs/api/candidacies/serializers.py
 
-from apps.jobs.candidacies.models import JobCandidacy
-from apps.jobs.postings.models import JobPosting
 from django.utils.text import Truncator
 from rest_framework import serializers
+
+from apps.jobs.candidacies.models import JobCandidacy
+from apps.jobs.postings.models import JobPosting
 
 
 class JobCandidacyListSerializer(serializers.ModelSerializer[JobCandidacy]):
