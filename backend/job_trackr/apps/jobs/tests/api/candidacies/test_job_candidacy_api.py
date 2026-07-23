@@ -22,6 +22,13 @@ def job_candidacy():
     return JobCandidacyFactory()
 
 
+JOB_POSTING_SUMMARY_KEYS = {
+    "id",
+    "title",
+    "company",
+    "location",
+}
+
 JOB_CANDIDACY_LIST_KEYS = {
     "id",
     "job_posting",
@@ -38,13 +45,23 @@ JOB_CANDIDACY_DETAIL_KEYS = JOB_CANDIDACY_LIST_KEYS | {
 }
 
 
+def assert_job_posting_summary(data: dict, job_posting: JobPosting) -> None:
+    assert data.keys() == JOB_POSTING_SUMMARY_KEYS
+    assert str(data["id"]) == str(job_posting.id)
+    assert data["title"] == job_posting.title
+    assert data["company"] == job_posting.company
+    assert data["location"] == job_posting.location
+
+
 def assert_job_candidacy_list_shape(data: dict) -> None:
     assert data.keys() == JOB_CANDIDACY_LIST_KEYS
+    assert data["job_posting"].keys() == JOB_POSTING_SUMMARY_KEYS
     assert "notes" not in data
 
 
 def assert_job_candidacy_detail_shape(data: dict) -> None:
     assert data.keys() == JOB_CANDIDACY_DETAIL_KEYS
+    assert data["job_posting"].keys() == JOB_POSTING_SUMMARY_KEYS
 
 
 def test_list_job_candidacies(authenticated_client):
@@ -79,7 +96,13 @@ def test_list_job_candidacies(authenticated_client):
 
     assert item is not None
     assert_job_candidacy_list_shape(item)
-    assert str(item["job_posting"]) == str(job_candidacy.job_posting_id)
+
+    assert_job_posting_summary(
+        data=item["job_posting"],
+        job_posting=job_candidacy.job_posting,
+    )
+
+    # Job candidacy assertions
     assert item["status"] == job_candidacy.status
     assert item["status_label"] == job_candidacy.get_status_display()
     assert item["applied_on"] == job_candidacy.applied_on.isoformat()
@@ -88,10 +111,12 @@ def test_list_job_candidacies(authenticated_client):
 
 def test_retrieve_job_candidacy(authenticated_client):
     applied_on = date(2026, 7, 15)
+
     notes = (
         "The first interview went well. "
         "A technical interview is scheduled for next week."
     )
+
     job_candidacy = JobCandidacyFactory(
         status=CandidacyStatus.INTERVIEW,
         applied_on=applied_on,
@@ -108,7 +133,13 @@ def test_retrieve_job_candidacy(authenticated_client):
     assert response.status_code == status.HTTP_200_OK
     assert_job_candidacy_detail_shape(response.data)
     assert response.data["id"] == str(job_candidacy.id)
-    assert str(response.data["job_posting"]) == str(job_candidacy.job_posting_id)
+
+    assert_job_posting_summary(
+        data=response.data["job_posting"],
+        job_posting=job_candidacy.job_posting,
+    )
+
+    # Job candidacy assertions
     assert response.data["status"] == CandidacyStatus.INTERVIEW
     assert response.data["status_label"] == CandidacyStatus.INTERVIEW.label
     assert response.data["applied_on"] == applied_on.isoformat()
@@ -143,7 +174,13 @@ def test_create_job_candidacy(authenticated_client):
     )
 
     assert response.data["id"] == str(job_candidacy.id)
-    assert str(response.data["job_posting"]) == str(job_posting.id)
+
+    assert_job_posting_summary(
+        data=response.data["job_posting"],
+        job_posting=job_posting,
+    )
+
+    # Job candidacy assertions
     assert response.data["status"] == CandidacyStatus.APPLIED
     assert response.data["status_label"] == CandidacyStatus.APPLIED.label
     assert response.data["applied_on"] == applied_on.isoformat()
@@ -230,6 +267,13 @@ def test_partial_update_job_candidacy(
 
     assert job_candidacy.status == CandidacyStatus.INTERVIEW
     assert job_candidacy.notes == "Recruiter interview scheduled."
+
+    assert_job_posting_summary(
+        data=response.data["job_posting"],
+        job_posting=job_candidacy.job_posting,
+    )
+
+    # Job candidacy assertions
     assert response.data["status"] == CandidacyStatus.INTERVIEW
     assert response.data["notes"] == "Recruiter interview scheduled."
 
@@ -261,6 +305,12 @@ def test_full_update_job_candidacy(
 
     job_candidacy.refresh_from_db()
 
+    assert_job_posting_summary(
+        data=response.data["job_posting"],
+        job_posting=job_candidacy.job_posting,
+    )
+
+    # Job candidacy assertions
     assert job_candidacy.status == CandidacyStatus.REJECTED
     assert job_candidacy.applied_on == applied_on
     assert job_candidacy.notes == ("The company selected another candidate.")

@@ -8,8 +8,24 @@ from apps.jobs.candidacies.models import JobCandidacy
 from apps.jobs.postings.models import JobPosting
 
 
+class JobPostingSummarySerializer(serializers.ModelSerializer[JobPosting]):
+    class Meta:
+        model = JobPosting
+        fields = [
+            "id",
+            "title",
+            "company",
+            "location",
+        ]
+        read_only_fields = tuple(fields)
+
+
 class JobCandidacyListSerializer(serializers.ModelSerializer[JobCandidacy]):
     notes_preview = serializers.SerializerMethodField()
+
+    job_posting = JobPostingSummarySerializer(
+        read_only=True,
+    )
 
     status_label = serializers.CharField(
         source="get_status_display",
