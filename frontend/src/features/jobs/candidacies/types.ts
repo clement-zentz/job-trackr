@@ -1,0 +1,32 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// File: frontend/src/features/jobs/candidacies/types.ts
+
+import type { CandidacyStatus } from "./choices";
+
+export interface JobPostingSummaryRead {
+  id: string;
+  title: string;
+  company: string;
+  location: string;
+}
+
+export interface JobCandidacyListItemRead {
+  id: string;
+  job_posting: JobPostingSummaryRead;
+  status: CandidacyStatus;
+  status_label: string;
+  applied_on: string;
+  notes_preview: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface JobCandidacyListParams {
+  page?: number;
+  pageSize?: number;
+}
+
+export interface JobCandidacyQueryParams {
+  page: number;
+  page_size: number;
+}
