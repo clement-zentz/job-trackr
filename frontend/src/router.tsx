@@ -4,6 +4,7 @@
 import { createBrowserRouter } from "react-router-dom";
 
 import { AppLayout } from "@/app";
+import { jobCandidaciesRoutes } from "@/features/jobs/candidacies";
 import { jobPostingsRoutes } from "@/features/jobs/postings";
 
 export const router = createBrowserRouter([
@@ -20,7 +21,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "jobs",
-        children: jobPostingsRoutes,
+        children: [...jobPostingsRoutes, ...jobCandidaciesRoutes],
       },
     ],
   },

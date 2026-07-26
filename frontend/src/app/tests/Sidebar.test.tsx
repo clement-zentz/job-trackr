@@ -7,17 +7,29 @@ import { describe, expect, it } from "vitest";
 
 import { Sidebar } from "../Sidebar";
 
+function renderSidebar() {
+  render(
+    <MemoryRouter>
+      <Sidebar />
+    </MemoryRouter>,
+  );
+}
+
 describe("Sidebar", () => {
   it("links to the job postings page", () => {
-    render(
-      <MemoryRouter>
-        <Sidebar />
-      </MemoryRouter>,
-    );
+    renderSidebar();
 
     expect(screen.getByRole("link", { name: "Job Postings" })).toHaveAttribute(
       "href",
       "/jobs/postings",
     );
+  });
+
+  it("links to the job candidacies page", () => {
+    renderSidebar();
+
+    expect(
+      screen.getByRole("link", { name: "Job Candidacies" }),
+    ).toHaveAttribute("href", "/jobs/candidacies");
   });
 });
