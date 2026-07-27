@@ -25,10 +25,10 @@ export function JobPostingDetailPage() {
 
   if (jobPostingQuery.isLoading) {
     return (
-      <main className={mainClassName}>
+      <div className={mainClassName}>
         <h1 className={h1ClassName}>{pageTitle}</h1>
         <p className={`${pClassName} text-gray-600`}>Loading job posting...</p>
-      </main>
+      </div>
     );
   }
 
@@ -38,7 +38,7 @@ export function JobPostingDetailPage() {
       jobPostingQuery.error.response?.status === 404;
 
     return (
-      <main className={mainClassName}>
+      <div className={mainClassName}>
         <div
           className={
             isNotFound
@@ -62,13 +62,13 @@ export function JobPostingDetailPage() {
 
           <BackToJobPostingsLink className="mt-6 inline-flex" />
         </div>
-      </main>
+      </div>
     );
   }
 
   if (!jobPostingQuery.data) {
     return (
-      <main className={mainClassName}>
+      <div className={mainClassName}>
         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
           <h1 className={h1ClassName}>{pageTitle}</h1>
 
@@ -78,12 +78,12 @@ export function JobPostingDetailPage() {
 
           <BackToJobPostingsLink className="mt-6 inline-flex" />
         </div>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className={mainClassName}>
+    <div className={mainClassName}>
       <div className="mb-6">
         <BackToJobPostingsLink />
 
@@ -104,6 +104,6 @@ export function JobPostingDetailPage() {
       </div>
 
       <JobPostingDetail jobPosting={jobPostingQuery.data} />
-    </main>
+    </div>
   );
 }

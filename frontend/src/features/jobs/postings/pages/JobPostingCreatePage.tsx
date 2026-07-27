@@ -16,7 +16,7 @@ export function JobPostingCreatePage() {
   const createJobPosting = useCreateJobPosting();
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-8">
+    <div className="mx-auto max-w-3xl px-4 py-8">
       <div className="mb-6">
         <BackToJobPostingsLink />
 
@@ -25,7 +25,7 @@ export function JobPostingCreatePage() {
         </h1>
 
         <p className="mt-1 text-sm text-slate-500">
-          Add the main information about the job posting.
+          Add information about the job posting.
         </p>
       </div>
 
@@ -45,6 +45,6 @@ export function JobPostingCreatePage() {
           });
         }}
       />
-    </main>
+    </div>
   );
 }
