@@ -29,40 +29,40 @@ export function JobPostingUpdatePage() {
 
   if (!jobPostingId) {
     return (
-      <main className={mainClassName}>
+      <div className={mainClassName}>
         <h1 className={h1ClassName}>{h1Text}</h1>
         <p className="text-red-500">Job posting ID is missing.</p>
-      </main>
+      </div>
     );
   }
 
   if (jobPostingQuery.isLoading) {
     return (
-      <main className={mainClassName}>
+      <div className={mainClassName}>
         <h1 className={h1ClassName}>{h1Text}</h1>
         <p>Loading job posting...</p>
-      </main>
+      </div>
     );
   }
 
   if (jobPostingQuery.isError || !jobPostingQuery.data) {
     return (
-      <main className={mainClassName}>
+      <div className={mainClassName}>
         <h1 className={h1ClassName}>{h1Text}</h1>
         <p className="text-red-500">Could not load job posting.</p>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className={mainClassName}>
+    <div className={mainClassName}>
       <div className="mb-6">
         <BackToJobPostingLink jobPostingId={jobPostingId} />
 
         <h1 className={h1ClassName}>{h1Text}</h1>
 
         <p className="mt-1 text-sm text-slate-500">
-          Update the main information about the job posting.
+          Update information about the job posting.
         </p>
       </div>
 
@@ -91,6 +91,6 @@ export function JobPostingUpdatePage() {
           );
         }}
       />
-    </main>
+    </div>
   );
 }
