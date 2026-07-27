@@ -10,4 +10,9 @@ export const jobCandidaciesKeys = {
 
   list: (params: JobCandidacyQueryParams) =>
     [...jobCandidaciesKeys.lists(), params] as const,
+
+  details: () => [...jobCandidaciesKeys.all, "detail"] as const,
+
+  detail: (candidacyId: string) =>
+    [...jobCandidaciesKeys.details(), candidacyId] as const,
 };

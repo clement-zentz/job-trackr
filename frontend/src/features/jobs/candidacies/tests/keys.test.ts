@@ -26,4 +26,16 @@ describe("jobCandidaciesKeys", () => {
       params,
     ]);
   });
+
+  it("returns the candidacy details key", () => {
+    expect(jobCandidaciesKeys.details()).toEqual(["job-candidacies", "detail"]);
+  });
+
+  it("returns a key for a specific candidacy detail", () => {
+    expect(jobCandidaciesKeys.detail("candidacy-1")).toEqual([
+      "job-candidacies",
+      "detail",
+      "candidacy-1",
+    ]);
+  });
 });
