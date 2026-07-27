@@ -4,11 +4,14 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { api } from "@/api/client";
-import { createJobCandidacyListItemRead } from "@/tests/factories/jobCandidacy";
+import {
+  createJobCandidacyDetailRead,
+  createJobCandidacyListItemRead,
+} from "@/tests/factories/jobCandidacy";
 import { createPaginatedResponse } from "@/tests/factories/paginatedResponse";
 
 import type { JobCandidacyQueryParams } from "../../types";
-import { listJobCandidacies } from "../jobCandidaciesApi";
+import { getJobCandidacy, listJobCandidacies } from "../jobCandidaciesApi";
 
 vi.mock("@/api/client", () => ({
   api: {
@@ -87,5 +90,35 @@ describe("listJobCandidacies", () => {
     expect(mockedApiGet).toHaveBeenCalledWith("/v1/jobs/candidacies/", {
       params,
     });
+  });
+});
+
+describe("getJobCandidacy", () => {
+  it("calls the job candidacy detail endpoint with the given id", async () => {
+    const jobCandidacy = createJobCandidacyDetailRead({
+      id: "1",
+    });
+
+    mockedApiGet.mockResolvedValueOnce({
+      data: jobCandidacy,
+    });
+
+    await getJobCandidacy("1");
+
+    expect(mockedApiGet).toHaveBeenCalledWith("/v1/jobs/candidacies/1/");
+  });
+
+  it("returns the job candidacy data from the response", async () => {
+    const jobCandidacy = createJobCandidacyDetailRead({
+      id: "1",
+    });
+
+    mockedApiGet.mockResolvedValueOnce({
+      data: jobCandidacy,
+    });
+
+    const result = await getJobCandidacy("1");
+
+    expect(result).toEqual(jobCandidacy);
   });
 });

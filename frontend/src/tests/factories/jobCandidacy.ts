@@ -1,13 +1,20 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/tests/factories/jobCandidacy.ts
 
-import type { JobCandidacyListItemRead } from "@/features/jobs/candidacies/types";
+import type {
+  JobCandidacyDetailRead,
+  JobCandidacyListItemRead,
+} from "@/features/jobs/candidacies/types";
 
 type JobCandidacyListItemReadOverrides = Omit<
   Partial<JobCandidacyListItemRead>,
   "job_posting"
 > & {
   job_posting?: Partial<JobCandidacyListItemRead["job_posting"]>;
+};
+
+type JobCandidacyDetailReadOverrides = JobCandidacyListItemReadOverrides & {
+  notes?: JobCandidacyDetailRead["notes"];
 };
 
 export function createJobCandidacyListItemRead(
@@ -32,4 +39,18 @@ export function createJobCandidacyListItemRead(
     updated_at: "2024-01-01T00:00:00Z",
     ...candidacyOverrides,
   } satisfies JobCandidacyListItemRead;
+}
+
+export function createJobCandidacyDetailRead(
+  overrides: JobCandidacyDetailReadOverrides = {},
+): JobCandidacyDetailRead {
+  const {
+    notes = "Looking forward to this opportunity.",
+    ...listItemOverrides
+  } = overrides;
+
+  return {
+    ...createJobCandidacyListItemRead(listItemOverrides),
+    notes,
+  } satisfies JobCandidacyDetailRead;
 }

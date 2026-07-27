@@ -21,6 +21,10 @@ export interface JobCandidacyListItemRead {
   updated_at: string;
 }
 
+export interface JobCandidacyDetailRead extends JobCandidacyListItemRead {
+  notes: string;
+}
+
 export interface JobCandidacyListParams {
   page?: number;
   pageSize?: number;

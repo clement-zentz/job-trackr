@@ -5,6 +5,7 @@ import { api } from "@/api/client";
 import type { PaginatedResponse } from "@/types/pagination";
 
 import type {
+  JobCandidacyDetailRead,
   JobCandidacyListItemRead,
   JobCandidacyQueryParams,
 } from "../types";
@@ -19,6 +20,16 @@ export async function listJobCandidacies(
     {
       params,
     },
+  );
+
+  return response.data;
+}
+
+export async function getJobCandidacy(
+  candidacyId: string,
+): Promise<JobCandidacyDetailRead> {
+  const response = await api.get<JobCandidacyDetailRead>(
+    `${JOB_CANDIDACIES_ENDPOINT}${candidacyId}/`,
   );
 
   return response.data;
