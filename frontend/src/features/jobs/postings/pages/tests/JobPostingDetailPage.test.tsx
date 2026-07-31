@@ -152,4 +152,20 @@ describe("JobPostingDetailPage", () => {
       screen.getByRole("heading", { name: "Backend Developer" }),
     ).toBeInTheDocument();
   });
+
+  it("links to the associated candidacy", () => {
+    const jobPosting = createJobPostingDetailRead({
+      candidacy_id: "candidacy-1",
+    });
+
+    // Configure the query and render the page...
+    mockUseJobPosting({
+      data: jobPosting,
+    });
+    renderJobPostingsRoute("/jobs/postings/job-123");
+
+    expect(
+      screen.getByRole("link", { name: "See job candidacy" }),
+    ).toHaveAttribute("href", "/jobs/candidacies/candidacy-1");
+  });
 });

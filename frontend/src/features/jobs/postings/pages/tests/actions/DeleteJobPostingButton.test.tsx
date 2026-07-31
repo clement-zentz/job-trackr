@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/postings/components/tests/DeleteJobPostingButton.test.tsx
+// File: frontend/src/features/jobs/postings/pages/tests/actions/DeleteJobPostingButton.test.tsx
 
 import { fireEvent, render, screen } from "@testing-library/react";
 import type * as ReactRouterDom from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { JOB_POSTINGS_LIST_PATH } from "../../constants";
-import { useDeleteJobPosting } from "../../hooks/useDeleteJobPosting";
-import { DeleteJobPostingButton } from "../DeleteJobPostingButton";
+import { JOB_POSTINGS_LIST_PATH } from "../../../constants";
+import { useDeleteJobPosting } from "../../../hooks/useDeleteJobPosting";
+import { DeleteJobPostingButton } from "../../actions/DeleteJobPostingButton";
 
 const { mutateMock, navigateMock } = vi.hoisted(() => ({
   mutateMock: vi.fn(),
@@ -24,7 +24,7 @@ vi.mock("react-router-dom", async () => {
   };
 });
 
-vi.mock("../../hooks/useDeleteJobPosting", () => ({
+vi.mock("../../../hooks/useDeleteJobPosting", () => ({
   useDeleteJobPosting: vi.fn(),
 }));
 

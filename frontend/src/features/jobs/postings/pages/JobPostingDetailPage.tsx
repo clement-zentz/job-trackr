@@ -2,108 +2,122 @@
 // File: frontend/src/features/jobs/postings/pages/JobPostingDetailPage.tsx
 
 import axios from "axios";
+import type { ReactNode } from "react";
 import { useParams } from "react-router-dom";
 
-import { BackToJobPostingsLink } from "../components/BackToJobPostingsLink";
-import { DeleteJobPostingButton } from "../components/DeleteJobPostingButton";
-import { EditJobPostingLink } from "../components/EditJobPostingLink";
 import { JobPostingDetail } from "../components/JobPostingDetail";
 import { useJobPosting } from "../hooks/useJobPosting";
+import { BackToJobPostingsLink } from "./actions/BackToJobPostingsLink";
+import { DeleteJobPostingButton } from "./actions/DeleteJobPostingButton";
+import { EditJobPostingLink } from "./actions/EditJobPostingLink";
+import { SeeJobCandidacyLink } from "./actions/SeeJobCandidacyLink";
 
 const pageTitle = "Job Posting Detail";
+const pageDescription = "Review and manage this job posting.";
 
-const mainClassName = "mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8";
-const h1ClassName = "text-2xl font-semibold text-gray-900";
-const pClassName = "mt-3 text-sm";
+const sectionClassName = "mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8";
 
-export function JobPostingDetailPage() {
-  const { id } = useParams<{ id: string }>();
+interface PageHeaderProps {
+  actions?: ReactNode;
+}
 
-  const jobPostingId = id?.trim() ?? undefined;
-
-  const jobPostingQuery = useJobPosting(jobPostingId);
-
-  if (jobPostingQuery.isLoading) {
-    return (
-      <div className={mainClassName}>
-        <h1 className={h1ClassName}>{pageTitle}</h1>
-        <p className={`${pClassName} text-gray-600`}>Loading job posting...</p>
-      </div>
-    );
-  }
-
-  if (jobPostingQuery.isError) {
-    const isNotFound =
-      axios.isAxiosError(jobPostingQuery.error) &&
-      jobPostingQuery.error.response?.status === 404;
-
-    return (
-      <div className={mainClassName}>
-        <div
-          className={
-            isNotFound
-              ? "rounded-lg border border-gray-200 bg-white p-6 shadow-sm"
-              : "rounded-lg border border-red-200 bg-red-50 p-6"
-          }
-        >
-          <h1 className={h1ClassName}>{pageTitle}</h1>
-
-          <p
-            className={
-              isNotFound
-                ? `${pClassName} text-gray-600`
-                : `${pClassName} text-red-700`
-            }
-          >
-            {isNotFound
-              ? "Job posting not found."
-              : "Could not load job posting."}
-          </p>
-
-          <BackToJobPostingsLink className="mt-6 inline-flex" />
-        </div>
-      </div>
-    );
-  }
-
-  if (!jobPostingQuery.data) {
-    return (
-      <div className={mainClassName}>
-        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-          <h1 className={h1ClassName}>{pageTitle}</h1>
-
-          <p className={`${pClassName} text-gray-600`}>
-            Job posting not found.
-          </p>
-
-          <BackToJobPostingsLink className="mt-6 inline-flex" />
-        </div>
-      </div>
-    );
-  }
-
+function pageHeader({ actions }: PageHeaderProps = {}) {
   return (
-    <div className={mainClassName}>
-      <div className="mb-6">
-        <BackToJobPostingsLink />
+    <div className="mb-4">
+      <BackToJobPostingsLink />
 
-        <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+      <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
             {pageTitle}
           </h1>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <EditJobPostingLink jobPostingId={jobPostingQuery.data.id} />
+          <p className="text-sm text-gray-600">{pageDescription}</p>
+        </div>
+
+        {actions && (
+          <div className="flex flex-wrap items-center gap-3">{actions}</div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export function JobPostingDetailPage() {
+  const { id: jobPostingIdParam } = useParams<{ id: string }>();
+
+  const jobPostingId = jobPostingIdParam?.trim() ?? "";
+
+  const jobPostingQuery = useJobPosting(jobPostingId);
+
+  if (!jobPostingId) {
+    return (
+      <section className={sectionClassName}>
+        {pageHeader()}
+
+        <p role="alert" className="text-sm text-red-700">
+          Invalid job posting identifier.
+        </p>
+      </section>
+    );
+  }
+
+  if (jobPostingQuery.isLoading) {
+    return (
+      <section className={sectionClassName} aria-busy="true">
+        {pageHeader()}
+
+        <p aria-live="polite" className="text-sm text-gray-600">
+          Loading job posting...
+        </p>
+      </section>
+    );
+  }
+
+  if (jobPostingQuery.isError || !jobPostingQuery.data) {
+    const isNotFound =
+      !jobPostingQuery.isError ||
+      (axios.isAxiosError(jobPostingQuery.error) &&
+        jobPostingQuery.error.response?.status === 404);
+
+    return (
+      <section className={sectionClassName}>
+        {pageHeader()}
+
+        <p
+          role="alert"
+          className={`text-sm ${isNotFound ? "text-gray-600" : "text-red-700"}`}
+        >
+          {isNotFound
+            ? "Job posting not found."
+            : "Could not load job posting."}
+        </p>
+      </section>
+    );
+  }
+
+  const jobPosting = jobPostingQuery.data;
+
+  return (
+    <section className={sectionClassName}>
+      {pageHeader({
+        actions: (
+          <>
+            {jobPosting.candidacy_id && (
+              <SeeJobCandidacyLink candidacyId={jobPosting.candidacy_id} />
+            )}
+
+            <EditJobPostingLink jobPostingId={jobPosting.id} />
 
             <DeleteJobPostingButton
-              jobPostingId={jobPostingQuery.data.id}
-              jobPostingTitle={jobPostingQuery.data.title}
+              jobPostingId={jobPosting.id}
+              jobPostingTitle={jobPosting.title}
             />
-          </div>
-        </div>
-      </div>
+          </>
+        ),
+      })}
 
-      <JobPostingDetail jobPosting={jobPostingQuery.data} />
-    </div>
+      <JobPostingDetail jobPosting={jobPosting} />
+    </section>
   );
 }

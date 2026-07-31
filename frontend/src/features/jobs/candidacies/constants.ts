@@ -1,6 +1,17 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/features/jobs/candidacies/constants.ts
 
+import { generatePath } from "react-router-dom";
+
 export const DEFAULT_JOB_CANDIDACIES_PAGE_SIZE = 10;
 
-export const JOB_CANDIDACIES_LIST_PATH = "/jobs/candidacies";
+const JOB_CANDIDACIES_BASE_PATH = "/jobs/candidacies";
+
+export const JOB_CANDIDACIES_LIST_PATH = JOB_CANDIDACIES_BASE_PATH;
+export const JOB_CANDIDACY_DETAIL_PATH = `${JOB_CANDIDACIES_BASE_PATH}/:candidacyId`;
+
+export function getJobCandidacyDetailPath(candidacyId: string): string {
+  return generatePath(JOB_CANDIDACY_DETAIL_PATH, {
+    candidacyId,
+  });
+}
