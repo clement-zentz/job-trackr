@@ -12,6 +12,7 @@ import type { PaginatedResponse } from "@/types/pagination";
 
 import {
   DEFAULT_JOB_CANDIDACIES_PAGE_SIZE,
+  getJobCandidacyDetailPath,
   JOB_CANDIDACIES_LIST_PATH,
 } from "../../../constants";
 import { useJobCandidacies } from "../../../hooks/useJobCandidacies";
@@ -324,6 +325,6 @@ describe("JobCandidacyList", () => {
       screen.getByRole("link", {
         name: `View details for ${candidacy.job_posting.title} at ${candidacy.job_posting.company}`,
       }),
-    ).toHaveAttribute("href", "/jobs/candidacies/42");
+    ).toHaveAttribute("href", getJobCandidacyDetailPath(candidacy.id));
   });
 });
