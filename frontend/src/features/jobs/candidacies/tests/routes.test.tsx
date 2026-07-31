@@ -14,4 +14,12 @@ describe("jobCandidaciesRoutes", () => {
       await screen.findByRole("heading", { name: "Job Candidacies" }),
     ).toBeInTheDocument();
   });
+
+  it("renders the job candidacy detail page for a candidacy id", async () => {
+    renderJobCandidaciesRoute("/jobs/candidacies/1");
+
+    expect(
+      await screen.findByRole("heading", { name: "Job Candidacy Detail" }),
+    ).toBeInTheDocument();
+  });
 });

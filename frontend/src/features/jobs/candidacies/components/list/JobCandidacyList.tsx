@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/features/jobs/candidacies/components/list/JobCandidacyList.tsx
 
+import { Link } from "react-router-dom";
+
 import { DEFAULT_JOB_CANDIDACIES_PAGE_SIZE } from "../../constants";
 import { useJobCandidacies } from "../../hooks/useJobCandidacies";
 import type { JobCandidacyListParams } from "../../types";
@@ -46,7 +48,14 @@ export function JobCandidacyList({
         <>
           <div className="grid gap-4">
             {data.results.map((candidacy) => (
-              <JobCandidacyCard key={candidacy.id} candidacy={candidacy} />
+              <Link
+                to={candidacy.id}
+                key={candidacy.id}
+                aria-label={`View details for ${candidacy.job_posting.title} at ${candidacy.job_posting.company}`}
+                className="block rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600"
+              >
+                <JobCandidacyCard candidacy={candidacy} />
+              </Link>
             ))}
           </div>
 

@@ -3,6 +3,7 @@
 
 import type { RouteObject } from "react-router-dom";
 
+import { JobCandidacyDetailPage } from "./pages/JobCandidacyDetailPage";
 import { JobCandidacyListPage } from "./pages/JobCandidacyListPage";
 
 export const jobCandidaciesRoutes: RouteObject[] = [
@@ -12,6 +13,10 @@ export const jobCandidaciesRoutes: RouteObject[] = [
       {
         index: true,
         element: <JobCandidacyListPage />,
+      },
+      {
+        path: ":candidacyId",
+        element: <JobCandidacyDetailPage />,
       },
     ],
   },

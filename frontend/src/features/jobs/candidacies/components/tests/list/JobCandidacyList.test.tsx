@@ -3,13 +3,17 @@
 
 import { render, screen } from "@testing-library/react";
 import type { ComponentProps } from "react";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 
 import { createJobCandidacyListItemRead } from "@/tests/factories/jobCandidacy";
 import { createPaginatedResponse } from "@/tests/factories/paginatedResponse";
 import type { PaginatedResponse } from "@/types/pagination";
 
-import { DEFAULT_JOB_CANDIDACIES_PAGE_SIZE } from "../../../constants";
+import {
+  DEFAULT_JOB_CANDIDACIES_PAGE_SIZE,
+  JOB_CANDIDACIES_LIST_PATH,
+} from "../../../constants";
 import { useJobCandidacies } from "../../../hooks/useJobCandidacies";
 import type {
   JobCandidacyListItemRead,
@@ -103,7 +107,18 @@ describe("JobCandidacyList", () => {
     params: JobCandidacyListParams = defaultParams,
   ) {
     return render(
-      <JobCandidacyList params={params} onPageChange={onPageChange} />,
+      <MemoryRouter initialEntries={[JOB_CANDIDACIES_LIST_PATH]}>
+        <Routes>
+          <Route path={JOB_CANDIDACIES_LIST_PATH}>
+            <Route
+              index
+              element={
+                <JobCandidacyList params={params} onPageChange={onPageChange} />
+              }
+            />
+          </Route>
+        </Routes>
+      </MemoryRouter>,
     );
   }
 
@@ -292,5 +307,23 @@ describe("JobCandidacyList", () => {
       isFetching: false,
       onPageChange,
     });
+  });
+
+  it("links each candidacy to its detail page", () => {
+    const candidacy = createJobCandidacyListItemRead({
+      id: "42",
+    });
+
+    mockJobCandidaciesData({
+      results: [candidacy],
+    });
+
+    renderJobCandidacyList();
+
+    expect(
+      screen.getByRole("link", {
+        name: `View details for ${candidacy.job_posting.title} at ${candidacy.job_posting.company}`,
+      }),
+    ).toHaveAttribute("href", "/jobs/candidacies/42");
   });
 });
