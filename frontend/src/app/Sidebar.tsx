@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/app/Sidebar.tsx
 
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 const navItems = [
   { to: "/", label: "Dashboard" },
@@ -13,7 +13,9 @@ const navItems = [
 export function Sidebar() {
   return (
     <aside className="w-64 border-r bg-white p-4">
-      <h1 className="mb-6 text-lg font-semibold">Job Tracker</h1>
+      <Link to="/" className="inline-block mb-4 text-lg font-semibold">
+        Job Trackr
+      </Link>
 
       <nav className="space-y-2">
         {navItems.map(({ to, label }) => (

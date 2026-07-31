@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/postings/components/EditJobPostingLink.tsx
+// File: frontend/src/features/jobs/postings/pages/actions/EditJobPostingLink.tsx
 
 import { Link } from "react-router-dom";
 
-import { getJobPostingEditPath } from "../constants";
+import { getJobPostingEditPath } from "../../constants";
 
 const baseLinkClassName = `
   inline-flex items-center justify-center rounded-md bg-yellow-300 px-4 py-2 text-sm font-semibold

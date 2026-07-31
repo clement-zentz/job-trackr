@@ -3,13 +3,13 @@
 
 import { useNavigate } from "react-router-dom";
 
-import { BackToJobPostingsLink } from "../components/BackToJobPostingsLink";
 import { JobPostingForm } from "../components/form/JobPostingForm";
 import {
   emptyJobPostingFormValues,
   formValuesToCreatePayload,
 } from "../components/form/jobPostingFormMappers";
 import { useCreateJobPosting } from "../hooks/useCreateJobPosting";
+import { BackToJobPostingsLink } from "./actions/BackToJobPostingsLink";
 
 export function JobPostingCreatePage() {
   const navigate = useNavigate();

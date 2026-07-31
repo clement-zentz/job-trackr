@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/postings/components/DeleteJobPostingButton.tsx
+// File: frontend/src/features/jobs/postings/pages/actions/DeleteJobPostingButton.tsx
 
 import { useNavigate } from "react-router-dom";
 
-import { JOB_POSTINGS_LIST_PATH } from "../constants";
-import { useDeleteJobPosting } from "../hooks/useDeleteJobPosting";
+import { JOB_POSTINGS_LIST_PATH } from "../../constants";
+import { useDeleteJobPosting } from "../../hooks/useDeleteJobPosting";
 
 const buttonClassName =
   "inline-flex items-center rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-medium " +

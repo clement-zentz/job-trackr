@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/postings/components/BackToJobPostingsLink.tsx
+// File: frontend/src/features/jobs/postings/pages/actions/BackToJobPostingsLink.tsx
 
 import { Link } from "react-router-dom";
 
-import { JOB_POSTINGS_LIST_PATH } from "../constants";
+import { JOB_POSTINGS_LIST_PATH } from "../../constants";
 
 const baseLinkClassName = `
   text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline
