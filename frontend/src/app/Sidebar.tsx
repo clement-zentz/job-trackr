@@ -13,7 +13,7 @@ const navItems = [
 export function Sidebar() {
   return (
     <aside className="w-64 border-r bg-white p-4">
-      <Link to="/" className="inline-block mb-4 text-lg font-semibold">
+      <Link to="/" className="mb-4 inline-block text-lg font-semibold">
         Job Trackr
       </Link>
 

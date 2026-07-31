@@ -3,7 +3,10 @@
 
 import { Link } from "react-router-dom";
 
-import { DEFAULT_JOB_CANDIDACIES_PAGE_SIZE } from "../../constants";
+import {
+  DEFAULT_JOB_CANDIDACIES_PAGE_SIZE,
+  getJobCandidacyDetailPath,
+} from "../../constants";
 import { useJobCandidacies } from "../../hooks/useJobCandidacies";
 import type { JobCandidacyListParams } from "../../types";
 import { JobCandidacyCard } from "./JobCandidacyCard";
@@ -49,8 +52,8 @@ export function JobCandidacyList({
           <div className="grid gap-4">
             {data.results.map((candidacy) => (
               <Link
-                to={candidacy.id}
                 key={candidacy.id}
+                to={getJobCandidacyDetailPath(candidacy.id)}
                 aria-label={`View details for ${candidacy.job_posting.title} at ${candidacy.job_posting.company}`}
                 className="block rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600"
               >

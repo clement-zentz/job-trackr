@@ -3,7 +3,10 @@
 
 import { Link } from "react-router-dom";
 
-import { DEFAULT_JOB_POSTINGS_PAGE_SIZE } from "../../constants";
+import {
+  DEFAULT_JOB_POSTINGS_PAGE_SIZE,
+  getJobPostingDetailPath,
+} from "../../constants";
 import { useJobPostings } from "../../hooks/useJobPostings";
 import type { JobPostingListParams } from "../../types";
 import { JobPostingCard } from "./JobPostingCard";
@@ -49,7 +52,7 @@ export function JobPostingList({ params, onPageChange }: JobPostingListProps) {
           {data?.results.map((job) => (
             <Link
               key={job.id}
-              to={job.id}
+              to={getJobPostingDetailPath(job.id)}
               aria-label={`View details for ${job.title} at ${job.company}`}
               className="block rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600"
             >

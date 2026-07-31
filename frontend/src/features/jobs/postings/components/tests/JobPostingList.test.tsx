@@ -9,7 +9,11 @@ import { createJobPostingListItemRead } from "@/tests/factories/jobPosting";
 import { createPaginatedResponse } from "@/tests/factories/paginatedResponse";
 import type { PaginatedResponse } from "@/types/pagination";
 
-import { DEFAULT_JOB_POSTINGS_PAGE_SIZE } from "../../constants";
+import {
+  DEFAULT_JOB_POSTINGS_PAGE_SIZE,
+  getJobPostingDetailPath,
+  JOB_POSTINGS_LIST_PATH,
+} from "../../constants";
 import { useJobPostings } from "../../hooks/useJobPostings";
 import type { JobPostingListItemRead, JobPostingListParams } from "../../types";
 import {
@@ -83,10 +87,10 @@ describe("JobPostingList", () => {
     };
 
     return render(
-      <MemoryRouter initialEntries={["/jobs/postings"]}>
+      <MemoryRouter initialEntries={[JOB_POSTINGS_LIST_PATH]}>
         <Routes>
           <Route
-            path="/jobs/postings"
+            path={JOB_POSTINGS_LIST_PATH}
             element={<JobPostingList {...mergedProps} />}
           />
         </Routes>
@@ -197,7 +201,7 @@ describe("JobPostingList", () => {
       name: /view details for backend engineer at acme/i,
     });
 
-    expect(detailLink).toHaveAttribute("href", "/jobs/postings/job-123");
+    expect(detailLink).toHaveAttribute("href", getJobPostingDetailPath(job.id));
     expect(detailLink).toContainElement(
       screen.getByRole("heading", { name: /backend engineer/i }),
     );
