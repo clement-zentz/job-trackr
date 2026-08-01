@@ -2,6 +2,7 @@
 // File: frontend/src/tests/factories/jobCandidacy.ts
 
 import type {
+  JobCandidacyCreatePayload,
   JobCandidacyDetailRead,
   JobCandidacyListItemRead,
 } from "@/features/jobs/candidacies/types";
@@ -53,4 +54,16 @@ export function createJobCandidacyDetailRead(
     ...createJobCandidacyListItemRead(listItemOverrides),
     notes,
   } satisfies JobCandidacyDetailRead;
+}
+
+export function createJobCandidacyCreatePayload(
+  overrides: Partial<JobCandidacyCreatePayload> = {},
+): JobCandidacyCreatePayload {
+  return {
+    job_posting: "job-1",
+    status: "applied",
+    applied_on: "2024-01-01",
+    notes: "Looking forward to this opportunity.",
+    ...overrides,
+  } satisfies JobCandidacyCreatePayload;
 }

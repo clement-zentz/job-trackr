@@ -25,6 +25,16 @@ export interface JobCandidacyDetailRead extends JobCandidacyListItemRead {
   notes: string;
 }
 
+export interface JobCandidacyMutablePayload {
+  status: CandidacyStatus;
+  applied_on: string;
+  notes: string;
+}
+
+export interface JobCandidacyCreatePayload extends JobCandidacyMutablePayload {
+  job_posting: string;
+}
+
 export interface JobCandidacyListParams {
   page?: number;
   pageSize?: number;

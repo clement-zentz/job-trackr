@@ -5,21 +5,28 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { api } from "@/api/client";
 import {
+  createJobCandidacyCreatePayload,
   createJobCandidacyDetailRead,
   createJobCandidacyListItemRead,
 } from "@/tests/factories/jobCandidacy";
 import { createPaginatedResponse } from "@/tests/factories/paginatedResponse";
 
 import type { JobCandidacyQueryParams } from "../../types";
-import { getJobCandidacy, listJobCandidacies } from "../jobCandidaciesApi";
+import {
+  createJobCandidacy,
+  getJobCandidacy,
+  listJobCandidacies,
+} from "../jobCandidaciesApi";
 
 vi.mock("@/api/client", () => ({
   api: {
     get: vi.fn(),
+    post: vi.fn(),
   },
 }));
 
 const mockedApiGet = vi.mocked(api.get);
+const mockedApiPost = vi.mocked(api.post);
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -120,5 +127,40 @@ describe("getJobCandidacy", () => {
     const result = await getJobCandidacy("1");
 
     expect(result).toEqual(jobCandidacy);
+  });
+});
+
+describe("createJobCandidacy", () => {
+  it("posts the payload to the job candidacies endpoint", async () => {
+    const payload = createJobCandidacyCreatePayload();
+    const jobCandidacy = createJobCandidacyDetailRead();
+
+    mockedApiPost.mockResolvedValueOnce({
+      data: jobCandidacy,
+    });
+
+    const result = await createJobCandidacy(payload);
+
+    expect(mockedApiPost).toHaveBeenCalledOnce();
+    expect(mockedApiPost).toHaveBeenCalledWith(
+      "/v1/jobs/candidacies/",
+      payload,
+    );
+    expect(result).toEqual(jobCandidacy);
+  });
+
+  it("propagates an error when the API request fails", async () => {
+    const payload = createJobCandidacyCreatePayload();
+    const error = new Error("Failed to create job candidacy");
+
+    mockedApiPost.mockRejectedValueOnce(error);
+
+    await expect(createJobCandidacy(payload)).rejects.toBe(error);
+
+    expect(mockedApiPost).toHaveBeenCalledOnce();
+    expect(mockedApiPost).toHaveBeenCalledWith(
+      "/v1/jobs/candidacies/",
+      payload,
+    );
   });
 });
