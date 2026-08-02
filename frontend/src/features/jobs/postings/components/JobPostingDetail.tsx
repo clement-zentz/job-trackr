@@ -2,7 +2,7 @@
 // File: frontend/src/features/jobs/postings/components/JobPostingDetail.tsx
 
 import type { JobPostingDetailRead } from "../types";
-import { formatDateTimeForDisplay, formatUrlForDisplay } from "./utils";
+import { formatDateForDisplay, formatUrlForDisplay } from "./utils";
 
 const dtClassName = "text-sm font-medium text-gray-500";
 const ddClassName = "mt-1 text-sm text-gray-900";
@@ -13,8 +13,8 @@ type JobPostingDetailProps = {
 };
 
 export function JobPostingDetail({ jobPosting }: JobPostingDetailProps) {
-  const formattedDate = jobPosting.posted_at
-    ? formatDateTimeForDisplay(jobPosting.posted_at)
+  const formattedPostedOn = jobPosting.posted_on
+    ? formatDateForDisplay(jobPosting.posted_on)
     : null;
 
   const formattedUrl = jobPosting.url
@@ -94,10 +94,10 @@ export function JobPostingDetail({ jobPosting }: JobPostingDetailProps) {
           </dd>
         </div>
 
-        {formattedDate && (
+        {formattedPostedOn && (
           <div>
-            <dt className={dtClassName}>Posted at</dt>
-            <dd className={ddClassName}>{formattedDate}</dd>
+            <dt className={dtClassName}>Posted on</dt>
+            <dd className={ddClassName}>{formattedPostedOn}</dd>
           </div>
         )}
       </dl>

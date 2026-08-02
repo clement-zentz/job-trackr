@@ -3,7 +3,6 @@
 
 import random
 
-from django.utils import timezone
 from factory.declarations import Iterator, LazyAttribute, LazyFunction, Sequence
 from factory.django import DjangoModelFactory
 from factory.faker import Faker
@@ -35,11 +34,10 @@ class DemoJobPostingFactory(DjangoModelFactory[JobPosting]):
     easy_apply = Faker("boolean")
     active_hiring = Faker("boolean")
 
-    posted_at = Faker(
-        "date_time_between",
+    posted_on = Faker(
+        "date_between",
         start_date="-30d",
-        end_date="now",
-        tzinfo=timezone.get_current_timezone(),
+        end_date="today",
     )
 
     platform = Iterator([choice for choice, _label in Platforms.choices])

@@ -28,7 +28,7 @@ export function createJobPostingListItemRead(
     work_mode: "",
     work_mode_label: "",
     candidacy_id: null,
-    posted_at: null,
+    posted_on: null,
     created_at: "2025-01-01T10:00:00Z",
     updated_at: "2025-01-01T10:00:00Z",
     ...overrides,

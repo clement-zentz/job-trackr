@@ -3,7 +3,11 @@
 
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { formatDateTimeForDisplay, formatUrlForDisplay } from "../utils";
+import {
+  formatDateForDisplay,
+  formatDateTimeForDisplay,
+  formatUrlForDisplay,
+} from "../utils";
 
 describe("formatDateTimeForDisplay", () => {
   afterEach(() => {
@@ -64,6 +68,66 @@ describe("formatDateTimeForDisplay", () => {
 
   it("returns the original value when the datetime is invalid", () => {
     expect(formatDateTimeForDisplay("not-a-date")).toBe("not-a-date");
+  });
+});
+
+describe("formatDateForDisplay", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  const expectedDateFormatOptions = {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  } as const;
+
+  function mockToLocaleDateString(returnValue = "Formatted date") {
+    return vi
+      .spyOn(Date.prototype, "toLocaleDateString")
+      .mockReturnValue(returnValue);
+  }
+
+  it("returns the formatted date from toLocaleDateString", () => {
+    const toLocaleDateStringSpy = mockToLocaleDateString();
+
+    const result = formatDateForDisplay("2026-06-10");
+
+    expect(result).toBe("Formatted date");
+    expect(toLocaleDateStringSpy).toHaveBeenCalledWith(undefined, {
+      ...expectedDateFormatOptions,
+      timeZone: undefined,
+    });
+  });
+
+  it("passes the provided locale to toLocaleDateString", () => {
+    const toLocaleDateStringSpy = mockToLocaleDateString();
+
+    formatDateForDisplay("2026-06-10", {
+      locale: "fr-FR",
+    });
+
+    expect(toLocaleDateStringSpy).toHaveBeenCalledWith("fr-FR", {
+      ...expectedDateFormatOptions,
+      timeZone: undefined,
+    });
+  });
+
+  it("passes the provided timezone to toLocaleDateString", () => {
+    const toLocaleDateStringSpy = mockToLocaleDateString();
+
+    formatDateForDisplay("2026-06-10", {
+      timeZone: "Europe/Paris",
+    });
+
+    expect(toLocaleDateStringSpy).toHaveBeenCalledWith(undefined, {
+      ...expectedDateFormatOptions,
+      timeZone: "Europe/Paris",
+    });
+  });
+
+  it("returns the original value when the date is invalid", () => {
+    expect(formatDateForDisplay("not-a-date")).toBe("not-a-date");
   });
 });
 

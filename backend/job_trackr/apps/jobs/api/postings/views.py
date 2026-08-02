@@ -53,14 +53,14 @@ class JobPostingViewSet(ReadAfterWriteModelViewSet[JobPosting]):
     ]
 
     ordering_fields = [
-        "posted_at",
+        "posted_on",
         "created_at",
         "updated_at",
         "company",
         "title",
         "platform",
     ]
-    ordering = ["-posted_at", "-created_at"]
+    ordering = ["-posted_on", "-created_at"]
 
     def get_queryset(self) -> QuerySet[JobPosting]:
         return JobPosting.objects.select_related("candidacy")

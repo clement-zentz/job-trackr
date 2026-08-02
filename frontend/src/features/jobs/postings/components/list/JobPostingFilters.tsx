@@ -128,8 +128,8 @@ export function JobPostingFilters({
             className="rounded border px-3 py-2"
           >
             <option value="">Default</option>
-            <option value="-posted_at">Newest</option>
-            <option value="posted_at">Oldest</option>
+            <option value="-posted_on">Newest</option>
+            <option value="posted_on">Oldest</option>
             <option value="company">Company A-Z</option>
             <option value="-company">Company Z-A</option>
             <option value="-rating">Top rated</option>

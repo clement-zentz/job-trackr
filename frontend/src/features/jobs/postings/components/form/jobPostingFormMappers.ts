@@ -24,7 +24,7 @@ export const emptyJobPostingFormValues: JobPostingFormValues = {
   employment_type: "",
   work_mode: "",
 
-  posted_at: "",
+  posted_on: "",
 };
 
 export function formValuesToCreatePayload(
@@ -38,7 +38,7 @@ export function formValuesToCreatePayload(
     platform: formValues.platform || undefined,
     employment_type: formValues.employment_type || undefined,
     work_mode: formValues.work_mode || undefined,
-    posted_at: formValues.posted_at || null,
+    posted_on: formValues.posted_on || null,
   };
 }
 
@@ -61,7 +61,7 @@ export function jobPostingToFormValues(
     employment_type: jobPosting.employment_type ?? "",
     work_mode: jobPosting.work_mode ?? "",
 
-    posted_at: jobPosting.posted_at ?? "",
+    posted_on: jobPosting.posted_on ?? "",
   };
 }
 
@@ -70,6 +70,6 @@ export function formValuesToUpdatePayload(
 ): JobPostingUpdatePayload {
   return {
     ...formValues,
-    posted_at: formValues.posted_at || null,
+    posted_on: formValues.posted_on || null,
   };
 }

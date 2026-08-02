@@ -16,7 +16,7 @@ import { useJobPostings } from "../useJobPostings";
 const defaultParams: JobPostingListParams = {
   page: 1,
   pageSize: DEFAULT_JOB_POSTINGS_PAGE_SIZE,
-  ordering: "-posted_at",
+  ordering: "-posted_on",
 };
 
 describe("useJobPostings", () => {

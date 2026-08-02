@@ -22,7 +22,7 @@ class JobPostingFactory(DjangoModelFactory[JobPosting]):
     easy_apply = False
     active_hiring = False
 
-    posted_at = None
+    posted_on = None
 
     platform = ""
     employment_type = ""

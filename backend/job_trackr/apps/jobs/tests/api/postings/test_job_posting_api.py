@@ -34,7 +34,7 @@ JOB_POSTING_LIST_KEYS = {
     "work_mode",
     "work_mode_label",
     "candidacy_id",
-    "posted_at",
+    "posted_on",
     "created_at",
     "updated_at",
 }

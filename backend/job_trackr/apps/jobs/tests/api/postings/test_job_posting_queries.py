@@ -83,17 +83,17 @@ def test_list_job_postings_filters_by_active_hiring(authenticated_client):
     assert response.data["results"][0]["active_hiring"] is True
 
 
-def test_list_job_postings_filters_by_posted_at_after(authenticated_client):
+def test_list_job_postings_filters_by_posted_on_after(authenticated_client):
     old_posting = JobPostingFactory(
-        posted_at=timezone.now() - timedelta(days=10),
+        posted_on=(timezone.localdate() - timedelta(days=10)).isoformat(),
     )
     recent_posting = JobPostingFactory(
-        posted_at=timezone.now() - timedelta(days=1),
+        posted_on=(timezone.localdate() - timedelta(days=1)).isoformat(),
     )
 
     response = authenticated_client.get(
         reverse("job-posting-list"),
-        {"posted_at_after": timezone.now() - timedelta(days=5)},
+        {"posted_on_after": (timezone.localdate() - timedelta(days=5)).isoformat()},
     )
 
     assert response.status_code == 200
@@ -104,17 +104,17 @@ def test_list_job_postings_filters_by_posted_at_after(authenticated_client):
     assert str(old_posting.id) not in returned_ids
 
 
-def test_list_job_postings_filters_by_posted_at_before(authenticated_client):
+def test_list_job_postings_filters_by_posted_on_before(authenticated_client):
     old_posting = JobPostingFactory(
-        posted_at=timezone.now() - timedelta(days=10),
+        posted_on=(timezone.localdate() - timedelta(days=10)).isoformat(),
     )
     recent_posting = JobPostingFactory(
-        posted_at=timezone.now() - timedelta(days=1),
+        posted_on=(timezone.localdate() - timedelta(days=1)).isoformat(),
     )
 
     response = authenticated_client.get(
         reverse("job-posting-list"),
-        {"posted_at_before": timezone.now() - timedelta(days=5)},
+        {"posted_on_before": (timezone.localdate() - timedelta(days=5)).isoformat()},
     )
 
     assert response.status_code == 200
@@ -125,16 +125,16 @@ def test_list_job_postings_filters_by_posted_at_before(authenticated_client):
     assert str(recent_posting.id) not in returned_ids
 
 
-def test_list_job_postings_supports_ordering_by_posted_at_desc(authenticated_client):
+def test_list_job_postings_supports_ordering_by_posted_on_desc(authenticated_client):
     older = JobPostingFactory(
-        posted_at=timezone.now() - timedelta(days=10),
+        posted_on=(timezone.localdate() - timedelta(days=10)).isoformat(),
     )
     newer = JobPostingFactory(
-        posted_at=timezone.now() - timedelta(days=1),
+        posted_on=(timezone.localdate() - timedelta(days=1)).isoformat(),
     )
 
     response = authenticated_client.get(
-        reverse("job-posting-list"), {"ordering": "-posted_at"}
+        reverse("job-posting-list"), {"ordering": "-posted_on"}
     )
 
     assert response.status_code == 200
@@ -145,16 +145,16 @@ def test_list_job_postings_supports_ordering_by_posted_at_desc(authenticated_cli
     assert results[1]["id"] == str(older.id)
 
 
-def test_list_job_postings_supports_ordering_by_posted_at_asc(authenticated_client):
+def test_list_job_postings_supports_ordering_by_posted_on_asc(authenticated_client):
     older = JobPostingFactory(
-        posted_at=timezone.now() - timedelta(days=10),
+        posted_on=(timezone.localdate() - timedelta(days=10)).isoformat(),
     )
     newer = JobPostingFactory(
-        posted_at=timezone.now() - timedelta(days=1),
+        posted_on=(timezone.localdate() - timedelta(days=1)).isoformat(),
     )
 
     response = authenticated_client.get(
-        reverse("job-posting-list"), {"ordering": "posted_at"}
+        reverse("job-posting-list"), {"ordering": "posted_on"}
     )
 
     assert response.status_code == 200
@@ -169,12 +169,12 @@ def test_list_job_postings_combines_search_filters_and_ordering(authenticated_cl
     matching_old = JobPostingFactory(
         title="Python Developer",
         platform="linkedin",
-        posted_at=timezone.now() - timedelta(days=5),
+        posted_on=(timezone.localdate() - timedelta(days=5)).isoformat(),
     )
     matching_new = JobPostingFactory(
         title="Senior Python Engineer",
         platform="linkedin",
-        posted_at=timezone.now() - timedelta(days=1),
+        posted_on=(timezone.localdate() - timedelta(days=1)).isoformat(),
     )
     JobPostingFactory(
         title="Python Developer",
@@ -190,7 +190,7 @@ def test_list_job_postings_combines_search_filters_and_ordering(authenticated_cl
         {
             "search": "Python",
             "platform": "linkedin",
-            "ordering": "-posted_at",
+            "ordering": "-posted_on",
         },
     )
 

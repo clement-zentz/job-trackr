@@ -24,6 +24,41 @@ export function formatDateTimeForDisplay(
   });
 }
 
+export function formatDateForDisplay(
+  dateString: string,
+  options: {
+    locale?: string;
+    timeZone?: string;
+  } = {},
+): string {
+  const isoDatePattern = /^\d{4}-\d{2}-\d{2}$/;
+
+  if (isoDatePattern.test(dateString)) {
+    const [year, month, day] = dateString.split("-").map(Number);
+    const date = new Date(Date.UTC(year, month - 1, day));
+
+    return date.toLocaleDateString(options.locale, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      timeZone: options.timeZone,
+    });
+  }
+
+  const date = new Date(dateString);
+
+  if (Number.isNaN(date.getTime())) {
+    return dateString;
+  }
+
+  return date.toLocaleDateString(options.locale, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    timeZone: options.timeZone,
+  });
+}
+
 export function formatUrlForDisplay(url: string, maxLength = 60): string {
   const displayUrl = url
     .trim()

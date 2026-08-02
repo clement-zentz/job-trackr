@@ -23,7 +23,7 @@ class JobPosting(models.Model):
     salary = models.CharField(max_length=255, blank=True)
     easy_apply = models.BooleanField(default=False)
     active_hiring = models.BooleanField(default=False)
-    posted_at = models.DateTimeField(null=True, blank=True)
+    posted_on = models.DateField(null=True, blank=True)
 
     platform = models.CharField(
         max_length=50,
@@ -46,12 +46,12 @@ class JobPosting(models.Model):
 
     class Meta:
         db_table = "job_posting"
-        ordering = ["-posted_at", "-created_at"]
+        ordering = ["-posted_on", "-created_at"]
         indexes = [
             models.Index(fields=["platform"], name="idx_job_post_platform"),
             models.Index(fields=["easy_apply"], name="idx_job_post_easy"),
             models.Index(fields=["active_hiring"], name="idx_job_post_active"),
-            models.Index(fields=["posted_at"], name="idx_job_post_posted"),
+            models.Index(fields=["posted_on"], name="idx_job_post_posted"),
             # Note: `company` is filtered using `icontains` (ILIKE '%...%'),
             # so this btree index is not used for that query pattern.
             # It is kept for potential exact/prefix queries and general use.

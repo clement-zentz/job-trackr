@@ -8,7 +8,7 @@ import type { JobPostingFilters as Filters } from "../../types";
 import { JobPostingFilters } from "../list/JobPostingFilters";
 
 const defaultParams: Filters = {
-  ordering: "-posted_at",
+  ordering: "-posted_on",
 };
 
 describe("JobPostingFilters", () => {

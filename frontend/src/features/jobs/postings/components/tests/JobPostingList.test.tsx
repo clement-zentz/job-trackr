@@ -76,7 +76,7 @@ describe("JobPostingList", () => {
   const defaultParams: JobPostingListParams = {
     page: 1,
     pageSize: DEFAULT_JOB_POSTINGS_PAGE_SIZE,
-    ordering: "-posted_at",
+    ordering: "-posted_on",
   };
 
   function renderJobPostingList(props: Partial<JobPostingListProps> = {}) {
