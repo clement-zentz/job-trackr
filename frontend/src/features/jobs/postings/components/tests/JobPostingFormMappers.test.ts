@@ -30,7 +30,7 @@ describe("JobPostingFormMappers", () => {
       employment_type: undefined,
       work_mode: undefined,
 
-      posted_at: null,
+      posted_on: null,
     });
   });
 
@@ -49,7 +49,7 @@ describe("JobPostingFormMappers", () => {
         platform: "linkedin",
         employment_type: "full_time",
         work_mode: "remote",
-        posted_at: "2024-06-01T12:00:00Z",
+        posted_on: "2024-06-01",
       }),
     ).toEqual({
       title: "Software Engineer",
@@ -67,7 +67,7 @@ describe("JobPostingFormMappers", () => {
       employment_type: "full_time",
       work_mode: "remote",
 
-      posted_at: "2024-06-01T12:00:00Z",
+      posted_on: "2024-06-01",
     });
   });
 
@@ -84,7 +84,7 @@ describe("JobPostingFormMappers", () => {
       platform: "indeed",
       employment_type: "apprenticeship",
       work_mode: "hybrid",
-      posted_at: "2024-05-15T09:00:00Z",
+      posted_on: "2024-05-15",
     });
 
     expect(jobPostingToFormValues(jobPosting)).toEqual({
@@ -103,7 +103,7 @@ describe("JobPostingFormMappers", () => {
       employment_type: "apprenticeship",
       work_mode: "hybrid",
 
-      posted_at: "2024-05-15T09:00:00Z",
+      posted_on: "2024-05-15",
     });
   });
 
@@ -131,7 +131,7 @@ describe("JobPostingFormMappers", () => {
       employment_type: "",
       work_mode: "",
 
-      posted_at: null,
+      posted_on: null,
     });
   });
 });

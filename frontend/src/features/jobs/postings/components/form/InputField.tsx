@@ -11,7 +11,7 @@ export type InputFieldProps = {
   id: string;
   label: string;
   value: string;
-  type?: "text" | "url" | "number" | "email" | "password";
+  type?: "text" | "url" | "number" | "email" | "password" | "date";
   placeholder?: string;
   disabled?: boolean;
   required?: boolean;

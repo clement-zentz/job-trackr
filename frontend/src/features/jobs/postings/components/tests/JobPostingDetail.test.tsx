@@ -15,7 +15,7 @@ vi.mock("../utils", async () => {
 
   return {
     ...actual,
-    formatDateTimeForDisplay: vi.fn(() => "Formatted date"),
+    formatDateForDisplay: vi.fn(() => "Formatted date"),
     formatUrlForDisplay: vi.fn(() => "linkedin.com/jobs/view/123"),
   };
 });
@@ -35,7 +35,7 @@ const baseJobPosting: JobPostingDetailRead = createJobPostingDetailRead({
   work_mode_label: "Remote",
   easy_apply: true,
   active_hiring: false,
-  posted_at: "2026-06-07T14:30:00Z",
+  posted_on: "2026-06-07",
   description: "Build React features for a job tracking application.",
   description_preview: "Build React features for a job tracking application.",
 });
@@ -69,7 +69,7 @@ describe("JobPostingDetail", () => {
     expect(screen.getByText("Salary")).toBeInTheDocument();
     expect(screen.getByText("€45,000 - €55,000")).toBeInTheDocument();
 
-    expect(screen.getByText("Posted at")).toBeInTheDocument();
+    expect(screen.getByText("Posted on")).toBeInTheDocument();
     expect(screen.getByText("Formatted date")).toBeInTheDocument();
   });
 
@@ -122,7 +122,7 @@ describe("JobPostingDetail", () => {
       ...baseJobPosting,
       url: "",
       salary: "",
-      posted_at: null,
+      posted_on: null,
       description: "",
     };
 
@@ -132,7 +132,7 @@ describe("JobPostingDetail", () => {
     expect(screen.queryByRole("link")).not.toBeInTheDocument();
 
     expect(screen.queryByText("Salary")).not.toBeInTheDocument();
-    expect(screen.queryByText("Posted at")).not.toBeInTheDocument();
+    expect(screen.queryByText("Posted on")).not.toBeInTheDocument();
     expect(screen.queryByText("Description")).not.toBeInTheDocument();
   });
 });

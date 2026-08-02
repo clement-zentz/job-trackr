@@ -43,7 +43,7 @@ class JobPostingListSerializer(serializers.ModelSerializer[JobPosting]):
             "work_mode",
             "work_mode_label",
             "candidacy_id",
-            "posted_at",
+            "posted_on",
             "created_at",
             "updated_at",
         ]
@@ -85,5 +85,5 @@ class JobPostingWriteSerializer(serializers.ModelSerializer[JobPosting]):
             "platform",
             "employment_type",
             "work_mode",
-            "posted_at",
+            "posted_on",
         ]

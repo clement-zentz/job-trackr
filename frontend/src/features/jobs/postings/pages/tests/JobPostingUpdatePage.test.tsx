@@ -68,7 +68,7 @@ describe("JobPostingUpdatePage", () => {
         platform: "wttj",
         employment_type: "full_time",
         work_mode: "remote",
-        posted_at: "2026-07-07",
+        posted_on: "2026-07-07",
       }),
     });
 
@@ -149,7 +149,7 @@ describe("JobPostingUpdatePage", () => {
           employment_type: "full_time",
           work_mode: "remote",
 
-          posted_at: "2026-07-07",
+          posted_on: "2026-07-07",
         },
       },
       {

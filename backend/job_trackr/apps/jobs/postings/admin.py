@@ -17,7 +17,7 @@ class JobPostingAdmin(admin.ModelAdmin[JobPosting]):
         "work_mode",
         "easy_apply",
         "active_hiring",
-        "posted_at",
+        "posted_on",
         "created_at",
     )
 
@@ -27,7 +27,7 @@ class JobPostingAdmin(admin.ModelAdmin[JobPosting]):
         "work_mode",
         "easy_apply",
         "active_hiring",
-        "posted_at",
+        "posted_on",
         "created_at",
     )
 
@@ -40,7 +40,7 @@ class JobPostingAdmin(admin.ModelAdmin[JobPosting]):
         "salary",
     )
 
-    ordering = ("-posted_at", "-created_at")
+    ordering = ("-posted_on", "-created_at")
 
     readonly_fields = (
         "id",
@@ -78,7 +78,7 @@ class JobPostingAdmin(admin.ModelAdmin[JobPosting]):
                 "fields": (
                     "easy_apply",
                     "active_hiring",
-                    "posted_at",
+                    "posted_on",
                 )
             },
         ),

@@ -85,13 +85,13 @@ describe("normalizeJobPostingParams", () => {
     const result = normalizeJobPostingParams({
       search: "python",
       platform: "linkedin",
-      ordering: "-posted_at",
+      ordering: "-posted_on",
     });
 
     expect(result).toMatchObject({
       search: "python",
       platform: "linkedin",
-      ordering: "-posted_at",
+      ordering: "-posted_on",
     });
   });
 

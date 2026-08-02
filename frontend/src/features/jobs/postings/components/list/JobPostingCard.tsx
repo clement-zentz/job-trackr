@@ -2,7 +2,11 @@
 // File: frontend/src/features/jobs/postings/components/list/JobPostingCard.tsx
 
 import type { JobPostingListItemRead } from "../../types";
-import { formatDateTimeForDisplay, formatUrlForDisplay } from "../utils";
+import {
+  formatDateForDisplay,
+  formatDateTimeForDisplay,
+  formatUrlForDisplay,
+} from "../utils";
 
 const dtClassName = "font-medium text-gray-700";
 const ddClassName = "text-gray-600";
@@ -12,14 +16,12 @@ interface JobPostingCardProps {
 }
 
 export function JobPostingCard({ job }: JobPostingCardProps) {
-  const postedAt = job.posted_at?.trim() || null;
+  const postedOn = job.posted_on?.trim() || null;
   const salary = job.salary.trim();
   const descriptionPreview = job.description_preview.trim();
   const url = job.url.trim();
 
-  const formattedPostedAt = postedAt
-    ? formatDateTimeForDisplay(postedAt)
-    : null;
+  const formattedPostedOn = postedOn ? formatDateForDisplay(postedOn) : null;
 
   const formattedCreatedAt = formatDateTimeForDisplay(job.created_at);
   const formattedUpdatedAt = formatDateTimeForDisplay(job.updated_at);
@@ -91,11 +93,11 @@ export function JobPostingCard({ job }: JobPostingCardProps) {
           </div>
         )}
 
-        {formattedPostedAt && (
+        {formattedPostedOn && (
           <div>
-            <dt className={dtClassName}>Posted at</dt>
-            <dd data-testid="posted-at" className={ddClassName}>
-              {formattedPostedAt}
+            <dt className={dtClassName}>Posted on</dt>
+            <dd data-testid="posted-on" className={ddClassName}>
+              {formattedPostedOn}
             </dd>
           </div>
         )}

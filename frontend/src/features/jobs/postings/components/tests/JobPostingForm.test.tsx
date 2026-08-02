@@ -251,7 +251,7 @@ describe("JobPostingForm", () => {
       platform: "",
       employment_type: "",
       work_mode: "",
-      posted_at: "",
+      posted_on: "",
     });
   });
 

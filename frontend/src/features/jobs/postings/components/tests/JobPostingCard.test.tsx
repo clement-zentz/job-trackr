@@ -14,6 +14,7 @@ vi.mock("../utils", async () => {
 
   return {
     ...actual,
+    formatDateForDisplay: vi.fn((value: string) => `Formatted date ${value}`),
     formatDateTimeForDisplay: vi.fn((value: string) => `Formatted ${value}`),
     formatUrlForDisplay: vi.fn(() => "example.com/1"),
   };
@@ -35,7 +36,7 @@ const baseJob = createJobPostingListItemRead({
   work_mode: "hybrid",
   work_mode_label: "Hybrid",
   candidacy_id: "candidacy-1",
-  posted_at: "2026-01-01T09:00:00Z",
+  posted_on: "2026-01-01",
   created_at: "2026-01-01T10:00:00Z",
   updated_at: "2026-01-01T11:00:00Z",
 });
@@ -86,9 +87,9 @@ describe("JobPostingCard", () => {
       screen.getByText("Build APIs and background jobs."),
     ).toBeInTheDocument();
 
-    expect(screen.getByText(/Posted at/)).toBeInTheDocument();
-    expect(screen.getByTestId("posted-at")).toHaveTextContent(
-      "Formatted 2026-01-01T09:00:00Z",
+    expect(screen.getByText(/Posted on/)).toBeInTheDocument();
+    expect(screen.getByTestId("posted-on")).toHaveTextContent(
+      "Formatted date 2026-01-01",
     );
   });
 
@@ -113,7 +114,7 @@ describe("JobPostingCard", () => {
       url: "",
       salary: "",
       description_preview: "",
-      posted_at: null,
+      posted_on: null,
     });
 
     expect(screen.queryByText("URL")).not.toBeInTheDocument();
@@ -122,8 +123,8 @@ describe("JobPostingCard", () => {
     expect(screen.queryByText("Salary")).not.toBeInTheDocument();
     expect(screen.queryByText("Description")).not.toBeInTheDocument();
 
-    expect(screen.queryByText("Posted at")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("posted-at")).not.toBeInTheDocument();
+    expect(screen.queryByText("Posted on")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("posted-on")).not.toBeInTheDocument();
   });
 
   it("does not render empty badges", () => {

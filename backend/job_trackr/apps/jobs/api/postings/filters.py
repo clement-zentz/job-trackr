@@ -18,12 +18,12 @@ class JobPostingFilter(filters.FilterSet):
     easy_apply = filters.BooleanFilter()
     active_hiring = filters.BooleanFilter()
 
-    posted_at_after = filters.IsoDateTimeFilter(
-        field_name="posted_at",
+    posted_on_after = filters.DateFilter(
+        field_name="posted_on",
         lookup_expr="gte",
     )
-    posted_at_before = filters.IsoDateTimeFilter(
-        field_name="posted_at",
+    posted_on_before = filters.DateFilter(
+        field_name="posted_on",
         lookup_expr="lte",
     )
 

@@ -184,6 +184,16 @@ export function JobPostingForm({
         onChange={(value: WorkMode) => updateField("work_mode", value)}
       />
 
+      <InputField
+        id="posted_on"
+        label="Posted on"
+        type="date"
+        value={form.posted_on ?? ""}
+        onChange={(value) => updateField("posted_on", value)}
+        placeholder="Select a date"
+        disabled={isSubmitting}
+      />
+
       <button
         type="submit"
         className={submitButtonClassName}

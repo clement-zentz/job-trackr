@@ -31,7 +31,7 @@ export interface JobPostingListItemRead {
 
   candidacy_id: string | null;
 
-  posted_at: string | null;
+  posted_on: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -59,7 +59,7 @@ export interface JobPostingWritePayload {
   employment_type?: EmploymentType;
   work_mode?: WorkMode;
 
-  posted_at?: string | null;
+  posted_on?: string | null;
 }
 
 export type JobPostingCreatePayload = JobPostingWritePayload;
@@ -84,7 +84,7 @@ export interface JobPostingFormValues {
   employment_type: EmploymentType;
   work_mode: WorkMode;
 
-  posted_at: string;
+  posted_on: string;
 }
 
 // --- API QUERY MODELS ---
@@ -112,7 +112,7 @@ export interface JobPostingListParams {
   easyApply?: boolean;
   activeHiring?: boolean;
 
-  ordering?: string; // "-posted_at", "company", etc.
+  ordering?: string; // "-posted_on", "company", etc.
 }
 
 /**
