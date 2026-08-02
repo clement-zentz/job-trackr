@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/postings/components/form/TextareaField.tsx
+// File: frontend/src/features/jobs/components/form/TextareaField.tsx
 
 import {
   fieldClassName,

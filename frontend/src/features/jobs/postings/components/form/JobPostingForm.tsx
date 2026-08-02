@@ -4,6 +4,13 @@
 import { type SubmitEventHandler, useState } from "react";
 
 import {
+  CheckboxField,
+  InputField,
+  SelectField,
+  TextareaField,
+} from "@/features/jobs/components/form";
+
+import {
   type EmploymentType,
   employmentTypeOptions,
   type Platform,
@@ -12,10 +19,6 @@ import {
   workModeOptions,
 } from "../../choices";
 import type { JobPostingFormValues } from "../../types";
-import { CheckboxField } from "./CheckboxField";
-import { InputField } from "./InputField";
-import { SelectField } from "./SelectField";
-import { TextareaField } from "./TextareaField";
 
 const formClassName = `
   space-y-6 rounded-lg border border-slate-200 bg-white p-6 shadow-sm
