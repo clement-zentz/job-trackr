@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/postings/pages/tests/actions/DeleteJobPostingButton.test.tsx
+// File: frontend/src/features/jobs/postings/components/tests/actions/DeleteJobPostingButton.test.tsx
 
 import { fireEvent, render, screen } from "@testing-library/react";
 import type * as ReactRouterDom from "react-router-dom";
