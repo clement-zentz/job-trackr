@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/postings/pages/actions/BackToJobPostingLink.tsx
+// File: frontend/src/features/jobs/postings/components/actions/BackToJobPostingLink.tsx
 
 import { Link } from "react-router-dom";
 

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/candidacies/pages/actions/BackToCandidaciesLink.tsx
+// File: frontend/src/features/jobs/candidacies/components/actions/BackToCandidaciesLink.tsx
 
 import { Link } from "react-router-dom";
 

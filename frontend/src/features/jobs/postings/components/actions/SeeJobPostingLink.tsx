@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/postings/pages/actions/SeeJobCandidacyLink.tsx
+// File: frontend/src/features/jobs/postings/components/actions/SeeJobPostingLink.tsx
 
 import { Link } from "react-router-dom";
 
-import { getJobCandidacyDetailPath } from "@/features/jobs/candidacies/constants";
+import { getJobPostingDetailPath } from "@/features/jobs/postings/constants";
 
 const baseLinkClassName = `
   inline-flex items-center justify-center rounded-md bg-cyan-600 px-4 py-2 text-sm font-semibold
@@ -11,21 +11,21 @@ const baseLinkClassName = `
   focus:ring-cyan-500 focus:ring-offset-2
 `.trim();
 
-interface SeeJobCandidacyLinkProps {
-  candidacyId: string;
+interface SeeJobPostingLinkProps {
+  jobPostingId: string;
   className?: string;
 }
 
-export function SeeJobCandidacyLink({
-  candidacyId,
+export function SeeJobPostingLink({
+  jobPostingId,
   className = "",
-}: SeeJobCandidacyLinkProps) {
+}: SeeJobPostingLinkProps) {
   return (
     <Link
-      to={getJobCandidacyDetailPath(candidacyId)}
+      to={getJobPostingDetailPath(jobPostingId)}
       className={`${baseLinkClassName} ${className}`.trim()}
     >
-      See job candidacy
+      See job posting
     </Link>
   );
 }

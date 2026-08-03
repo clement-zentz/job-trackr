@@ -3,6 +3,7 @@
 
 import { useNavigate, useParams } from "react-router-dom";
 
+import { BackToJobPostingLink } from "../components/actions";
 import { JobPostingForm } from "../components/form/JobPostingForm";
 import {
   formValuesToUpdatePayload,
@@ -11,7 +12,6 @@ import {
 import { getJobPostingDetailPath } from "../constants";
 import { useJobPosting } from "../hooks/useJobPosting";
 import { useUpdateJobPosting } from "../hooks/useUpdateJobPosting";
-import { BackToJobPostingLink } from "./actions/BackToJobPostingLink";
 
 const h1Text = "Update Job Posting";
 

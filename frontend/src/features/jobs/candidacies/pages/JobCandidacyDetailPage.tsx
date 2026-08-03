@@ -4,10 +4,11 @@
 import type { ReactNode } from "react";
 import { useParams } from "react-router-dom";
 
+import { SeeJobPostingLink } from "@/features/jobs/postings/components/actions";
+
+import { BackToCandidaciesLink } from "../components/actions";
 import { JobCandidacyDetail } from "../components/JobCandidacyDetail";
 import { useJobCandidacy } from "../hooks/useJobCandidacy";
-import { BackToCandidaciesLink } from "./actions/BackToCandidaciesLink";
-import { SeeJobPostingLink } from "./actions/SeeJobPostingLink";
 
 const sectionClassName = "mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8";
 const h1ClassName =

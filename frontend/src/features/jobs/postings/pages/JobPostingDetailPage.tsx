@@ -5,12 +5,15 @@ import axios from "axios";
 import type { ReactNode } from "react";
 import { useParams } from "react-router-dom";
 
+import { SeeJobCandidacyLink } from "@/features/jobs/candidacies/components/actions";
+
+import {
+  BackToJobPostingsLink,
+  DeleteJobPostingButton,
+  EditJobPostingLink,
+} from "../components/actions";
 import { JobPostingDetail } from "../components/JobPostingDetail";
 import { useJobPosting } from "../hooks/useJobPosting";
-import { BackToJobPostingsLink } from "./actions/BackToJobPostingsLink";
-import { DeleteJobPostingButton } from "./actions/DeleteJobPostingButton";
-import { EditJobPostingLink } from "./actions/EditJobPostingLink";
-import { SeeJobCandidacyLink } from "./actions/SeeJobCandidacyLink";
 
 const pageTitle = "Job Posting Detail";
 const pageDescription = "Review and manage this job posting.";
