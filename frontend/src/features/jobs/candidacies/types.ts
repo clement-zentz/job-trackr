@@ -35,6 +35,12 @@ export interface JobCandidacyCreatePayload extends JobCandidacyMutablePayload {
   job_posting: string;
 }
 
+export interface JobCandidacyFormValues {
+  status: CandidacyStatus;
+  applied_on: string;
+  notes: string;
+}
+
 export interface JobCandidacyListParams {
   page?: number;
   pageSize?: number;
