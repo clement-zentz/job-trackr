@@ -88,7 +88,7 @@ describe("formatDateForDisplay", () => {
       .mockReturnValue(returnValue);
   }
 
-  it("returns the formatted date from toLocaleDateString", () => {
+  it("formats ISO date-only values in UTC", () => {
     const toLocaleDateStringSpy = mockToLocaleDateString();
 
     const result = formatDateForDisplay("2026-06-10");
@@ -96,11 +96,11 @@ describe("formatDateForDisplay", () => {
     expect(result).toBe("Formatted date");
     expect(toLocaleDateStringSpy).toHaveBeenCalledWith(undefined, {
       ...expectedDateFormatOptions,
-      timeZone: undefined,
+      timeZone: "UTC",
     });
   });
 
-  it("passes the provided locale to toLocaleDateString", () => {
+  it("passes the provided locale for ISO date-only values", () => {
     const toLocaleDateStringSpy = mockToLocaleDateString();
 
     formatDateForDisplay("2026-06-10", {
@@ -109,20 +109,44 @@ describe("formatDateForDisplay", () => {
 
     expect(toLocaleDateStringSpy).toHaveBeenCalledWith("fr-FR", {
       ...expectedDateFormatOptions,
-      timeZone: undefined,
+      timeZone: "UTC",
     });
   });
 
-  it("passes the provided timezone to toLocaleDateString", () => {
+  it("ignores the provided timezone for ISO date-only values", () => {
     const toLocaleDateStringSpy = mockToLocaleDateString();
 
     formatDateForDisplay("2026-06-10", {
+      timeZone: "America/Los_Angeles",
+    });
+
+    expect(toLocaleDateStringSpy).toHaveBeenCalledWith(undefined, {
+      ...expectedDateFormatOptions,
+      timeZone: "UTC",
+    });
+  });
+
+  it("passes the provided timezone for non-date-only values", () => {
+    const toLocaleDateStringSpy = mockToLocaleDateString();
+
+    formatDateForDisplay("2026-06-10T12:00:00Z", {
       timeZone: "Europe/Paris",
     });
 
     expect(toLocaleDateStringSpy).toHaveBeenCalledWith(undefined, {
       ...expectedDateFormatOptions,
       timeZone: "Europe/Paris",
+    });
+  });
+
+  it("uses the default timezone for non-date-only values when none is provided", () => {
+    const toLocaleDateStringSpy = mockToLocaleDateString();
+
+    formatDateForDisplay("2026-06-10T12:00:00Z");
+
+    expect(toLocaleDateStringSpy).toHaveBeenCalledWith(undefined, {
+      ...expectedDateFormatOptions,
+      timeZone: undefined,
     });
   });
 
