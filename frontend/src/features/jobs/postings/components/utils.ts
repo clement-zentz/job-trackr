@@ -41,7 +41,7 @@ export function formatDateForDisplay(
       year: "numeric",
       month: "short",
       day: "numeric",
-      timeZone: options.timeZone,
+      timeZone: "UTC",
     });
   }
 
