@@ -5,7 +5,10 @@ import axios from "axios";
 import type { ReactNode } from "react";
 import { useParams } from "react-router-dom";
 
-import { SeeJobCandidacyLink } from "@/features/jobs/candidacies/components/actions";
+import {
+  CreateJobCandidacyLink,
+  SeeJobCandidacyLink,
+} from "@/features/jobs/candidacies/components/actions";
 
 import {
   BackToJobPostingsLink,
@@ -106,8 +109,10 @@ export function JobPostingDetailPage() {
       {pageHeader({
         actions: (
           <>
-            {jobPosting.candidacy_id && (
+            {jobPosting.candidacy_id ? (
               <SeeJobCandidacyLink candidacyId={jobPosting.candidacy_id} />
+            ) : (
+              <CreateJobCandidacyLink jobPostingId={jobPosting.id} />
             )}
 
             <EditJobPostingLink jobPostingId={jobPosting.id} />

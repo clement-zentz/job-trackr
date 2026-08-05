@@ -2,4 +2,5 @@
 // File: frontend/src/features/jobs/candidacies/components/actions/index.ts
 
 export { BackToCandidaciesLink } from "./BackToCandidaciesLink";
+export { CreateJobCandidacyLink } from "./CreateJobCandidacyLink";
 export { SeeJobCandidacyLink } from "./SeeJobCandidacyLink";
