@@ -77,6 +77,7 @@ export function JobCandidacyForm({
         value={form.status}
         placeholder="Select status"
         options={statusChoices}
+        disabled={isSubmitting}
         onChange={(value) => {
           if (value === "") {
             return;
@@ -93,6 +94,7 @@ export function JobCandidacyForm({
         value={form.applied_on}
         onChange={(value) => setFormField("applied_on", value)}
         placeholder="Select a date"
+        disabled={isSubmitting}
       />
 
       <TextareaField
@@ -101,6 +103,7 @@ export function JobCandidacyForm({
         value={form.notes}
         onChange={(value) => setFormField("notes", value)}
         placeholder="Enter notes"
+        disabled={isSubmitting}
       />
 
       <button
