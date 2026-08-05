@@ -13,25 +13,29 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterModelOptions(
-            name='jobposting',
-            options={'ordering': ['-posted_on', '-created_at']},
-        ),
         migrations.RemoveIndex(
             model_name='jobposting',
             name='idx_job_post_posted',
         ),
-        migrations.AddField(
+        migrations.RenameField(
+            model_name='jobposting',
+            old_name='posted_at',
+            new_name='posted_on',
+        ),
+        migrations.AlterField(
             model_name='jobposting',
             name='posted_on',
             field=models.DateField(blank=True, null=True),
         ),
+        migrations.AlterModelOptions(
+            name='jobposting',
+            options={'ordering': ['-posted_on', '-created_at']},
+        ),
         migrations.AddIndex(
             model_name='jobposting',
-            index=models.Index(fields=['posted_on'], name='idx_job_post_posted'),
-        ),
-        migrations.RemoveField(
-            model_name='jobposting',
-            name='posted_at',
+            index=models.Index(
+                fields=['posted_on'],
+                name='idx_job_post_posted',
+            ),
         ),
     ]
