@@ -62,7 +62,14 @@ export function JobCandidacyForm({
 
   return (
     <form onSubmit={handleSubmit} className={formClassName}>
-      {error && <p role="alert">{error}</p>}
+      {error && (
+        <p
+          role="alert"
+          className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+        >
+          {error}
+        </p>
+      )}
 
       <SelectField
         id="status"
