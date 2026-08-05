@@ -135,13 +135,16 @@ describe("JobCandidacyForm", () => {
     );
   });
 
-  it("disables the submit button and uses the submitting label", () => {
+  it("disables the form fields and uses the submitting label", () => {
     renderJobCandidacyForm({
       isSubmitting: true,
       submitLabel: "Save changes",
       submittingLabel: "Saving...",
     });
 
+    expect(screen.getByLabelText("Status")).toBeDisabled();
+    expect(screen.getByLabelText("Applied on")).toBeDisabled();
+    expect(screen.getByLabelText("Notes")).toBeDisabled();
     expect(screen.getByRole("button", { name: "Saving..." })).toBeDisabled();
   });
 
