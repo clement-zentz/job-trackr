@@ -153,19 +153,53 @@ describe("JobPostingDetailPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("links to the associated candidacy", () => {
-    const jobPosting = createJobPostingDetailRead({
-      candidacy_id: "candidacy-1",
+  it("shows the create candidacy link when the posting has no candidacy", async () => {
+    mockUseJobPosting({
+      data: createJobPostingDetailRead({
+        id: "job-posting-1",
+        candidacy_id: null,
+      }),
+    });
+    renderJobPostingsRoute("/jobs/postings/job-posting-1");
+
+    const createLink = await screen.findByRole("link", {
+      name: "Create job candidacy",
     });
 
-    // Configure the query and render the page...
-    mockUseJobPosting({
-      data: jobPosting,
-    });
-    renderJobPostingsRoute("/jobs/postings/job-123");
+    expect(createLink).toHaveAttribute(
+      "href",
+      "/jobs/candidacies/new?jobPostingId=job-posting-1",
+    );
 
     expect(
-      screen.getByRole("link", { name: "See job candidacy" }),
-    ).toHaveAttribute("href", "/jobs/candidacies/candidacy-1");
+      screen.queryByRole("link", {
+        name: "See job candidacy",
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("shows the candidacy detail link when the posting has a candidacy", async () => {
+    mockUseJobPosting({
+      data: createJobPostingDetailRead({
+        id: "job-posting-1",
+        candidacy_id: "candidacy-1",
+      }),
+    });
+    renderJobPostingsRoute("/jobs/postings/job-posting-1");
+
+    const candidacyLink = await screen.findByRole("link", {
+      name: "See job candidacy",
+    });
+
+    expect(candidacyLink).toHaveAttribute(
+      "href",
+      "/jobs/candidacies/candidacy-1",
+    );
+
+    expect(
+      screen.queryByRole("link", {
+        name: "Create job candidacy",
+      }),
+    ).not.toBeInTheDocument();
   });
 });
