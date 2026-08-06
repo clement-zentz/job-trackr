@@ -4,10 +4,16 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { JobCandidacyFormValues } from "@/features/jobs/candidacies/types";
+import {
+  createJobCandidacyDetailRead,
+  createJobCandidacyUpdatePayload,
+} from "@/tests/factories/jobCandidacy";
 
 import {
   createEmptyJobCandidacyFormValues,
   formValuesToCreatePayload,
+  formValuesToUpdatePayload,
+  jobCandidacyToFormValues,
 } from "../../form/jobCandidacyFormMappers";
 
 describe("createEmptyJobCandidacyFormValues", () => {
@@ -54,5 +60,55 @@ describe("formValuesToCreatePayload", () => {
       applied_on: "2026-08-03",
       notes: "Prepare examples for the interview.",
     });
+  });
+});
+
+describe("jobCandidacyToFormValues", () => {
+  it("maps a job candidacy detail response to form values", () => {
+    const candidacy = createJobCandidacyDetailRead({
+      status: "interview",
+      applied_on: "2026-08-01",
+      notes: "Technical interview scheduled.",
+    });
+
+    expect(jobCandidacyToFormValues(candidacy)).toEqual({
+      status: "interview",
+      applied_on: "2026-08-01",
+      notes: "Technical interview scheduled.",
+    });
+  });
+});
+
+describe("formValuesToUpdatePayload", () => {
+  it("maps form values to an update payload", () => {
+    const values = {
+      status: "offer",
+      applied_on: "2026-08-05",
+      notes: "Offer received.",
+    } satisfies JobCandidacyFormValues;
+
+    expect(formValuesToUpdatePayload(values)).toEqual(
+      createJobCandidacyUpdatePayload({
+        status: "offer",
+        applied_on: "2026-08-05",
+        notes: "Offer received.",
+      }),
+    );
+  });
+
+  it("trims notes", () => {
+    const values = {
+      status: "offer",
+      applied_on: "2026-08-05",
+      notes: "  Offer received.  ",
+    } satisfies JobCandidacyFormValues;
+
+    expect(formValuesToUpdatePayload(values)).toEqual(
+      createJobCandidacyUpdatePayload({
+        status: "offer",
+        applied_on: "2026-08-05",
+        notes: "Offer received.",
+      }),
+    );
   });
 });

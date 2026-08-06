@@ -3,7 +3,9 @@
 
 import type {
   JobCandidacyCreatePayload,
+  JobCandidacyDetailRead,
   JobCandidacyFormValues,
+  JobCandidacyUpdatePayload,
 } from "../../types";
 
 function getLocalDateInputValue(date = new Date()): string {
@@ -28,6 +30,27 @@ export function formValuesToCreatePayload(
 ): JobCandidacyCreatePayload {
   return {
     job_posting: jobPostingId,
+    status: values.status,
+    applied_on: values.applied_on,
+    notes: values.notes.trim(),
+  };
+}
+
+// --- Update Mappers ---
+export function jobCandidacyToFormValues(
+  candidacy: JobCandidacyDetailRead,
+): JobCandidacyFormValues {
+  return {
+    status: candidacy.status,
+    applied_on: candidacy.applied_on,
+    notes: candidacy.notes,
+  };
+}
+
+export function formValuesToUpdatePayload(
+  values: JobCandidacyFormValues,
+): JobCandidacyUpdatePayload {
+  return {
     status: values.status,
     applied_on: values.applied_on,
     notes: values.notes.trim(),
