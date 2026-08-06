@@ -9,6 +9,7 @@ import type {
   JobCandidacyDetailRead,
   JobCandidacyListItemRead,
   JobCandidacyQueryParams,
+  JobCandidacyUpdatePayload,
 } from "../types";
 
 const JOB_CANDIDACIES_ENDPOINT = "/v1/jobs/candidacies/";
@@ -41,6 +42,18 @@ export async function createJobCandidacy(
 ): Promise<JobCandidacyDetailRead> {
   const response = await api.post<JobCandidacyDetailRead>(
     JOB_CANDIDACIES_ENDPOINT,
+    payload,
+  );
+
+  return response.data;
+}
+
+export async function updateJobCandidacy(
+  candidacyId: string,
+  payload: JobCandidacyUpdatePayload,
+): Promise<JobCandidacyDetailRead> {
+  const response = await api.patch<JobCandidacyDetailRead>(
+    `${JOB_CANDIDACIES_ENDPOINT}${candidacyId}/`,
     payload,
   );
 
