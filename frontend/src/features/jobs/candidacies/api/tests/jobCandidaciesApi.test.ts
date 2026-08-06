@@ -8,6 +8,7 @@ import {
   createJobCandidacyCreatePayload,
   createJobCandidacyDetailRead,
   createJobCandidacyListItemRead,
+  createJobCandidacyUpdatePayload,
 } from "@/tests/factories/jobCandidacy";
 import { createPaginatedResponse } from "@/tests/factories/paginatedResponse";
 
@@ -16,17 +17,20 @@ import {
   createJobCandidacy,
   getJobCandidacy,
   listJobCandidacies,
+  updateJobCandidacy,
 } from "../jobCandidaciesApi";
 
 vi.mock("@/api/client", () => ({
   api: {
     get: vi.fn(),
     post: vi.fn(),
+    patch: vi.fn(),
   },
 }));
 
 const mockedApiGet = vi.mocked(api.get);
 const mockedApiPost = vi.mocked(api.post);
+const mockedApiPatch = vi.mocked(api.patch);
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -160,6 +164,49 @@ describe("createJobCandidacy", () => {
     expect(mockedApiPost).toHaveBeenCalledOnce();
     expect(mockedApiPost).toHaveBeenCalledWith(
       "/v1/jobs/candidacies/",
+      payload,
+    );
+  });
+});
+
+describe("updateJobCandidacy", () => {
+  it("patches the candidacy and returns the updated data", async () => {
+    const candidacyId = "candidacy-1";
+    const payload = createJobCandidacyUpdatePayload();
+    const jobCandidacy = createJobCandidacyDetailRead({
+      id: candidacyId,
+      status: payload.status,
+      status_label: "Interview",
+      applied_on: payload.applied_on,
+      notes: payload.notes,
+    });
+
+    mockedApiPatch.mockResolvedValueOnce({
+      data: jobCandidacy,
+    });
+
+    const result = await updateJobCandidacy(candidacyId, payload);
+
+    expect(mockedApiPatch).toHaveBeenCalledOnce();
+    expect(mockedApiPatch).toHaveBeenCalledWith(
+      `/v1/jobs/candidacies/${candidacyId}/`,
+      payload,
+    );
+    expect(result).toEqual(jobCandidacy);
+  });
+
+  it("propagates an error when the API request fails", async () => {
+    const candidacyId = "candidacy-1";
+    const payload = createJobCandidacyUpdatePayload();
+    const error = new Error("Failed to update job candidacy");
+
+    mockedApiPatch.mockRejectedValueOnce(error);
+
+    await expect(updateJobCandidacy(candidacyId, payload)).rejects.toBe(error);
+
+    expect(mockedApiPatch).toHaveBeenCalledOnce();
+    expect(mockedApiPatch).toHaveBeenCalledWith(
+      `/v1/jobs/candidacies/${candidacyId}/`,
       payload,
     );
   });

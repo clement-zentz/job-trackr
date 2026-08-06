@@ -5,6 +5,7 @@ import type {
   JobCandidacyCreatePayload,
   JobCandidacyDetailRead,
   JobCandidacyListItemRead,
+  JobCandidacyUpdatePayload,
 } from "@/features/jobs/candidacies/types";
 
 type JobCandidacyListItemReadOverrides = Omit<
@@ -66,4 +67,15 @@ export function createJobCandidacyCreatePayload(
     notes: "Looking forward to this opportunity.",
     ...overrides,
   } satisfies JobCandidacyCreatePayload;
+}
+
+export function createJobCandidacyUpdatePayload(
+  overrides: JobCandidacyUpdatePayload = {},
+): JobCandidacyUpdatePayload {
+  return {
+    status: "interview",
+    applied_on: "2026-08-05",
+    notes: "First interview scheduled.",
+    ...overrides,
+  } satisfies JobCandidacyUpdatePayload;
 }

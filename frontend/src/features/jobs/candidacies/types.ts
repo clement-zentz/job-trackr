@@ -35,6 +35,8 @@ export interface JobCandidacyCreatePayload extends JobCandidacyMutablePayload {
   job_posting: string;
 }
 
+export type JobCandidacyUpdatePayload = Partial<JobCandidacyMutablePayload>;
+
 export interface JobCandidacyFormValues {
   status: CandidacyStatus;
   applied_on: string;
