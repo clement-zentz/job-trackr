@@ -30,4 +30,12 @@ describe("jobCandidaciesRoutes", () => {
       await screen.findByRole("heading", { name: "Create Job Candidacy" }),
     ).toBeInTheDocument();
   });
+
+  it("renders the edit job candidacy page for a candidacy id", async () => {
+    renderJobCandidaciesRoute("/jobs/candidacies/1/edit");
+
+    expect(
+      await screen.findByRole("heading", { name: "Update Job Candidacy" }),
+    ).toBeInTheDocument();
+  });
 });
