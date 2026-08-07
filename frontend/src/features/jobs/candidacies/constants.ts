@@ -10,6 +10,7 @@ const JOB_CANDIDACIES_BASE_PATH = "/jobs/candidacies";
 export const JOB_CANDIDACIES_LIST_PATH = JOB_CANDIDACIES_BASE_PATH;
 export const JOB_CANDIDACY_DETAIL_PATH = `${JOB_CANDIDACIES_BASE_PATH}/:candidacyId`;
 export const JOB_CANDIDACY_CREATE_PATH = `${JOB_CANDIDACIES_BASE_PATH}/new`;
+export const JOB_CANDIDACY_EDIT_PATH = `${JOB_CANDIDACIES_BASE_PATH}/:candidacyId/edit`;
 
 export function getJobCandidacyDetailPath(candidacyId: string): string {
   return generatePath(JOB_CANDIDACY_DETAIL_PATH, {
@@ -21,4 +22,10 @@ export function getJobCandidacyCreatePath(jobPostingId: string): string {
   const searchParams = new URLSearchParams({ jobPostingId });
 
   return `${JOB_CANDIDACY_CREATE_PATH}?${searchParams.toString()}`;
+}
+
+export function getJobCandidacyEditPath(candidacyId: string): string {
+  return generatePath(JOB_CANDIDACY_EDIT_PATH, {
+    candidacyId,
+  });
 }
