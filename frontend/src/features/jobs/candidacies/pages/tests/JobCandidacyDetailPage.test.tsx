@@ -9,7 +9,10 @@ import { getJobPostingDetailPath } from "@/features/jobs/postings/constants";
 import { createJobCandidacyDetailRead } from "@/tests/factories/jobCandidacy";
 
 import { JobCandidacyDetail } from "../../components/JobCandidacyDetail";
-import { JOB_CANDIDACIES_LIST_PATH } from "../../constants";
+import {
+  getJobCandidacyEditPath,
+  JOB_CANDIDACIES_LIST_PATH,
+} from "../../constants";
 import { useJobCandidacy } from "../../hooks/useJobCandidacy";
 import { JobCandidacyDetailPage } from "../JobCandidacyDetailPage";
 
@@ -167,6 +170,10 @@ describe("JobCandidacyDetailPage", () => {
       "href",
       getJobPostingDetailPath(candidacy.job_posting.id),
     );
+
+    expect(
+      screen.getByRole("link", { name: "Edit job candidacy" }),
+    ).toHaveAttribute("href", getJobCandidacyEditPath(candidacy.id));
 
     expect(screen.getByTestId("job-candidacy-detail")).toBeInTheDocument();
     expect(JobCandidacyDetail).toHaveBeenCalledWith(
