@@ -4,4 +4,5 @@
 export { BackToCandidaciesLink } from "./BackToCandidaciesLink";
 export { BackToCandidacyLink } from "./BackToCandidacyLink";
 export { CreateJobCandidacyLink } from "./CreateJobCandidacyLink";
+export { EditJobCandidacyLink } from "./EditJobCandidacyLink";
 export { SeeJobCandidacyLink } from "./SeeJobCandidacyLink";

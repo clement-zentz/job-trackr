@@ -6,7 +6,10 @@ import { useParams } from "react-router-dom";
 
 import { SeeJobPostingLink } from "@/features/jobs/postings/components/actions";
 
-import { BackToCandidaciesLink } from "../components/actions";
+import {
+  BackToCandidaciesLink,
+  EditJobCandidacyLink,
+} from "../components/actions";
 import { JobCandidacyDetail } from "../components/JobCandidacyDetail";
 import { useJobCandidacy } from "../hooks/useJobCandidacy";
 
@@ -86,7 +89,13 @@ export function JobCandidacyDetailPage() {
   return (
     <section className={sectionClassName}>
       <PageHeader
-        actions={<SeeJobPostingLink jobPostingId={candidacy.job_posting.id} />}
+        actions={
+          <>
+            <SeeJobPostingLink jobPostingId={candidacy.job_posting.id} />
+
+            <EditJobCandidacyLink candidacyId={candidacy.id} />
+          </>
+        }
       />
 
       <JobCandidacyDetail candidacy={candidacy} />
