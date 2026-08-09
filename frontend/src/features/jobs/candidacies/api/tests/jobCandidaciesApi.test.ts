@@ -15,6 +15,7 @@ import { createPaginatedResponse } from "@/tests/factories/paginatedResponse";
 import type { JobCandidacyQueryParams } from "../../types";
 import {
   createJobCandidacy,
+  deleteJobCandidacy,
   getJobCandidacy,
   listJobCandidacies,
   updateJobCandidacy,
@@ -25,12 +26,14 @@ vi.mock("@/api/client", () => ({
     get: vi.fn(),
     post: vi.fn(),
     patch: vi.fn(),
+    delete: vi.fn(),
   },
 }));
 
 const mockedApiGet = vi.mocked(api.get);
 const mockedApiPost = vi.mocked(api.post);
 const mockedApiPatch = vi.mocked(api.patch);
+const mockedApiDelete = vi.mocked(api.delete);
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -209,5 +212,26 @@ describe("updateJobCandidacy", () => {
       `/v1/jobs/candidacies/${candidacyId}/`,
       payload,
     );
+  });
+});
+
+describe("deleteJobCandidacy", () => {
+  it("deletes the job candidacy", async () => {
+    mockedApiDelete.mockResolvedValueOnce({
+      data: undefined,
+    });
+
+    await expect(deleteJobCandidacy("123")).resolves.toBeUndefined();
+
+    expect(mockedApiDelete).toHaveBeenCalledOnce();
+    expect(mockedApiDelete).toHaveBeenCalledWith("/v1/jobs/candidacies/123/");
+  });
+
+  it("propagates the API error", async () => {
+    const error = new Error("Request failed");
+
+    mockedApiDelete.mockRejectedValueOnce(error);
+
+    await expect(deleteJobCandidacy("123")).rejects.toBe(error);
   });
 });
