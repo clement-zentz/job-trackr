@@ -59,3 +59,7 @@ export async function updateJobCandidacy(
 
   return response.data;
 }
+
+export async function deleteJobCandidacy(candidacyId: string): Promise<void> {
+  await api.delete(`${JOB_CANDIDACIES_ENDPOINT}${candidacyId}/`);
+}
