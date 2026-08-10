@@ -8,6 +8,7 @@ import { SeeJobPostingLink } from "@/features/jobs/postings/components/actions";
 
 import {
   BackToCandidaciesLink,
+  DeleteJobCandidacyButton,
   EditJobCandidacyLink,
 } from "../components/actions";
 import { JobCandidacyDetail } from "../components/JobCandidacyDetail";
@@ -94,6 +95,12 @@ export function JobCandidacyDetailPage() {
             <SeeJobPostingLink jobPostingId={candidacy.job_posting.id} />
 
             <EditJobCandidacyLink candidacyId={candidacy.id} />
+
+            <DeleteJobCandidacyButton
+              candidacyId={candidacy.id}
+              jobPostingId={candidacy.job_posting.id}
+              jobPostingTitle={candidacy.job_posting.title}
+            />
           </>
         }
       />
