@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/features/jobs/candidacies/pages/tests/JobCandidacyDetailPage.test.tsx
 
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { getJobPostingDetailPath } from "@/features/jobs/postings/constants";
 import { createJobCandidacyDetailRead } from "@/tests/factories/jobCandidacy";
+import { renderWithQueryClient } from "@/tests/utils";
 
 import { JobCandidacyDetail } from "../../components/JobCandidacyDetail";
 import {
@@ -27,7 +28,7 @@ vi.mock("../../components/JobCandidacyDetail", () => ({
 const routePath = "/jobs/candidacies/:candidacyId";
 
 function renderPage(initialEntry = "/jobs/candidacies/candidacy-1") {
-  return render(
+  return renderWithQueryClient(
     <MemoryRouter initialEntries={[initialEntry]}>
       <Routes>
         <Route path={routePath} element={<JobCandidacyDetailPage />} />
@@ -174,6 +175,10 @@ describe("JobCandidacyDetailPage", () => {
     expect(
       screen.getByRole("link", { name: "Edit job candidacy" }),
     ).toHaveAttribute("href", getJobCandidacyEditPath(candidacy.id));
+
+    expect(
+      screen.getByRole("button", { name: "Delete job candidacy" }),
+    ).toBeInTheDocument();
 
     expect(screen.getByTestId("job-candidacy-detail")).toBeInTheDocument();
     expect(JobCandidacyDetail).toHaveBeenCalledWith(
