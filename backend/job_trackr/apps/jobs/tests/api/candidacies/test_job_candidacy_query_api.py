@@ -7,6 +7,7 @@ import pytest
 from django.urls import reverse
 
 from apps.jobs.candidacies.choices import CandidacyStatus
+from apps.jobs.postings.choices import Platforms
 from apps.jobs.tests.factories.job_candidacy import JobCandidacyFactory
 
 pytestmark = pytest.mark.django_db
@@ -101,3 +102,75 @@ def test_list_job_candidacies_uses_default_ordering(
         str(later.id),
         str(earlier.id),
     ]
+
+
+def test_list_job_candidacies_filters_by_applied_on_range(
+    authenticated_client,
+    job_candidacy_list_url,
+):
+    JobCandidacyFactory(
+        applied_on=date(2026, 1, 9),
+    )
+    matching_candidacy = JobCandidacyFactory(
+        applied_on=date(2026, 1, 15),
+    )
+    JobCandidacyFactory(
+        applied_on=date(2026, 1, 21),
+    )
+
+    response = authenticated_client.get(
+        job_candidacy_list_url,
+        {
+            "applied_on_after": "2026-01-10",
+            "applied_on_before": "2026-01-20",
+        },
+    )
+
+    assert response.status_code == 200
+    assert {item["id"] for item in response.data["results"]} == {
+        str(matching_candidacy.id)
+    }
+
+
+def test_list_job_candidacies_combines_filters(
+    authenticated_client,
+    job_candidacy_list_url,
+):
+    matching_candidacy = JobCandidacyFactory(
+        status=CandidacyStatus.INTERVIEW,
+        job_posting__platform=Platforms.LINKEDIN,
+    )
+    JobCandidacyFactory(
+        status=CandidacyStatus.REJECTED,
+        job_posting__platform=Platforms.LINKEDIN,
+    )
+    JobCandidacyFactory(
+        status=CandidacyStatus.INTERVIEW,
+        job_posting__platform=Platforms.INDEED,
+    )
+
+    response = authenticated_client.get(
+        job_candidacy_list_url,
+        {
+            "status": CandidacyStatus.INTERVIEW,
+            "platform": Platforms.LINKEDIN,
+        },
+    )
+
+    assert response.status_code == 200
+    assert {item["id"] for item in response.data["results"]} == {
+        str(matching_candidacy.id)
+    }
+
+
+def test_list_job_candidacies_rejects_invalid_filter_value(
+    authenticated_client,
+    job_candidacy_list_url,
+):
+    response = authenticated_client.get(
+        job_candidacy_list_url,
+        {"status": "invalid"},
+    )
+
+    assert response.status_code == 400
+    assert "status" in response.data

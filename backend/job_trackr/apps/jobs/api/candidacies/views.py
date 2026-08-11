@@ -60,7 +60,5 @@ class JobCandidacyViewSet(ReadAfterWriteModelViewSet[JobCandidacy]):
         "updated_at",
     ]
 
-    ordering = ["-applied_on", "-created_at"]
-
     def get_queryset(self) -> QuerySet[JobCandidacy]:
         return JobCandidacy.objects.select_related("job_posting")
