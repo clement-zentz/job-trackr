@@ -9,6 +9,7 @@ export const platformOptions = [
 ] as const;
 
 export type Platform = "" | (typeof platformOptions)[number]["value"];
+export type NonEmptyPlatform = Exclude<Platform, "">;
 
 export const employmentTypeOptions = [
   { value: "full_time", label: "Full-time" },
@@ -22,6 +23,7 @@ export const employmentTypeOptions = [
 export type EmploymentType =
   | ""
   | (typeof employmentTypeOptions)[number]["value"];
+export type NonEmptyEmploymentType = Exclude<EmploymentType, "">;
 
 export const workModeOptions = [
   { value: "on_site", label: "On-site" },
@@ -30,3 +32,4 @@ export const workModeOptions = [
 ] as const;
 
 export type WorkMode = "" | (typeof workModeOptions)[number]["value"];
+export type NonEmptyWorkMode = Exclude<WorkMode, "">;

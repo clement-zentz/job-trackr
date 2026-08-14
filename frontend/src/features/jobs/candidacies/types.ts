@@ -1,6 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/features/jobs/candidacies/types.ts
 
+import type {
+  NonEmptyEmploymentType,
+  NonEmptyPlatform,
+  NonEmptyWorkMode,
+} from "../postings/choices";
 import type { CandidacyStatus } from "./choices";
 
 export interface JobPostingSummaryRead {
@@ -43,11 +48,39 @@ export interface JobCandidacyFormValues {
   notes: string;
 }
 
+// --- LIST QUERY MODELS ---
+
+export type JobCandidacyOrdering =
+  | "applied_on"
+  | "-applied_on"
+  | "created_at"
+  | "-created_at"
+  | "updated_at"
+  | "-updated_at";
+
 export interface JobCandidacyListParams {
   page?: number;
+  search?: string;
+  status?: CandidacyStatus;
+  appliedOnAfter?: string;
+  appliedOnBefore?: string;
+  platform?: NonEmptyPlatform;
+  employmentType?: NonEmptyEmploymentType;
+  workMode?: NonEmptyWorkMode;
+  ordering?: JobCandidacyOrdering;
 }
+
+export type JobCandidacyFilters = Omit<JobCandidacyListParams, "page">;
 
 export interface JobCandidacyQueryParams {
   page: number;
   page_size: number;
+  search?: string;
+  status?: CandidacyStatus;
+  applied_on_after?: string;
+  applied_on_before?: string;
+  platform?: NonEmptyPlatform;
+  employment_type?: NonEmptyEmploymentType;
+  work_mode?: NonEmptyWorkMode;
+  ordering?: JobCandidacyOrdering;
 }
