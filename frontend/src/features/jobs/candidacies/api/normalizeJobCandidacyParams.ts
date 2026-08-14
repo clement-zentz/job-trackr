@@ -9,6 +9,6 @@ export function normalizeJobCandidacyParams(
 ): JobCandidacyQueryParams {
   return {
     page: params.page ?? 1,
-    page_size: params.pageSize ?? DEFAULT_JOB_CANDIDACIES_PAGE_SIZE,
+    page_size: DEFAULT_JOB_CANDIDACIES_PAGE_SIZE,
   };
 }

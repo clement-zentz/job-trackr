@@ -45,7 +45,6 @@ export interface JobCandidacyFormValues {
 
 export interface JobCandidacyListParams {
   page?: number;
-  pageSize?: number;
 }
 
 export interface JobCandidacyQueryParams {

@@ -53,7 +53,6 @@ describe("useJobCandidacies", () => {
       () =>
         useJobCandidacies({
           page: 3,
-          pageSize: 25,
         }),
       {
         wrapper: createWrapper(),
@@ -67,7 +66,7 @@ describe("useJobCandidacies", () => {
       expect(listJobCandidaciesMock).toHaveBeenCalledOnce();
       expect(listJobCandidaciesMock).toHaveBeenCalledWith({
         page: 3,
-        page_size: 25,
+        page_size: DEFAULT_JOB_CANDIDACIES_PAGE_SIZE,
       });
     });
   });
@@ -119,7 +118,6 @@ describe("useJobCandidacies", () => {
       ({ page }) =>
         useJobCandidacies({
           page,
-          pageSize: 20,
         }),
       {
         initialProps: {
@@ -138,7 +136,7 @@ describe("useJobCandidacies", () => {
       expect(listJobCandidaciesMock).toHaveBeenCalledOnce();
       expect(listJobCandidaciesMock).toHaveBeenCalledWith({
         page: 1,
-        page_size: 20,
+        page_size: DEFAULT_JOB_CANDIDACIES_PAGE_SIZE,
       });
     });
 
@@ -150,7 +148,7 @@ describe("useJobCandidacies", () => {
       expect(listJobCandidaciesMock).toHaveBeenCalledTimes(2);
       expect(listJobCandidaciesMock).toHaveBeenLastCalledWith({
         page: 2,
-        page_size: 20,
+        page_size: DEFAULT_JOB_CANDIDACIES_PAGE_SIZE,
       });
 
       expect(result.current.data?.results).toEqual([firstCandidacy]);

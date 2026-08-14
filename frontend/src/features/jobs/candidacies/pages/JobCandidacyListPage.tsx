@@ -4,7 +4,6 @@
 import { useState } from "react";
 
 import { JobCandidacyList } from "../components/list/JobCandidacyList";
-import { DEFAULT_JOB_CANDIDACIES_PAGE_SIZE } from "../constants";
 
 export function JobCandidacyListPage() {
   const [page, setPage] = useState(1);
@@ -18,13 +17,7 @@ export function JobCandidacyListPage() {
         </p>
       </header>
 
-      <JobCandidacyList
-        params={{
-          page,
-          pageSize: DEFAULT_JOB_CANDIDACIES_PAGE_SIZE,
-        }}
-        onPageChange={setPage}
-      />
+      <JobCandidacyList params={{ page }} onPageChange={setPage} />
     </div>
   );
 }

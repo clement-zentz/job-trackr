@@ -6,7 +6,6 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { JobCandidacyList } from "../../components/list/JobCandidacyList";
-import { DEFAULT_JOB_CANDIDACIES_PAGE_SIZE } from "../../constants";
 import { JobCandidacyListPage } from "../JobCandidacyListPage";
 
 type MockJobCandidacyListProps = {
@@ -39,14 +38,12 @@ describe("JobCandidacyListPage", () => {
 
     expect(jobCandidacyListMock.mock.calls.at(-1)?.[0].params).toEqual({
       page: 1,
-      pageSize: DEFAULT_JOB_CANDIDACIES_PAGE_SIZE,
     });
 
     await user.click(screen.getByRole("button", { name: "Go to page 2" }));
 
     expect(jobCandidacyListMock.mock.calls.at(-1)?.[0].params).toEqual({
       page: 2,
-      pageSize: DEFAULT_JOB_CANDIDACIES_PAGE_SIZE,
     });
   });
 });
