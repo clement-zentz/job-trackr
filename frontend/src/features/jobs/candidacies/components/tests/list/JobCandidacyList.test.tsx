@@ -94,7 +94,6 @@ describe("JobCandidacyList", () => {
 
   const defaultParams = {
     page: 1,
-    pageSize: DEFAULT_JOB_CANDIDACIES_PAGE_SIZE,
   } satisfies JobCandidacyListParams;
 
   beforeEach(() => {
@@ -272,14 +271,13 @@ describe("JobCandidacyList", () => {
 
     renderJobCandidacyList({
       page: 2,
-      pageSize: 20,
     });
 
     expect(jobCandidacyPaginationMock).toHaveBeenCalledOnce();
 
     expect(jobCandidacyPaginationMock).toHaveBeenCalledWith({
       currentPage: 2,
-      totalPages: 3,
+      totalPages: 5,
       hasPreviousPage: true,
       hasNextPage: true,
       isFetching: true,

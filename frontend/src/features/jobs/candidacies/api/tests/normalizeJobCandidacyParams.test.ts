@@ -14,19 +14,7 @@ describe("normalizeJobCandidacyParams", () => {
     });
   });
 
-  it("maps frontend pagination parameters to API parameters", () => {
-    expect(
-      normalizeJobCandidacyParams({
-        page: 3,
-        pageSize: 25,
-      }),
-    ).toEqual({
-      page: 3,
-      page_size: 25,
-    });
-  });
-
-  it("uses the default page size when only the page is provided", () => {
+  it("uses the fixed candidacy page size", () => {
     expect(
       normalizeJobCandidacyParams({
         page: 4,
@@ -34,17 +22,6 @@ describe("normalizeJobCandidacyParams", () => {
     ).toEqual({
       page: 4,
       page_size: DEFAULT_JOB_CANDIDACIES_PAGE_SIZE,
-    });
-  });
-
-  it("uses the default page when only the page size is provided", () => {
-    expect(
-      normalizeJobCandidacyParams({
-        pageSize: 50,
-      }),
-    ).toEqual({
-      page: 1,
-      page_size: 50,
     });
   });
 });

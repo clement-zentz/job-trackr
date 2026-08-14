@@ -32,8 +32,10 @@ export function JobCandidacyList({
   }
 
   const currentPage = params.page ?? 1;
-  const pageSize = params.pageSize ?? DEFAULT_JOB_CANDIDACIES_PAGE_SIZE;
-  const totalPages = Math.max(1, Math.ceil((data?.count ?? 0) / pageSize));
+  const totalPages = Math.max(
+    1,
+    Math.ceil((data?.count ?? 0) / DEFAULT_JOB_CANDIDACIES_PAGE_SIZE),
+  );
 
   return (
     <section className="space-y-4">
