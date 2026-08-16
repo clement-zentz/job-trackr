@@ -9,7 +9,7 @@ export function JobCandidacyListPage() {
   const { filters, page, setPage, updateFilter, resetFilters } =
     useJobCandidacyFilters();
 
-  const params = {
+  const listParams = {
     ...filters,
     page,
   };
@@ -25,12 +25,12 @@ export function JobCandidacyListPage() {
       </header>
 
       <JobCandidacyFilters
-        params={params}
+        params={filters}
         updateFilter={updateFilter}
         resetFilters={resetFilters}
       />
 
-      <JobCandidacyList params={params} onPageChange={setPage} />
+      <JobCandidacyList params={listParams} onPageChange={setPage} />
     </div>
   );
 }
