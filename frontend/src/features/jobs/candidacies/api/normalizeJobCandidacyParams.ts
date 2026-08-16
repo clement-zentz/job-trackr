@@ -4,7 +4,9 @@
 import { DEFAULT_JOB_CANDIDACIES_PAGE_SIZE } from "../constants";
 import type { JobCandidacyListParams, JobCandidacyQueryParams } from "../types";
 
-function normalizeSearch(value: string | undefined): string | undefined {
+function normalizeOptionalString(
+  value: string | undefined,
+): string | undefined {
   const trimmed = value?.trim();
   return trimmed || undefined;
 }
@@ -24,16 +26,18 @@ export function normalizeJobCandidacyParams(
     ordering,
   } = params;
 
-  const normalizedSearch = normalizeSearch(search);
+  const normalizedSearch = normalizeOptionalString(search);
+  const normalizedAppliedOnAfter = normalizeOptionalString(appliedOnAfter);
+  const normalizedAppliedOnBefore = normalizeOptionalString(appliedOnBefore);
 
   return {
     ...(normalizedSearch !== undefined && { search: normalizedSearch }),
     ...(status !== undefined && { status }),
-    ...(appliedOnAfter !== undefined && {
-      applied_on_after: appliedOnAfter,
+    ...(normalizedAppliedOnAfter !== undefined && {
+      applied_on_after: normalizedAppliedOnAfter,
     }),
-    ...(appliedOnBefore !== undefined && {
-      applied_on_before: appliedOnBefore,
+    ...(normalizedAppliedOnBefore !== undefined && {
+      applied_on_before: normalizedAppliedOnBefore,
     }),
     ...(platform !== undefined && { platform }),
     ...(employmentType !== undefined && {
