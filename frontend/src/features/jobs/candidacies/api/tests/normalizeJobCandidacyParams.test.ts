@@ -29,6 +29,8 @@ describe("normalizeJobCandidacyParams", () => {
     const result = normalizeJobCandidacyParams({
       search: "",
       status: undefined,
+      appliedOnAfter: "",
+      appliedOnBefore: "",
     });
 
     expect(result).toEqual({
@@ -37,13 +39,30 @@ describe("normalizeJobCandidacyParams", () => {
     });
   });
 
-  it("trims search values", () => {
+  it("trims optional string filter values", () => {
     const result = normalizeJobCandidacyParams({
       search: "  frontend developer  ",
+      appliedOnAfter: " 2026-01-01 ",
+      appliedOnBefore: " 2026-08-12 ",
     });
 
     expect(result).toMatchObject({
       search: "frontend developer",
+      applied_on_after: "2026-01-01",
+      applied_on_before: "2026-08-12",
+    });
+  });
+
+  it("removes optional string values that become empty after trimming", () => {
+    const result = normalizeJobCandidacyParams({
+      search: "   ",
+      appliedOnAfter: "   ",
+      appliedOnBefore: "   ",
+    });
+
+    expect(result).toEqual({
+      page: 1,
+      page_size: DEFAULT_JOB_CANDIDACIES_PAGE_SIZE,
     });
   });
 
