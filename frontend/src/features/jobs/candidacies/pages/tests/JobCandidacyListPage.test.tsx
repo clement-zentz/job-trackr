@@ -2,48 +2,107 @@
 // File: frontend/src/features/jobs/candidacies/pages/tests/JobCandidacyListPage.test.tsx
 
 import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { JobCandidacyFilters } from "../../components/list/JobCandidacyFilters";
 import { JobCandidacyList } from "../../components/list/JobCandidacyList";
+import { useJobCandidacyFilters } from "../../hooks/useJobCandidacyFilters";
 import { JobCandidacyListPage } from "../JobCandidacyListPage";
 
-type MockJobCandidacyListProps = {
-  onPageChange: (page: number) => void;
-};
+vi.mock("../../hooks/useJobCandidacyFilters");
 
-vi.mock("../../components/list/JobCandidacyList", () => ({
-  JobCandidacyList: vi.fn(({ onPageChange }: MockJobCandidacyListProps) => (
-    <button type="button" onClick={() => onPageChange(2)}>
-      Go to page 2
-    </button>
-  )),
+vi.mock("../../components/list/JobCandidacyFilters", () => ({
+  JobCandidacyFilters: vi.fn(() => <div data-testid="job-candidacy-filters" />),
 }));
 
+vi.mock("../../components/list/JobCandidacyList", () => ({
+  JobCandidacyList: vi.fn(() => <div data-testid="job-candidacy-list" />),
+}));
+
+const jobCandidacyFiltersMock = vi.mocked(JobCandidacyFilters);
 const jobCandidacyListMock = vi.mocked(JobCandidacyList);
+const useJobCandidacyFiltersMock = vi.mocked(useJobCandidacyFilters);
+
+const setPage = vi.fn();
+const updateFilter = vi.fn();
+const resetFilters = vi.fn();
+
+function mockFilterState(
+  overrides: Partial<ReturnType<typeof useJobCandidacyFilters>> = {},
+) {
+  useJobCandidacyFiltersMock.mockReturnValue({
+    filters: {},
+    page: 1,
+    setPage,
+    updateFilter,
+    resetFilters,
+    ...overrides,
+  });
+}
 
 describe("JobCandidacyListPage", () => {
   beforeEach(() => {
-    jobCandidacyListMock.mockClear();
+    vi.clearAllMocks();
+    mockFilterState();
   });
 
-  it("renders the page and manages pagination state", async () => {
-    const user = userEvent.setup();
-
+  it("renders the page", () => {
     render(<JobCandidacyListPage />);
 
     expect(
       screen.getByRole("heading", { name: "Job Candidacies" }),
     ).toBeInTheDocument();
 
-    expect(jobCandidacyListMock.mock.calls.at(-1)?.[0].params).toEqual({
-      page: 1,
+    expect(screen.getByTestId("job-candidacy-filters")).toBeInTheDocument();
+    expect(screen.getByTestId("job-candidacy-list")).toBeInTheDocument();
+  });
+
+  it("passes the current filters and page to the filters and list", () => {
+    mockFilterState({
+      filters: {
+        search: "software engineer",
+      },
+      page: 3,
     });
 
-    await user.click(screen.getByRole("button", { name: "Go to page 2" }));
+    render(<JobCandidacyListPage />);
 
-    expect(jobCandidacyListMock.mock.calls.at(-1)?.[0].params).toEqual({
-      page: 2,
-    });
+    const expectedParams = {
+      search: "software engineer",
+      page: 3,
+    };
+
+    expect(jobCandidacyFiltersMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        params: expectedParams,
+      }),
+      undefined,
+    );
+
+    expect(jobCandidacyListMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        params: expectedParams,
+      }),
+      undefined,
+    );
+  });
+
+  it("wires the filter and pagination callbacks", () => {
+    render(<JobCandidacyListPage />);
+
+    expect(jobCandidacyFiltersMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        updateFilter,
+        resetFilters,
+      }),
+      undefined,
+    );
+
+    expect(jobCandidacyListMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        onPageChange: setPage,
+      }),
+      undefined,
+    );
   });
 });
