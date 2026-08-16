@@ -57,7 +57,7 @@ describe("JobCandidacyListPage", () => {
     expect(screen.getByTestId("job-candidacy-list")).toBeInTheDocument();
   });
 
-  it("passes the current filters and page to the filters and list", () => {
+  it("passes filters separately from list pagination params", () => {
     mockFilterState({
       filters: {
         search: "software engineer",
@@ -67,42 +67,44 @@ describe("JobCandidacyListPage", () => {
 
     render(<JobCandidacyListPage />);
 
-    const expectedParams = {
-      search: "software engineer",
-      page: 3,
-    };
+    const filterProps = jobCandidacyFiltersMock.mock.lastCall?.[0];
+    const listProps = jobCandidacyListMock.mock.lastCall?.[0];
 
-    expect(jobCandidacyFiltersMock).toHaveBeenCalledWith(
+    expect(filterProps).toEqual(
       expect.objectContaining({
-        params: expectedParams,
+        params: {
+          search: "software engineer",
+        },
       }),
-      undefined,
     );
 
-    expect(jobCandidacyListMock).toHaveBeenCalledWith(
+    expect(listProps).toEqual(
       expect.objectContaining({
-        params: expectedParams,
+        params: {
+          search: "software engineer",
+          page: 3,
+        },
       }),
-      undefined,
     );
   });
 
   it("wires the filter and pagination callbacks", () => {
     render(<JobCandidacyListPage />);
 
-    expect(jobCandidacyFiltersMock).toHaveBeenCalledWith(
+    const filterProps = jobCandidacyFiltersMock.mock.lastCall?.[0];
+    const listProps = jobCandidacyListMock.mock.lastCall?.[0];
+
+    expect(filterProps).toEqual(
       expect.objectContaining({
         updateFilter,
         resetFilters,
       }),
-      undefined,
     );
 
-    expect(jobCandidacyListMock).toHaveBeenCalledWith(
+    expect(listProps).toEqual(
       expect.objectContaining({
         onPageChange: setPage,
       }),
-      undefined,
     );
   });
 });
