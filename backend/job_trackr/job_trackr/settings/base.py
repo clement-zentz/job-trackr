@@ -40,8 +40,11 @@ INSTALLED_APPS = [
     # DRF
     "rest_framework",
     # domain apps
+    "apps.users",
     "apps.jobs",
 ]
+
+AUTH_USER_MODEL = "users.User"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
