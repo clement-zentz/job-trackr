@@ -53,17 +53,19 @@ manage:
 	$(COMPOSE_DEV) exec backend $(BACKEND_PYTHON) $(MANAGE) $(CMD)
 
 migrations:
-	$(COMPOSE_DEV) exec backend $(BACKEND_PYTHON) $(MANAGE) makemigrations
+	$(COMPOSE_DEV) run --rm \
+		--entrypoint "" \
+		backend $(BACKEND_PYTHON) $(MANAGE) makemigrations $(APP)
 
 migrate:
-	$(COMPOSE_DEV) exec backend $(BACKEND_PYTHON) $(MANAGE) migrate
+	$(COMPOSE_DEV) exec backend $(BACKEND_PYTHON) $(MANAGE) migrate $(APP)
 
 superuser:
 	$(COMPOSE_DEV) exec backend $(BACKEND_PYTHON) $(MANAGE) createsuperuser
 
 django-check:
 	$(COMPOSE_DEV) exec backend $(BACKEND_PYTHON) \
-	-c "import django; print(django.get_version())"
+		-c "import django; print(django.get_version())"
 
 # --- Tooling ---
 backend-mypy:
@@ -77,8 +79,8 @@ backend-test: test-db
 
 backend-coverage: test-db
 	uv --directory backend run pytest $(ARGS) --cov \
-	--cov-report=term-missing \
-	--cov-report=html
+		--cov-report=term-missing \
+		--cov-report=html
 
 down-test:
 	$(COMPOSE_TEST) down -v --remove-orphans
@@ -88,7 +90,7 @@ frontend-test:
 
 pre-commit:
 	uv --directory backend run pre-commit run --all-files \
-	--config ../.pre-commit-config.yaml
+		--config ../.pre-commit-config.yaml
 
 # --- Dependencies ---
 backend-deptry:
