@@ -13,13 +13,14 @@ from apps.jobs.candidacies.models import JobCandidacy
 from apps.jobs.postings.models import JobPosting
 from apps.jobs.tests.factories.job_candidacy import JobCandidacyFactory
 from apps.jobs.tests.factories.job_posting import JobPostingFactory
+from apps.users.tests.factories.user import UserFactory
 
 pytestmark = pytest.mark.django_db
 
 
 @pytest.fixture
-def job_candidacy():
-    return JobCandidacyFactory()
+def job_candidacy(user):
+    return JobCandidacyFactory(job_posting__owner=user)
 
 
 JOB_POSTING_SUMMARY_KEYS = {
@@ -64,13 +65,13 @@ def assert_job_candidacy_detail_shape(data: dict) -> None:
     assert data["job_posting"].keys() == JOB_POSTING_SUMMARY_KEYS
 
 
-def test_list_job_candidacies(authenticated_client):
+def test_list_job_candidacies(authenticated_client, user):
     notes = (
         "I applied after reviewing the role and adapting my CV. "
         "The position matches my backend development experience. "
         "Follow up with the recruiter next week."
     )
-    job_candidacy = JobCandidacyFactory(notes=notes)
+    job_candidacy = JobCandidacyFactory(notes=notes, job_posting__owner=user)
 
     url = reverse("job-candidacy-list")
 
@@ -109,7 +110,7 @@ def test_list_job_candidacies(authenticated_client):
     assert item["notes_preview"] == Truncator(notes).chars(100)
 
 
-def test_retrieve_job_candidacy(authenticated_client):
+def test_retrieve_job_candidacy(authenticated_client, user):
     applied_on = date(2026, 7, 15)
 
     notes = (
@@ -121,6 +122,7 @@ def test_retrieve_job_candidacy(authenticated_client):
         status=CandidacyStatus.INTERVIEW,
         applied_on=applied_on,
         notes=notes,
+        job_posting__owner=user,
     )
 
     url = reverse(
@@ -147,8 +149,8 @@ def test_retrieve_job_candidacy(authenticated_client):
     assert response.data["notes"] == notes
 
 
-def test_create_job_candidacy(authenticated_client):
-    job_posting = JobPostingFactory()
+def test_create_job_candidacy(authenticated_client, user):
+    job_posting = JobPostingFactory(owner=user)
     applied_on = date(2026, 7, 18)
     notes = "Application submitted through the company website."
 
@@ -345,9 +347,10 @@ def test_full_update_requires_job_posting(
 def test_job_posting_cannot_be_changed(
     authenticated_client,
     job_candidacy,
+    user,
 ):
     original_job_posting_id = job_candidacy.job_posting_id
-    replacement_job_posting = JobPostingFactory()
+    replacement_job_posting = JobPostingFactory(owner=user)
 
     url = reverse(
         "job-candidacy-detail",
@@ -459,3 +462,104 @@ def test_reverse_job_candidacy_detail(job_candidacy):
     )
 
     assert url == (f"/api/v1/jobs/candidacies/{job_candidacy.id}/")
+
+
+# --- OWNERSHIP ---
+def test_list_job_candidacies_returns_only_owned_postings(
+    authenticated_client,
+    user,
+):
+    own_candidacy = JobCandidacyFactory(job_posting__owner=user)
+    other_candidacy = JobCandidacyFactory(
+        job_posting__owner=UserFactory(),
+    )
+
+    response = authenticated_client.get(reverse("job-candidacy-list"))
+
+    assert response.status_code == status.HTTP_200_OK
+
+    returned_ids = {item["id"] for item in response.data["results"]}
+
+    assert str(own_candidacy.id) in returned_ids
+    assert str(other_candidacy.id) not in returned_ids
+
+
+def test_cannot_retrieve_another_users_job_candidacy(
+    authenticated_client,
+):
+    other_candidacy = JobCandidacyFactory(
+        job_posting__owner=UserFactory(),
+    )
+
+    response = authenticated_client.get(
+        reverse(
+            "job-candidacy-detail",
+            args=[other_candidacy.id],
+        )
+    )
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+def test_cannot_create_candidacy_for_another_users_posting(
+    authenticated_client,
+):
+    other_posting = JobPostingFactory(owner=UserFactory())
+
+    response = authenticated_client.post(
+        reverse("job-candidacy-list"),
+        {
+            "job_posting": str(other_posting.id),
+            "status": CandidacyStatus.APPLIED,
+            "applied_on": "2026-07-18",
+            "notes": "Unauthorized application.",
+        },
+        format="json",
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "job_posting" in response.data
+    assert not JobCandidacy.objects.filter(job_posting=other_posting).exists()
+
+
+def test_cannot_update_another_users_job_candidacy(
+    authenticated_client,
+):
+    other_candidacy = JobCandidacyFactory(
+        job_posting__owner=UserFactory(),
+    )
+    original_notes = other_candidacy.notes
+
+    response = authenticated_client.patch(
+        reverse(
+            "job-candidacy-detail",
+            args=[other_candidacy.id],
+        ),
+        {
+            "notes": "Changed by attacker.",
+        },
+        format="json",
+    )
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    other_candidacy.refresh_from_db()
+    assert other_candidacy.notes == original_notes
+
+
+def test_cannot_delete_another_users_job_candidacy(
+    authenticated_client,
+):
+    other_candidacy = JobCandidacyFactory(
+        job_posting__owner=UserFactory(),
+    )
+
+    response = authenticated_client.delete(
+        reverse(
+            "job-candidacy-detail",
+            args=[other_candidacy.id],
+        )
+    )
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert JobCandidacy.objects.filter(pk=other_candidacy.id).exists()

@@ -19,13 +19,15 @@ def job_candidacy_list_url() -> str:
 
 
 def test_list_job_candidacies_filters_by_status(
-    authenticated_client, job_candidacy_list_url
+    authenticated_client, job_candidacy_list_url, user
 ):
     matching_candidacy = JobCandidacyFactory(
         status=CandidacyStatus.INTERVIEW,
+        job_posting__owner=user,
     )
     JobCandidacyFactory(
         status=CandidacyStatus.REJECTED,
+        job_posting__owner=user,
     )
 
     response = authenticated_client.get(
@@ -41,13 +43,15 @@ def test_list_job_candidacies_filters_by_status(
 
 
 def test_list_job_candidacies_searches_by_company(
-    authenticated_client, job_candidacy_list_url
+    authenticated_client, job_candidacy_list_url, user
 ):
     matching_candidacy = JobCandidacyFactory(
         job_posting__company="Acme",
+        job_posting__owner=user,
     )
     JobCandidacyFactory(
         job_posting__company="Globex",
+        job_posting__owner=user,
     )
 
     response = authenticated_client.get(
@@ -64,12 +68,15 @@ def test_list_job_candidacies_searches_by_company(
 def test_list_job_candidacies_orders_by_applied_on(
     authenticated_client,
     job_candidacy_list_url,
+    user,
 ):
     earlier = JobCandidacyFactory(
         applied_on=date(2026, 1, 1),
+        job_posting__owner=user,
     )
     later = JobCandidacyFactory(
         applied_on=date(2026, 1, 31),
+        job_posting__owner=user,
     )
 
     response = authenticated_client.get(
@@ -87,12 +94,15 @@ def test_list_job_candidacies_orders_by_applied_on(
 def test_list_job_candidacies_uses_default_ordering(
     authenticated_client,
     job_candidacy_list_url,
+    user,
 ):
     earlier = JobCandidacyFactory(
         applied_on=date(2026, 1, 1),
+        job_posting__owner=user,
     )
     later = JobCandidacyFactory(
         applied_on=date(2026, 1, 31),
+        job_posting__owner=user,
     )
 
     response = authenticated_client.get(job_candidacy_list_url)
@@ -107,15 +117,19 @@ def test_list_job_candidacies_uses_default_ordering(
 def test_list_job_candidacies_filters_by_applied_on_range(
     authenticated_client,
     job_candidacy_list_url,
+    user,
 ):
     JobCandidacyFactory(
         applied_on=date(2026, 1, 9),
+        job_posting__owner=user,
     )
     matching_candidacy = JobCandidacyFactory(
         applied_on=date(2026, 1, 15),
+        job_posting__owner=user,
     )
     JobCandidacyFactory(
         applied_on=date(2026, 1, 21),
+        job_posting__owner=user,
     )
 
     response = authenticated_client.get(
@@ -135,18 +149,22 @@ def test_list_job_candidacies_filters_by_applied_on_range(
 def test_list_job_candidacies_combines_filters(
     authenticated_client,
     job_candidacy_list_url,
+    user,
 ):
     matching_candidacy = JobCandidacyFactory(
         status=CandidacyStatus.INTERVIEW,
         job_posting__platform=Platforms.LINKEDIN,
+        job_posting__owner=user,
     )
     JobCandidacyFactory(
         status=CandidacyStatus.REJECTED,
         job_posting__platform=Platforms.LINKEDIN,
+        job_posting__owner=user,
     )
     JobCandidacyFactory(
         status=CandidacyStatus.INTERVIEW,
         job_posting__platform=Platforms.INDEED,
+        job_posting__owner=user,
     )
 
     response = authenticated_client.get(

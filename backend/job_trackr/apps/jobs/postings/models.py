@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/job_trackr/apps/jobs/postings/models.py
 
+from django.conf import settings
 from django.db import models
 
 from apps.common.uuid import uuid7_default
@@ -12,6 +13,12 @@ class JobPosting(models.Model):
         primary_key=True,
         default=uuid7_default,
         editable=False,
+    )
+
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="job_postings",
     )
 
     title = models.CharField(max_length=255)
