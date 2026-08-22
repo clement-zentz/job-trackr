@@ -8,13 +8,14 @@ from rest_framework import status
 from apps.jobs.postings.choices import EmploymentType, Platforms, WorkMode
 from apps.jobs.postings.models import JobPosting
 from apps.jobs.tests.factories.job_posting import JobPostingFactory
+from apps.users.tests.factories.user import UserFactory
 
 pytestmark = pytest.mark.django_db
 
 
 @pytest.fixture
-def job_posting():
-    return JobPostingFactory()
+def job_posting(user):
+    return JobPostingFactory(owner=user)
 
 
 JOB_POSTING_LIST_KEYS = {
@@ -81,8 +82,9 @@ def test_list_job_postings(authenticated_client, job_posting):
     assert_job_posting_list_shape(item)
 
 
-def test_retrieve_job_posting(authenticated_client):
+def test_retrieve_job_posting(authenticated_client, user):
     job_posting = JobPostingFactory(
+        owner=user,
         title="Backend Engineer",
         company="Stripe",
         location="Paris",
@@ -118,7 +120,7 @@ def test_retrieve_job_posting(authenticated_client):
     assert response.data["candidacy_id"] is None
 
 
-def test_create_job_posting(authenticated_client):
+def test_create_job_posting(authenticated_client, user):
     url = reverse("job-posting-list")
 
     payload = {
@@ -145,6 +147,7 @@ def test_create_job_posting(authenticated_client):
         pk=response.data["id"],
     )
 
+    assert created_posting.owner.pk == user.pk
     assert created_posting.title == "Frontend Engineer"
     assert created_posting.company == "Google"
     assert created_posting.location == "Lyon"
@@ -274,3 +277,88 @@ def test_reverse_job_posting_list():
 def test_reverse_job_posting_detail(job_posting):
     url = reverse("job-posting-detail", args=[job_posting.id])
     assert url == f"/api/v1/jobs/postings/{job_posting.id}/"
+
+
+# --- OWNERSHIP ---
+def test_create_job_posting_ignores_submitted_owner(
+    authenticated_client,
+    user,
+):
+    other_user = UserFactory()
+
+    response = authenticated_client.post(
+        reverse("job-posting-list"),
+        {
+            "title": "Frontend Engineer",
+            "company": "Google",
+            "location": "Lyon",
+            "owner": str(other_user.id),
+        },
+        format="json",
+    )
+
+    assert response.status_code == status.HTTP_201_CREATED
+
+    created_posting = JobPosting.objects.get(pk=response.data["id"])
+
+    assert created_posting.owner.pk == user.id
+    assert created_posting.owner.pk != other_user.id
+
+
+def test_list_job_postings_returns_only_owned_postings(
+    authenticated_client,
+    user,
+):
+    own_posting = JobPostingFactory(owner=user)
+    other_posting = JobPostingFactory(owner=UserFactory())
+
+    response = authenticated_client.get(reverse("job-posting-list"))
+
+    assert response.status_code == status.HTTP_200_OK
+
+    returned_ids = {item["id"] for item in response.data["results"]}
+
+    assert str(own_posting.id) in returned_ids
+    assert str(other_posting.id) not in returned_ids
+
+
+def test_cannot_retrieve_another_users_job_posting(
+    authenticated_client,
+):
+    other_posting = JobPostingFactory(owner=UserFactory())
+
+    response = authenticated_client.get(
+        reverse("job-posting-detail", args=[other_posting.id])
+    )
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+def test_cannot_update_another_users_job_posting(
+    authenticated_client,
+):
+    other_posting = JobPostingFactory(owner=UserFactory())
+
+    response = authenticated_client.patch(
+        reverse("job-posting-detail", args=[other_posting.id]),
+        {"title": "Changed by attacker"},
+        format="json",
+    )
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    other_posting.refresh_from_db()
+    assert other_posting.title != "Changed by attacker"
+
+
+def test_cannot_delete_another_users_job_posting(
+    authenticated_client,
+):
+    other_posting = JobPostingFactory(owner=UserFactory())
+
+    response = authenticated_client.delete(
+        reverse("job-posting-detail", args=[other_posting.id])
+    )
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert JobPosting.objects.filter(pk=other_posting.id).exists()

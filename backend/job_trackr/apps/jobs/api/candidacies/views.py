@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/job_trackr/apps/jobs/api/candidacies/views.py
 
+from typing import cast
+
 from django.db.models import QuerySet
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
@@ -9,6 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from apps.jobs.api.base_viewsets import ReadAfterWriteModelViewSet
 from apps.jobs.candidacies.models import JobCandidacy
+from apps.users.models import User
 
 from .filters import JobCandidacyFilter
 from .serializers import (
@@ -61,4 +64,7 @@ class JobCandidacyViewSet(ReadAfterWriteModelViewSet[JobCandidacy]):
     ]
 
     def get_queryset(self) -> QuerySet[JobCandidacy]:
-        return JobCandidacy.objects.select_related("job_posting")
+        user = cast(User, self.request.user)
+        return JobCandidacy.objects.filter(job_posting__owner=user).select_related(
+            "job_posting"
+        )

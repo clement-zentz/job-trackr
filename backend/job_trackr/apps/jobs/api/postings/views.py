@@ -1,14 +1,17 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/job_trackr/apps/jobs/api/postings/views.py
 
+from typing import cast
+
 from django.db.models import QuerySet
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters
+from rest_framework import filters, serializers
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 
 from apps.jobs.api.base_viewsets import ReadAfterWriteModelViewSet
 from apps.jobs.postings.models import JobPosting
+from apps.users.models import User
 
 from .filters import JobPostingFilter
 from .serializers import (
@@ -63,4 +66,12 @@ class JobPostingViewSet(ReadAfterWriteModelViewSet[JobPosting]):
     ordering = ["-posted_on", "-created_at"]
 
     def get_queryset(self) -> QuerySet[JobPosting]:
-        return JobPosting.objects.select_related("candidacy")
+        user = cast(User, self.request.user)
+        return JobPosting.objects.filter(owner=user).select_related("candidacy")
+
+    def perform_create(
+        self,
+        serializer: serializers.BaseSerializer[JobPosting],
+    ) -> None:
+        user = cast(User, self.request.user)
+        serializer.save(owner=user)

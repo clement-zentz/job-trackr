@@ -10,8 +10,8 @@ pytestmark = pytest.mark.django_db
 
 
 @pytest.fixture
-def job_postings():
-    return JobPostingFactory.create_batch(30)
+def job_postings(user):
+    return JobPostingFactory.create_batch(30, owner=user)
 
 
 def test_list_job_postings_is_paginated(authenticated_client, job_postings):
@@ -48,11 +48,12 @@ def test_list_job_postings_multiple_pages(authenticated_client, job_postings):
     assert ids_page_1 != ids_page_2
 
 
-def test_page_size_is_capped(authenticated_client):
+def test_page_size_is_capped(authenticated_client, user):
     url = reverse("job-posting-list")
 
     JobPostingFactory.create_batch(
         130,  # more than 100
+        owner=user,
     )
 
     response = authenticated_client.get(url, {"page_size": 1000})
