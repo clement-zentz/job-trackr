@@ -35,9 +35,9 @@ reset-compose:
 prune-global:
 	./scripts/prune_global_docker.sh
 
-APP ?= backend
+SERVICE ?= backend
 bash:
-	$(COMPOSE_DEV) exec $(APP) bash
+	$(COMPOSE_DEV) exec $(SERVICE) bash
 
 USER_DB ?= dev_user
 DATABASE ?= dev_database
