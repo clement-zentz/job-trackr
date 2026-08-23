@@ -109,6 +109,7 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = [
   "apps.jobs.demo_data.*",
+  "apps.users.demo_data.*",
   "apps.jobs.management.commands.seed_demo_jobs",
 ]
 disable_error_code = ["no-untyped-call"]
@@ -118,7 +119,8 @@ disable_error_code = ["no-untyped-call"]
 extend_exclude = [
   ".*/migrations/.*",
   ".*/tests/.*",
-  "job_trackr/apps/jobs/demo_data/.*"
+  "job_trackr/apps/jobs/demo_data/.*",
+  "job_trackr/apps/users/demo_data/.*"
 ]
 
 known_first_party = [

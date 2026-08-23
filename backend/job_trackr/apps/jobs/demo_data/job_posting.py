@@ -3,25 +3,44 @@
 
 import random
 
-from factory.declarations import Iterator, LazyAttribute, LazyFunction, Sequence
+from factory.declarations import (
+    Iterator,
+    LazyAttribute,
+    LazyFunction,
+    Sequence,
+    SubFactory,
+)
 from factory.django import DjangoModelFactory
 from factory.faker import Faker
 
+from apps.common.demo_data.constants import (
+    COMPANIES,
+    JOB_TITLES,
+    LOCATIONS,
+)
 from apps.jobs.postings.choices import EmploymentType, Platforms, WorkMode
 from apps.jobs.postings.models import JobPosting
+from apps.users.demo_data.user import DemoUserFactory
+
+
+def generate_salary() -> str:
+    salary = random.randrange(55, 130, 5)
+    return f"{salary}k € / year"
 
 
 class DemoJobPostingFactory(DjangoModelFactory[JobPosting]):
     class Meta:
         model = JobPosting
 
-    title = Faker("job")
-    company = Faker("company")
-    location = Faker("city")
+    owner = SubFactory(DemoUserFactory)
+
+    title = Iterator(JOB_TITLES)
+    company = Iterator(COMPANIES)
+    location = Iterator(LOCATIONS)
 
     url = Sequence(lambda n: f"https://example.com/jobs/{n}")
 
-    salary = LazyFunction(lambda: f"{random.randrange(55, 130, 5)}k € / year")
+    salary = LazyFunction(generate_salary)
 
     description = LazyAttribute(
         lambda obj: (
@@ -40,8 +59,6 @@ class DemoJobPostingFactory(DjangoModelFactory[JobPosting]):
         end_date="today",
     )
 
-    platform = Iterator([choice for choice, _label in Platforms.choices])
-
-    employment_type = Iterator([choice for choice, _label in EmploymentType.choices])
-
-    work_mode = Iterator([choice for choice, _label in WorkMode.choices])
+    platform = Iterator(Platforms.values)
+    employment_type = Iterator(EmploymentType.values)
+    work_mode = Iterator(WorkMode.values)
