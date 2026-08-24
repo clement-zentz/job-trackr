@@ -13,6 +13,7 @@ from .models import JobCandidacy
 class JobCandidacyAdmin(admin.ModelAdmin[JobCandidacy]):
     list_display = (
         "short_job_candidacy",
+        "owner",
         "job_posting_link",
         "status",
         "applied_on",
@@ -21,14 +22,19 @@ class JobCandidacyAdmin(admin.ModelAdmin[JobCandidacy]):
 
     list_display_links = ("short_job_candidacy",)
 
-    list_select_related = ("job_posting",)
+    list_select_related = (
+        "job_posting",
+        "job_posting__owner",
+    )
 
     list_filter = (
+        "job_posting__owner",
         "status",
         "applied_on",
     )
 
     search_fields = (
+        "job_posting__owner__email",
         "job_posting__title",
         "job_posting__company",
         "job_posting__location",
@@ -40,13 +46,21 @@ class JobCandidacyAdmin(admin.ModelAdmin[JobCandidacy]):
     date_hierarchy = "applied_on"
 
     readonly_fields = (
+        "id",
+        "owner",
         "created_at",
         "updated_at",
     )
 
     fieldsets = (
         (
-            None,
+            "Ownership",
+            {
+                "fields": ("owner",),
+            },
+        ),
+        (
+            "Candidacy",
             {
                 "fields": (
                     "job_posting",
@@ -60,6 +74,7 @@ class JobCandidacyAdmin(admin.ModelAdmin[JobCandidacy]):
             "Metadata",
             {
                 "fields": (
+                    "id",
                     "created_at",
                     "updated_at",
                 ),
@@ -72,6 +87,10 @@ class JobCandidacyAdmin(admin.ModelAdmin[JobCandidacy]):
     def short_job_candidacy(self, obj: JobCandidacy) -> str:
         title = Truncator(obj.job_posting.title).chars(60)
         return f"{title} — {obj.status_label()}"
+
+    @admin.display(description="Owner", ordering="job_posting__owner__email")
+    def owner(self, obj: JobCandidacy) -> str:
+        return str(obj.job_posting.owner)
 
     @admin.display(description="Job Posting", ordering="job_posting__company")
     def job_posting_link(self, obj: JobCandidacy) -> str:

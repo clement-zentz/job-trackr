@@ -3,7 +3,7 @@
 
 from django.contrib import admin
 
-from apps.jobs.postings.models import JobPosting
+from .models import JobPosting
 
 
 @admin.register(JobPosting)
@@ -11,6 +11,7 @@ class JobPostingAdmin(admin.ModelAdmin[JobPosting]):
     list_display = (
         "title",
         "company",
+        "owner",
         "location",
         "platform",
         "employment_type",
@@ -22,6 +23,7 @@ class JobPostingAdmin(admin.ModelAdmin[JobPosting]):
     )
 
     list_filter = (
+        "owner",
         "platform",
         "employment_type",
         "work_mode",
@@ -38,9 +40,12 @@ class JobPostingAdmin(admin.ModelAdmin[JobPosting]):
         "url",
         "description",
         "salary",
+        "owner__email",
     )
 
     ordering = ("-posted_on", "-created_at")
+
+    list_select_related = ("owner",)
 
     readonly_fields = (
         "id",
@@ -49,6 +54,12 @@ class JobPostingAdmin(admin.ModelAdmin[JobPosting]):
     )
 
     fieldsets = (
+        (
+            "Ownership",
+            {
+                "fields": ("owner",),
+            },
+        ),
         (
             "Job information",
             {
