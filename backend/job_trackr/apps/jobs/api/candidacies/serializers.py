@@ -3,6 +3,7 @@
 
 from typing import Any, cast
 
+from django.db import IntegrityError, transaction
 from django.utils.text import Truncator
 from rest_framework import serializers
 
@@ -114,3 +115,12 @@ class JobCandidacyWriteSerializer(serializers.ModelSerializer[JobCandidacy]):
             )
 
         return job_posting
+
+    def create(self, validated_data: dict[str, Any]) -> JobCandidacy:
+        try:
+            with transaction.atomic():
+                return super().create(validated_data)
+        except IntegrityError as exc:
+            raise serializers.ValidationError(
+                {"job_posting": ["A candidacy already exists for this job posting."]}
+            ) from exc
