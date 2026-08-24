@@ -87,18 +87,24 @@ class Command(BaseCommand):
                 "Candidacies count cannot be greater than postings count."
             )
 
-        demo_users = User.objects.filter(username__startswith=DEMO_USERNAME_PREFIX)
+        demo_users = [
+            user
+            for user in User.objects.filter(username__startswith=DEMO_USERNAME_PREFIX)
+            if user.username.removeprefix(DEMO_USERNAME_PREFIX).isdigit()
+        ]
+        demo_user_ids = [user.pk for user in demo_users]
+        demo_users_queryset = User.objects.filter(pk__in=demo_user_ids)
 
         if reset:
-            deleted_users = demo_users.count()
-            demo_users.delete()
+            deleted_users = demo_users_queryset.count()
+            demo_users_queryset.delete()
 
             if deleted_users:
                 self.stdout.write(
                     f"Deleted {deleted_users} existing demo users and their data."
                 )
 
-        elif demo_users.exists():
+        elif demo_users_queryset.exists():
             raise CommandError(
                 "Demo data already exists. Run the command with --reset to replace it."
             )
