@@ -3,6 +3,7 @@
 
 import pytest
 from django.conf import settings
+from django.core.cache import cache
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
@@ -10,6 +11,11 @@ from rest_framework.test import APIClient
 from apps.users.models import User
 
 pytestmark = pytest.mark.django_db
+
+
+@pytest.fixture(autouse=True)
+def clear_cache():
+    cache.clear()
 
 
 @pytest.fixture
@@ -191,3 +197,35 @@ def test_reverse_auth_urls():
     assert reverse("auth-login") == "/api/v1/auth/login/"
     assert reverse("auth-logout") == "/api/v1/auth/logout/"
     assert reverse("auth-me") == "/api/v1/auth/me/"
+
+
+def test_login_throttles_repeated_attempts(
+    csrf_client: APIClient,
+    user: User,
+):
+    csrf_token = get_csrf_token(csrf_client)
+
+    for _ in range(5):
+        response = csrf_client.post(
+            reverse("auth-login"),
+            {
+                "username": user.username,
+                "password": "wrong-password",
+            },
+            format="json",
+            HTTP_X_CSRFTOKEN=csrf_token,
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    response = csrf_client.post(
+        reverse("auth-login"),
+        {
+            "username": user.username,
+            "password": "wrong-password",
+        },
+        format="json",
+        HTTP_X_CSRFTOKEN=csrf_token,
+    )
+
+    assert response.status_code == status.HTTP_429_TOO_MANY_REQUESTS

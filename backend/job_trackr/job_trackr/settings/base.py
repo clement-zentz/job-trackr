@@ -125,4 +125,8 @@ REST_FRAMEWORK = {
     # `PAGE_SIZE` is kept for DRF compatibility but is overridden by
     # DefaultPagination.page_size.
     "PAGE_SIZE": 20,
+    # Throttle login attempts to reduce credential-guessing abuse.
+    "DEFAULT_THROTTLE_RATES": {
+        "login": "5/min",
+    },
 }
