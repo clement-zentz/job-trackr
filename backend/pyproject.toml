@@ -13,6 +13,7 @@ dependencies = [
     "django-filter>=25.2",
     "django-stubs-ext>=6.0.3",
     "django-environ>=0.13.0",
+    "django-allauth[headless,headless-spec]>=65.19.1,<66",
 ]
 
 [dependency-groups]
@@ -129,4 +130,7 @@ known_first_party = [
 ]
 
 [tool.deptry.per_rule_ignores]
-DEP002 = ["psycopg"]
+DEP002 = [
+  "psycopg",
+  "django-allauth",
+]
