@@ -22,3 +22,14 @@ DATABASES = {
 PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.MD5PasswordHasher",
 ]
+
+# --- Django-Allauth registration tests ---
+EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+
+# --- Django-Allauth headless frontend URLs (required for email verification flows) ---
+HEADLESS_FRONTEND_URLS = {
+    "account_confirm_email": "http://testserver/verify-email/{key}",
+    "account_reset_password": "http://testserver/forgot-password",
+    "account_reset_password_from_key": "http://testserver/reset-password/{key}",
+    "account_signup": "http://testserver/register",
+}

@@ -35,6 +35,10 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # Django Allauth
+    "allauth",
+    "allauth.account",
+    "allauth.headless",
     # Filter
     "django_filters",
     # DRF
@@ -46,12 +50,37 @@ INSTALLED_APPS = [
 
 AUTH_USER_MODEL = "users.User"
 
+# --- Django Allauth settings ---
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
+
+HEADLESS_ONLY = True
+HEADLESS_CLIENTS = ("browser",)
+
+ACCOUNT_LOGIN_METHODS = {"username"}
+
+ACCOUNT_SIGNUP_FIELDS = [
+    "username*",
+    "email*",
+    "password1*",
+    "password2*",
+]
+
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+# --------------------------------
+
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    # --- Django Allauth Middleware ---
+    "allauth.account.middleware.AccountMiddleware",
+    # ---------------------------------
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -125,4 +154,8 @@ REST_FRAMEWORK = {
     # `PAGE_SIZE` is kept for DRF compatibility but is overridden by
     # DefaultPagination.page_size.
     "PAGE_SIZE": 20,
+    # --- Authentication ---
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+    ],
 }

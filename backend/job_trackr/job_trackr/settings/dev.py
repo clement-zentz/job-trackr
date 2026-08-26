@@ -39,3 +39,15 @@ DATABASES = {
 }
 
 CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS")
+
+# --- Django-Allauth registration ---
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+HEADLESS_FRONTEND_URLS = {
+    "account_confirm_email": "http://localhost:5173/verify-email/{key}",
+    "account_reset_password": "http://localhost:5173/forgot-password",
+    "account_reset_password_from_key": "http://localhost:5173/reset-password/{key}",
+    "account_signup": "http://localhost:5173/register",
+}
+
+HEADLESS_SERVE_SPECIFICATION = True
