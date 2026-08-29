@@ -8,7 +8,7 @@ import {
   InputField,
   SelectField,
   TextareaField,
-} from "@/features/jobs/components/form";
+} from "@/components/form";
 
 import {
   type EmploymentType,

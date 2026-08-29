@@ -3,13 +3,9 @@
 
 import { type SubmitEventHandler, useState } from "react";
 
+import { InputField, SelectField, TextareaField } from "@/components/form";
 import { statusChoices } from "@/features/jobs/candidacies/choices";
 import type { JobCandidacyFormValues } from "@/features/jobs/candidacies/types";
-import {
-  InputField,
-  SelectField,
-  TextareaField,
-} from "@/features/jobs/components/form";
 
 const formClassName = `
   space-y-6 rounded-lg border border-slate-200 bg-white p-6 shadow-sm
