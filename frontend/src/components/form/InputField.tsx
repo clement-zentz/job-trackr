@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/components/form/InputField.tsx
 
+import type { ComponentProps } from "react";
+
 import {
   fieldClassName,
   fieldWrapperClassName,
@@ -13,6 +15,7 @@ export type InputFieldProps = {
   value: string;
   type?: "text" | "url" | "number" | "email" | "password" | "date";
   placeholder?: string;
+  autoComplete?: ComponentProps<"input">["autoComplete"];
   disabled?: boolean;
   required?: boolean;
   onChange: (value: string) => void;
@@ -24,6 +27,7 @@ export function InputField({
   value,
   type = "text",
   placeholder,
+  autoComplete,
   required = false,
   disabled = false,
   onChange,
@@ -41,6 +45,7 @@ export function InputField({
         placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
         required={required}
+        autoComplete={autoComplete}
         disabled={disabled}
       />
     </div>
