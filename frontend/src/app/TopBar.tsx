@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/app/TopBar.tsx
 
+import { LogoutButton } from "@/features/auth/components/form/LogoutButton";
+
 export function TopBar() {
   return (
     <header className="flex h-14 items-center justify-between border-b bg-white px-4">
@@ -11,6 +13,8 @@ export function TopBar() {
         <button className="rounded bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700">
           + Action
         </button>
+
+        <LogoutButton />
       </div>
     </header>
   );
