@@ -3,6 +3,7 @@
 
 import { Link } from "react-router-dom";
 
+import { AuthLayout } from "../components/AuthLayout";
 import { AuthPageHeader } from "../components/AuthPageHeader";
 import { SignupForm } from "../components/form/SignupForm";
 import { useSignup } from "../hooks/useSignup";
@@ -19,7 +20,7 @@ export function SignupPage() {
     const isAuthenticated = signupMutation.data.meta.is_authenticated;
 
     return (
-      <>
+      <AuthLayout>
         <AuthPageHeader
           title="Account created"
           description={
@@ -37,12 +38,12 @@ export function SignupPage() {
             {isAuthenticated ? "Continue to dashboard" : "Continue to login"}
           </Link>
         </div>
-      </>
+      </AuthLayout>
     );
   }
 
   return (
-    <>
+    <AuthLayout>
       <AuthPageHeader
         title="Create your account"
         description="Enter your details to get started."
@@ -70,6 +71,6 @@ export function SignupPage() {
           Log in
         </Link>
       </div>
-    </>
+    </AuthLayout>
   );
 }

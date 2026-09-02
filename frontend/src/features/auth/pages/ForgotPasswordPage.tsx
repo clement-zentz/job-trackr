@@ -3,6 +3,7 @@
 
 import { Link } from "react-router-dom";
 
+import { AuthLayout } from "../components/AuthLayout";
 import { AuthPageHeader } from "../components/AuthPageHeader";
 import { ForgotPasswordForm } from "../components/form/ForgotPasswordForm";
 import { useRequestPasswordReset } from "../hooks/useRequestPasswordReset";
@@ -15,7 +16,7 @@ export function ForgotPasswordPage() {
   };
 
   return (
-    <>
+    <AuthLayout>
       <AuthPageHeader
         title="Forgot your password?"
         description="Enter your email address and we'll send you a password reset link."
@@ -44,6 +45,6 @@ export function ForgotPasswordPage() {
           Back to login
         </Link>
       </div>
-    </>
+    </AuthLayout>
   );
 }

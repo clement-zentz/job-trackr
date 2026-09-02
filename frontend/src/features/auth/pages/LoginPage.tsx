@@ -3,6 +3,7 @@
 
 import { Link, Navigate } from "react-router-dom";
 
+import { AuthLayout } from "../components/AuthLayout";
 import { AuthPageHeader } from "../components/AuthPageHeader";
 import { LoginForm } from "../components/form/LoginForm";
 import { useLogin } from "../hooks/useLogin";
@@ -23,7 +24,7 @@ export function LoginPage() {
     loginMutation.isSuccess && !loginMutation.data.meta.is_authenticated;
 
   return (
-    <>
+    <AuthLayout>
       <AuthPageHeader
         title="Sign in"
         description="Enter your credentials to access your account."
@@ -67,6 +68,6 @@ export function LoginPage() {
           </Link>
         </div>
       </div>
-    </>
+    </AuthLayout>
   );
 }
