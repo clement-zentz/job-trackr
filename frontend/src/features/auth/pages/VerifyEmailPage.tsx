@@ -4,6 +4,7 @@
 import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 
+import { AuthLayout } from "../components/AuthLayout";
 import { AuthPageHeader } from "../components/AuthPageHeader";
 import { useVerifyEmail } from "../hooks/useVerifyEmail";
 
@@ -27,7 +28,7 @@ export function VerifyEmailPage() {
 
   if (!key) {
     return (
-      <>
+      <AuthLayout>
         <AuthPageHeader
           title="Invalid verification link"
           description="The email verification link is missing its verification key."
@@ -36,13 +37,13 @@ export function VerifyEmailPage() {
         <p className="text-center text-sm text-slate-500">
           Please use the verification link from your email.
         </p>
-      </>
+      </AuthLayout>
     );
   }
 
   if (isError) {
     return (
-      <>
+      <AuthLayout>
         <AuthPageHeader
           title="Email verification failed"
           description="We could not verify your email address."
@@ -51,7 +52,7 @@ export function VerifyEmailPage() {
         <p className="text-center text-sm text-slate-500">
           The verification link may be invalid or expired.
         </p>
-      </>
+      </AuthLayout>
     );
   }
 
@@ -59,7 +60,7 @@ export function VerifyEmailPage() {
     const isAuthenticated = data.meta.is_authenticated;
 
     return (
-      <>
+      <AuthLayout>
         <AuthPageHeader
           title="Email verified"
           description="Your email address has been successfully verified."
@@ -73,18 +74,18 @@ export function VerifyEmailPage() {
             {isAuthenticated ? "Continue to dashboard" : "Continue to login"}
           </Link>
         </div>
-      </>
+      </AuthLayout>
     );
   }
 
   return (
-    <>
+    <AuthLayout>
       <AuthPageHeader
         title="Verifying your email"
         description="Please wait while we verify your email address."
       />
 
       <p className="text-center text-sm text-slate-500">Verifying email...</p>
-    </>
+    </AuthLayout>
   );
 }

@@ -3,6 +3,7 @@
 
 import { Link, useParams } from "react-router-dom";
 
+import { AuthLayout } from "../components/AuthLayout";
 import { AuthPageHeader } from "../components/AuthPageHeader";
 import { ResetPasswordForm } from "../components/form/ResetPasswordForm";
 import { useResetPassword } from "../hooks/useResetPassword";
@@ -18,7 +19,7 @@ export function ResetPasswordPage() {
 
   if (!key) {
     return (
-      <>
+      <AuthLayout>
         <AuthPageHeader
           title="Invalid password reset link"
           description="The password reset link is missing its reset key."
@@ -36,7 +37,7 @@ export function ResetPasswordPage() {
             Request a new reset link
           </Link>
         </div>
-      </>
+      </AuthLayout>
     );
   }
 
@@ -44,7 +45,7 @@ export function ResetPasswordPage() {
     const isAuthenticated = resetPasswordMutation.data.meta.is_authenticated;
 
     return (
-      <>
+      <AuthLayout>
         <AuthPageHeader
           title="Password reset"
           description="Your password has been successfully reset."
@@ -58,12 +59,12 @@ export function ResetPasswordPage() {
             {isAuthenticated ? "Continue to dashboard" : "Continue to login"}
           </Link>
         </div>
-      </>
+      </AuthLayout>
     );
   }
 
   return (
-    <>
+    <AuthLayout>
       <AuthPageHeader
         title="Reset your password"
         description="Enter a new password for your account."
@@ -79,6 +80,6 @@ export function ResetPasswordPage() {
             : undefined
         }
       />
-    </>
+    </AuthLayout>
   );
 }
