@@ -10,7 +10,11 @@ import {
   createLoginPayload,
   createUnauthenticatedAuthResponse,
 } from "@/tests/factories/auth";
-import { createTestQueryClient, createWrapperWithClient } from "@/tests/utils";
+import {
+  createDeferred,
+  createTestQueryClient,
+  createWrapperWithClient,
+} from "@/tests/utils";
 
 import { login } from "../../api/authApi";
 import { authKeys } from "../../keys";
@@ -117,5 +121,40 @@ describe("useLogin", () => {
     );
 
     expect(queryClient.getQueryData(authKeys.session())).toEqual(existingUser);
+  });
+
+  it("prevents an in-flight session query from overwriting the authenticated user", async () => {
+    const queryClient = createTestQueryClient();
+    const payload = createLoginPayload();
+    const response = createAuthenticatedAuthResponse();
+    const deferredSession = createDeferred<null>();
+
+    const sessionQueryPromise = queryClient
+      .fetchQuery({
+        queryKey: authKeys.session(),
+        queryFn: () => deferredSession.promise,
+      })
+      .catch(() => undefined);
+
+    expect(
+      queryClient.isFetching({
+        queryKey: authKeys.session(),
+      }),
+    ).toBe(1);
+
+    mockedLogin.mockResolvedValueOnce(response);
+
+    const { result } = renderHook(() => useLogin(), {
+      wrapper: createWrapperWithClient(queryClient),
+    });
+
+    await result.current.mutateAsync(payload);
+
+    deferredSession.resolve(null);
+    await sessionQueryPromise;
+
+    expect(queryClient.getQueryData(authKeys.session())).toEqual(
+      response.data.user,
+    );
   });
 });
