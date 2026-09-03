@@ -95,4 +95,22 @@ describe("useSession", () => {
     expect(mockedGetCurrentSession).toHaveBeenCalledOnce();
     expect(result.current.error).toBe(error);
   });
+
+  it("forwards the query abort signal to the session request", async () => {
+    mockedGetCurrentSession.mockResolvedValueOnce(
+      createAuthenticatedAuthResponse(),
+    );
+
+    const { result } = renderHook(() => useSession(), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
+
+    expect(mockedGetCurrentSession).toHaveBeenCalledWith(
+      expect.any(AbortSignal),
+    );
+  });
 });

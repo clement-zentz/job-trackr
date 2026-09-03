@@ -80,6 +80,24 @@ describe("getCurrentSession", () => {
 
     await expect(getCurrentSession()).rejects.toBe(error);
   });
+
+  it("forwards the abort signal when getting the current session", async () => {
+    const controller = new AbortController();
+    const response = createAuthenticatedAuthResponse();
+
+    mockedApiGet.mockResolvedValueOnce({
+      data: response,
+    });
+
+    await getCurrentSession(controller.signal);
+
+    expect(mockedApiGet).toHaveBeenCalledWith(
+      "/_allauth/browser/v1/auth/session",
+      expect.objectContaining({
+        signal: controller.signal,
+      }),
+    );
+  });
 });
 
 describe("login", () => {

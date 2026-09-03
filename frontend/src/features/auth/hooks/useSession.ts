@@ -9,8 +9,8 @@ import { authKeys } from "../keys";
 export const useSession = () =>
   useQuery({
     queryKey: authKeys.session(),
-    queryFn: async () => {
-      const response = await getCurrentSession();
+    queryFn: async ({ signal }) => {
+      const response = await getCurrentSession(signal);
 
       if (!response.meta.is_authenticated) {
         return null;
