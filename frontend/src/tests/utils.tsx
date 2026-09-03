@@ -21,9 +21,14 @@ export function createTestQueryClient() {
 export function renderWithQueryClient(ui: ReactElement) {
   const client = createTestQueryClient();
 
-  return render(
+  const renderResult = render(
     <QueryClientProvider client={client}>{ui}</QueryClientProvider>,
   );
+
+  return {
+    ...renderResult,
+    queryClient: client,
+  };
 }
 
 export function createWrapper() {
