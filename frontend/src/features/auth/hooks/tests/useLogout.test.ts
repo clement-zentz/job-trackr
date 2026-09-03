@@ -9,7 +9,11 @@ import {
   createAuthUser,
   createUnauthenticatedAuthResponse,
 } from "@/tests/factories/auth";
-import { createTestQueryClient, createWrapperWithClient } from "@/tests/utils";
+import {
+  createDeferred,
+  createTestQueryClient,
+  createWrapperWithClient,
+} from "@/tests/utils";
 
 import { logout } from "../../api/authApi";
 import { authKeys } from "../../keys";
@@ -125,5 +129,40 @@ describe("useLogout", () => {
     expect(queryClient.getQueryData(jobPostingsKeys.all)).toEqual(
       cachedJobPostings,
     );
+  });
+
+  it("prevents an in-flight session query from restoring the authenticated user after logout", async () => {
+    const queryClient = createTestQueryClient();
+    const user = createAuthUser();
+    const response = createUnauthenticatedAuthResponse({
+      status: 200,
+    });
+    const deferredSession = createDeferred<typeof user>();
+
+    const sessionQueryPromise = queryClient
+      .fetchQuery({
+        queryKey: authKeys.session(),
+        queryFn: () => deferredSession.promise,
+      })
+      .catch(() => undefined);
+
+    expect(
+      queryClient.isFetching({
+        queryKey: authKeys.session(),
+      }),
+    ).toBe(1);
+
+    mockedLogout.mockResolvedValueOnce(response);
+
+    const { result } = renderHook(() => useLogout(), {
+      wrapper: createWrapperWithClient(queryClient),
+    });
+
+    await result.current.mutateAsync();
+
+    deferredSession.resolve(user);
+    await sessionQueryPromise;
+
+    expect(queryClient.getQueryData(authKeys.session())).toBeNull();
   });
 });

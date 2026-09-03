@@ -12,7 +12,9 @@ export const useLogout = () => {
   return useMutation({
     mutationFn: () => logout(),
 
-    onSuccess: () => {
+    onSuccess: async () => {
+      await queryClient.cancelQueries({ queryKey: authKeys.session() });
+
       queryClient.setQueryData(authKeys.session(), null);
 
       queryClient.removeQueries({

@@ -13,7 +13,9 @@ export const useLogin = () => {
   return useMutation({
     mutationFn: (payload: LoginPayload) => login(payload),
 
-    onSuccess: (response) => {
+    onSuccess: async (response) => {
+      await queryClient.cancelQueries({ queryKey: authKeys.session() });
+
       const user = response.meta.is_authenticated
         ? (response.data.user ?? null)
         : null;

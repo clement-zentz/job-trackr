@@ -12,7 +12,9 @@ export const useVerifyEmail = () => {
   return useMutation({
     mutationFn: (key: string) => verifyEmail(key),
 
-    onSuccess: (response) => {
+    onSuccess: async (response) => {
+      await queryClient.cancelQueries({ queryKey: authKeys.session() });
+
       const user = response.meta.is_authenticated
         ? (response.data.user ?? null)
         : null;
