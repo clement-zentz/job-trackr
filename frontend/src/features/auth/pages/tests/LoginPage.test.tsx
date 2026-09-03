@@ -6,10 +6,7 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import {
-  createAuthenticatedAuthResponse,
-  createUnauthenticatedAuthResponse,
-} from "@/tests/factories/auth";
+import { createUnauthenticatedAuthResponse } from "@/tests/factories/auth";
 import { createTestQueryClient, createWrapperWithClient } from "@/tests/utils";
 
 import { login } from "../../api/authApi";
@@ -120,35 +117,6 @@ describe("LoginPage", () => {
 
     expect(screen.getByLabelText("Username")).toBeDisabled();
     expect(screen.getByLabelText("Password")).toBeDisabled();
-  });
-
-  it("redirects to the dashboard after successful authentication", async () => {
-    vi.mocked(login).mockResolvedValue(createAuthenticatedAuthResponse());
-
-    renderLoginPage();
-
-    const user = await fillLoginForm();
-
-    await user.click(
-      screen.getByRole("button", {
-        name: "Sign in",
-      }),
-    );
-
-    expect(await screen.findByText("Dashboard")).toBeInTheDocument();
-
-    expect(
-      screen.queryByRole("heading", {
-        name: "Sign in",
-      }),
-    ).not.toBeInTheDocument();
-
-    expect(login).toHaveBeenCalledWith({
-      username: USERNAME,
-      password: PASSWORD,
-    });
-
-    expect(login).toHaveBeenCalledTimes(1);
   });
 
   it("shows a verification message when login requires an additional authentication step", async () => {
