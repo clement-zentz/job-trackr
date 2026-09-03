@@ -15,8 +15,11 @@ const AUTH_ENDPOINT = "/_allauth/browser/v1/auth";
 const acceptAuthenticationStatus = (status: number) =>
   status === 200 || status === 401;
 
-export async function getCurrentSession(): Promise<AuthResponse> {
+export async function getCurrentSession(
+  signal?: AbortSignal,
+): Promise<AuthResponse> {
   const response = await api.get<AuthResponse>(`${AUTH_ENDPOINT}/session`, {
+    signal,
     validateStatus: acceptAuthenticationStatus,
   });
 
