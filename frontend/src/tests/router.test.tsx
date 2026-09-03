@@ -1,25 +1,33 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/tests/router.test.tsx
 
-import { act, cleanup, screen } from "@testing-library/react";
+import { act, cleanup, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { RouterProvider } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { getCurrentSession, verifyEmail } from "@/features/auth/api/authApi";
+import {
+  getCurrentSession,
+  login,
+  verifyEmail,
+} from "@/features/auth/api/authApi";
 import { router } from "@/router";
 import { renderWithQueryClient } from "@/tests/utils";
 
 import {
   createAuthenticatedAuthResponse,
+  createLoginPayload,
   createUnauthenticatedAuthResponse,
 } from "./factories/auth";
 
 vi.mock("@/features/auth/api/authApi", () => ({
   getCurrentSession: vi.fn(),
+  login: vi.fn(),
   verifyEmail: vi.fn(),
 }));
 
 const mockedGetCurrentSession = vi.mocked(getCurrentSession);
+const mockedLogin = vi.mocked(login);
 const mockedVerifyEmail = vi.mocked(verifyEmail);
 
 async function renderRouterAt(path: string) {
@@ -33,6 +41,7 @@ async function renderRouterAt(path: string) {
 describe("router", () => {
   beforeEach(() => {
     mockedGetCurrentSession.mockReset();
+    mockedLogin.mockReset();
     mockedVerifyEmail.mockReset();
 
     mockedGetCurrentSession.mockResolvedValue(
@@ -143,6 +152,57 @@ describe("router", () => {
     ).toBeInTheDocument();
 
     expect(router.state.location.pathname).toBe("/login");
+  });
+
+  it("returns the user to the protected route after successful login", async () => {
+    const loginPayload = createLoginPayload();
+    const authenticatedAuthResponse = createAuthenticatedAuthResponse();
+    const unauthenticatedAuthResponse = createUnauthenticatedAuthResponse();
+
+    let isAuthenticated = false;
+
+    mockedGetCurrentSession.mockImplementation(() =>
+      Promise.resolve(
+        isAuthenticated
+          ? authenticatedAuthResponse
+          : unauthenticatedAuthResponse,
+      ),
+    );
+
+    mockedLogin.mockImplementation(async () => {
+      isAuthenticated = true;
+
+      return authenticatedAuthResponse;
+    });
+
+    await renderRouterAt("/settings");
+
+    expect(
+      await screen.findByRole("heading", {
+        name: "Sign in",
+      }),
+    ).toBeInTheDocument();
+
+    expect(router.state.location.pathname).toBe("/login");
+
+    const user = userEvent.setup();
+
+    await user.type(screen.getByLabelText("Username"), loginPayload.username);
+    await user.type(screen.getByLabelText("Password"), loginPayload.password);
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "Sign in",
+      }),
+    );
+
+    const main = await screen.findByRole("main");
+
+    expect(within(main).getByText("Settings")).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe("/settings");
+
+    expect(mockedLogin).toHaveBeenCalledWith(loginPayload);
+    expect(mockedLogin).toHaveBeenCalledTimes(1);
   });
 
   it("registers the job candidacies routes", async () => {

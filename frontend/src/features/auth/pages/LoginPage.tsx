@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/features/auth/pages/LoginPage.tsx
 
-import { Link, Navigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import { AuthLayout } from "../components/AuthLayout";
 import { AuthPageHeader } from "../components/AuthPageHeader";
@@ -15,10 +15,6 @@ export function LoginPage() {
   const handleSubmit = (payload: LoginPayload) => {
     loginMutation.mutate(payload);
   };
-
-  if (loginMutation.isSuccess && loginMutation.data.meta.is_authenticated) {
-    return <Navigate to="/" replace />;
-  }
 
   const requiresAdditionalAuthentication =
     loginMutation.isSuccess && !loginMutation.data.meta.is_authenticated;
