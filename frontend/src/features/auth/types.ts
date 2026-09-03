@@ -5,7 +5,7 @@ export interface AuthUser {
   id: number;
   display: string;
   username: string;
-  email: string;
+  email?: string;
   has_usable_password: boolean;
 }
 
