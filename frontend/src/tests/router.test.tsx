@@ -284,4 +284,63 @@ describe("router", () => {
     expect(queryClient.getQueryData(authKeys.session())).toBeNull();
     expect(queryClient.getQueryData(jobPostingsKey)).toBeUndefined();
   });
+
+  it("shows a retry state when the initial session request fails", async () => {
+    const error = new Error("Session request failed");
+
+    mockedGetCurrentSession.mockRejectedValueOnce(error);
+
+    await renderRouterAt("/settings");
+
+    expect(
+      await screen.findByText(
+        "Unable to determine your authentication status.",
+      ),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole("button", {
+        name: "Try again",
+      }),
+    ).toBeInTheDocument();
+
+    expect(router.state.location.pathname).toBe("/settings");
+
+    expect(
+      screen.queryByRole("heading", {
+        name: "Sign in",
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("retries the session request after a bootstrap failure", async () => {
+    mockedGetCurrentSession
+      .mockRejectedValueOnce(new Error("Session request failed"))
+      .mockResolvedValueOnce(createAuthenticatedAuthResponse());
+
+    await renderRouterAt("/settings");
+
+    expect(
+      await screen.findByText(
+        "Unable to determine your authentication status.",
+      ),
+    ).toBeInTheDocument();
+
+    const user = userEvent.setup();
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "Try again",
+      }),
+    );
+
+    expect(
+      await screen.findByRole("link", {
+        name: "Settings",
+        current: "page",
+      }),
+    ).toBeInTheDocument();
+
+    expect(router.state.location.pathname).toBe("/settings");
+  });
 });
