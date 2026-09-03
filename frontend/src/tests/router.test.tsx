@@ -11,6 +11,8 @@ import {
   login,
   verifyEmail,
 } from "@/features/auth/api/authApi";
+import { authKeys } from "@/features/auth/keys";
+import { jobPostingsKeys } from "@/features/jobs/postings/keys";
 import { router } from "@/router";
 import { renderWithQueryClient } from "@/tests/utils";
 
@@ -235,5 +237,51 @@ describe("router", () => {
         name: "Invalid password reset link",
       }),
     ).toBeInTheDocument();
+  });
+
+  it("clears non-auth queries when the authenticated session expires", async () => {
+    const jobPostingsKey = jobPostingsKeys.list({
+      page: 1,
+      page_size: 10,
+    });
+    const cachedJobPostings = ["cached job posting"];
+
+    mockedGetCurrentSession.mockResolvedValue(
+      createAuthenticatedAuthResponse(),
+    );
+
+    const { queryClient } = await renderRouterAt("/settings");
+
+    expect(
+      await screen.findByRole("link", {
+        name: "Settings",
+        current: "page",
+      }),
+    ).toBeInTheDocument();
+
+    queryClient.setQueryData(jobPostingsKey, cachedJobPostings);
+
+    expect(queryClient.getQueryData(jobPostingsKey)).toEqual(cachedJobPostings);
+
+    mockedGetCurrentSession.mockResolvedValue(
+      createUnauthenticatedAuthResponse(),
+    );
+
+    await act(async () => {
+      await queryClient.refetchQueries({
+        queryKey: authKeys.session(),
+      });
+    });
+
+    expect(
+      await screen.findByRole("heading", {
+        name: "Sign in",
+      }),
+    ).toBeInTheDocument();
+
+    expect(router.state.location.pathname).toBe("/login");
+
+    expect(queryClient.getQueryData(authKeys.session())).toBeNull();
+    expect(queryClient.getQueryData(jobPostingsKey)).toBeUndefined();
   });
 });
