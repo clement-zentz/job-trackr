@@ -70,4 +70,24 @@ describe("LogoutButton", () => {
 
     expect(mutate).not.toHaveBeenCalled();
   });
+
+  it("shows an error message when logout fails", async () => {
+    mockUseLogout.mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+      isError: true,
+    });
+
+    render(<LogoutButton />);
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Sign out failed. Please try again.",
+    );
+
+    expect(
+      screen.getByRole("button", {
+        name: "Sign out",
+      }),
+    ).toBeEnabled();
+  });
 });
