@@ -216,4 +216,24 @@ describe("router", () => {
 
     expect(router.state.location.pathname).toBe("/jobs/candidacies");
   });
+
+  it("renders the invalid verification link state when the key is missing", async () => {
+    await renderRouterAt("/verify-email");
+
+    expect(
+      await screen.findByRole("heading", {
+        name: "Invalid verification link",
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it("renders the invalid password reset link state when the key is missing", async () => {
+    await renderRouterAt("/reset-password");
+
+    expect(
+      await screen.findByRole("heading", {
+        name: "Invalid password reset link",
+      }),
+    ).toBeInTheDocument();
+  });
 });

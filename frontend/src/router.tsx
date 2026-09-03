@@ -28,11 +28,11 @@ export const router = createBrowserRouter([
         ],
       },
       {
-        path: "verify-email/:key",
+        path: "verify-email/:key?",
         element: <VerifyEmailPage />,
       },
       {
-        path: "reset-password/:key",
+        path: "reset-password/:key?",
         element: <ResetPasswordPage />,
       },
       {
