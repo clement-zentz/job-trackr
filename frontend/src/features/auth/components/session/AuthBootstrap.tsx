@@ -32,5 +32,17 @@ export function AuthBootstrap() {
     );
   }
 
+  if (session.isLoadingError) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4">
+        <p>Unable to determine your authentication status.</p>
+
+        <button type="button" onClick={() => void session.refetch()}>
+          Try again
+        </button>
+      </div>
+    );
+  }
+
   return <Outlet />;
 }
