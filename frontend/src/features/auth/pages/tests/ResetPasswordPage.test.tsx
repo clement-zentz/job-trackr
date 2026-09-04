@@ -15,6 +15,10 @@ import { createTestQueryClient, createWrapperWithClient } from "@/tests/utils";
 import { resetPassword } from "../../api/authApi";
 import { ResetPasswordPage } from "../ResetPasswordPage";
 
+export const RESET_PASSWORD_ERROR_MESSAGE =
+  "We could not reset your password. The new password may not meet the " +
+  "requirements, or the reset link may be invalid or expired.";
+
 vi.mock("../../api/authApi", () => ({
   resetPassword: vi.fn(),
 }));
@@ -221,9 +225,7 @@ describe("ResetPasswordPage", () => {
     );
 
     expect(
-      await screen.findByText(
-        "We could not reset your password. The reset link may be invalid or expired.",
-      ),
+      await screen.findByText(RESET_PASSWORD_ERROR_MESSAGE),
     ).toBeInTheDocument();
 
     expect(

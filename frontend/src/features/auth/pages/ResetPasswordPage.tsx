@@ -9,6 +9,10 @@ import { ResetPasswordForm } from "../components/form/ResetPasswordForm";
 import { useResetPassword } from "../hooks/useResetPassword";
 import type { ResetPasswordPayload } from "../types";
 
+const RESET_PASSWORD_ERROR_MESSAGE =
+  "We could not reset your password. The new password may not meet the " +
+  "requirements, or the reset link may be invalid or expired.";
+
 export function ResetPasswordPage() {
   const { key } = useParams<{ key: string }>();
   const resetPasswordMutation = useResetPassword();
@@ -76,7 +80,7 @@ export function ResetPasswordPage() {
         isPending={resetPasswordMutation.isPending}
         errorMessage={
           resetPasswordMutation.isError
-            ? "We could not reset your password. The reset link may be invalid or expired."
+            ? RESET_PASSWORD_ERROR_MESSAGE
             : undefined
         }
       />
