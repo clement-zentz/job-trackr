@@ -2,7 +2,7 @@
 // File: frontend/src/features/auth/components/session/AuthBootstrap.tsx
 
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { Outlet } from "react-router-dom";
 
 import { removeNonAuthQueries } from "../../cache";
@@ -14,7 +14,7 @@ export function AuthBootstrap() {
   const session = useSession();
   const previousUserRef = useRef<AuthUser | null | undefined>(session.data);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (
       session.isSuccess &&
       previousUserRef.current &&
