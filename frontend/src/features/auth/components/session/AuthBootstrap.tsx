@@ -15,7 +15,11 @@ export function AuthBootstrap() {
   const previousUserRef = useRef<AuthUser | null | undefined>(session.data);
 
   useEffect(() => {
-    if (session.isSuccess && previousUserRef.current && session.data === null) {
+    if (
+      session.isSuccess &&
+      previousUserRef.current &&
+      session.data?.id !== previousUserRef.current.id
+    ) {
       removeNonAuthQueries(queryClient);
     }
 
