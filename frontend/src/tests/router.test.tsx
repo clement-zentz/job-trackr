@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/tests/router.test.tsx
 
-import { act, cleanup, screen, within } from "@testing-library/react";
+import { act, cleanup, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { RouterProvider } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -18,6 +18,7 @@ import { renderWithQueryClient } from "@/tests/utils";
 
 import {
   createAuthenticatedAuthResponse,
+  createAuthUser,
   createLoginPayload,
   createUnauthenticatedAuthResponse,
 } from "./factories/auth";
@@ -340,6 +341,65 @@ describe("router", () => {
         current: "page",
       }),
     ).toBeInTheDocument();
+
+    expect(router.state.location.pathname).toBe("/settings");
+  });
+
+  it("clears non-auth queries when the authenticated user changes", async () => {
+    const userAResponse = createAuthenticatedAuthResponse({
+      data: {
+        user: createAuthUser({
+          id: 1,
+          username: "user-a",
+        }),
+      },
+    });
+    const userBResponse = createAuthenticatedAuthResponse({
+      data: {
+        user: createAuthUser({
+          id: 2,
+          username: "user-b",
+        }),
+      },
+    });
+
+    const jobPostingsKey = jobPostingsKeys.list({
+      page: 1,
+      page_size: 10,
+    });
+
+    mockedGetCurrentSession.mockResolvedValue(userAResponse);
+
+    const { queryClient } = await renderRouterAt("/settings");
+
+    expect(
+      await screen.findByRole("link", {
+        name: "Settings",
+        current: "page",
+      }),
+    ).toBeInTheDocument();
+
+    queryClient.setQueryData(jobPostingsKey, ["user A cached job"]);
+
+    expect(queryClient.getQueryData(jobPostingsKey)).toEqual([
+      "user A cached job",
+    ]);
+
+    mockedGetCurrentSession.mockResolvedValue(userBResponse);
+
+    await act(async () => {
+      await queryClient.refetchQueries({
+        queryKey: authKeys.session(),
+      });
+    });
+
+    await waitFor(() => {
+      expect(queryClient.getQueryData(jobPostingsKey)).toBeUndefined();
+    });
+
+    expect(queryClient.getQueryData(authKeys.session())).toEqual(
+      userBResponse.data.user,
+    );
 
     expect(router.state.location.pathname).toBe("/settings");
   });
