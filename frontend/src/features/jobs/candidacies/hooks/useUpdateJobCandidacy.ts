@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/features/jobs/candidacies/hooks/useUpdateJobCandidacy.ts
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
+
+import { useSessionBoundMutation } from "@/features/auth/hooks/useSessionBoundMutation";
 
 import { updateJobCandidacy } from "../api/jobCandidaciesApi";
 import { jobCandidaciesKeys } from "../keys";
@@ -15,9 +17,11 @@ interface UpdateJobCandidacyVariables {
 export function useUpdateJobCandidacy() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: ({ candidacyId, payload }: UpdateJobCandidacyVariables) =>
-      updateJobCandidacy(candidacyId, payload),
+  return useSessionBoundMutation({
+    mutationFn: (
+      { candidacyId, payload }: UpdateJobCandidacyVariables,
+      signal,
+    ) => updateJobCandidacy(candidacyId, payload, signal),
 
     onSuccess: async (updatedCandidacy) => {
       queryClient.setQueryData(

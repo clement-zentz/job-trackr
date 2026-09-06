@@ -2,31 +2,17 @@
 // File: frontend/src/features/auth/components/session/AuthBootstrap.tsx
 
 import { useQueryClient } from "@tanstack/react-query";
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect } from "react";
 import { Outlet } from "react-router-dom";
 
-import { removeNonAuthQueries } from "../../cache";
+import { subscribeToAuthSession } from "../../cache";
 import { useSession } from "../../hooks/useSession";
-import type { AuthUser } from "../../types";
 
 export function AuthBootstrap() {
   const queryClient = useQueryClient();
   const session = useSession();
-  const previousUserRef = useRef<AuthUser | null | undefined>(session.data);
 
-  useLayoutEffect(() => {
-    if (
-      session.isSuccess &&
-      previousUserRef.current &&
-      session.data?.id !== previousUserRef.current.id
-    ) {
-      removeNonAuthQueries(queryClient);
-    }
-
-    if (session.isSuccess) {
-      previousUserRef.current = session.data;
-    }
-  }, [queryClient, session.data, session.isSuccess]);
+  useLayoutEffect(() => subscribeToAuthSession(queryClient), [queryClient]);
 
   if (session.isPending) {
     return (

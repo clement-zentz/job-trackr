@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/features/jobs/candidacies/hooks/useDeleteJobCandidacy.ts
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 
+import { useSessionBoundMutation } from "@/features/auth/hooks/useSessionBoundMutation";
 import { jobPostingsKeys } from "@/features/jobs/postings/keys";
 
 import { deleteJobCandidacy } from "../api/jobCandidaciesApi";
@@ -16,9 +17,9 @@ interface DeleteJobCandidacyVariables {
 export function useDeleteJobCandidacy() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: ({ candidacyId }: DeleteJobCandidacyVariables) =>
-      deleteJobCandidacy(candidacyId),
+  return useSessionBoundMutation({
+    mutationFn: ({ candidacyId }: DeleteJobCandidacyVariables, signal) =>
+      deleteJobCandidacy(candidacyId, signal),
 
     onSuccess: async (_, { candidacyId, jobPostingId }) => {
       queryClient.removeQueries({

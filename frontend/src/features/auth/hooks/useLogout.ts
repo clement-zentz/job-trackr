@@ -4,7 +4,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { logout } from "../api/authApi";
-import { removeNonAuthQueries } from "../cache";
+import { resetSessionBoundState } from "../cache";
 import { authKeys } from "../keys";
 
 export const useLogout = () => {
@@ -18,7 +18,7 @@ export const useLogout = () => {
 
       queryClient.setQueryData(authKeys.session(), null);
 
-      removeNonAuthQueries(queryClient);
+      resetSessionBoundState(queryClient);
     },
   });
 };

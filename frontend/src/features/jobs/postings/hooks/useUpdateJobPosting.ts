@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/features/jobs/postings/hooks/useUpdateJobPosting.ts
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
+
+import { useSessionBoundMutation } from "@/features/auth/hooks/useSessionBoundMutation";
 
 import { updateJobPosting } from "../api/jobPostingsApi";
 import { jobPostingsKeys } from "../keys";
@@ -15,9 +17,9 @@ type UpdateJobPostingVariables = {
 export function useUpdateJobPosting() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: ({ id, payload }: UpdateJobPostingVariables) =>
-      updateJobPosting(id, payload),
+  return useSessionBoundMutation({
+    mutationFn: ({ id, payload }: UpdateJobPostingVariables, signal) =>
+      updateJobPosting(id, payload, signal),
 
     onSuccess: (updatedJobPosting) => {
       queryClient.invalidateQueries({ queryKey: jobPostingsKeys.lists() });

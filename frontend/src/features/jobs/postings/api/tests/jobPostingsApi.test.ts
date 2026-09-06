@@ -127,20 +127,28 @@ describe("getJobPosting", () => {
 });
 
 describe("createJobPosting", () => {
-  it("posts the payload to the job postings endpoint", async () => {
-    const payload = createJobPostingCreatePayload();
+  it.each([false, true])(
+    "posts the payload to the job postings endpoint (signal: %s)",
+    async (withSignal) => {
+      const signal = withSignal ? new AbortController().signal : undefined;
+      const payload = createJobPostingCreatePayload();
 
-    const jobPosting = createJobPostingDetailRead();
+      const jobPosting = createJobPostingDetailRead();
 
-    mockedApiPost.mockResolvedValueOnce({
-      data: jobPosting,
-    });
+      mockedApiPost.mockResolvedValueOnce({
+        data: jobPosting,
+      });
 
-    const result = await createJobPosting(payload);
+      const result = await createJobPosting(payload, signal);
 
-    expect(mockedApiPost).toHaveBeenCalledWith("/v1/jobs/postings/", payload);
-    expect(result).toEqual(jobPosting);
-  });
+      expect(mockedApiPost).toHaveBeenCalledWith(
+        "/v1/jobs/postings/",
+        payload,
+        { signal },
+      );
+      expect(result).toEqual(jobPosting);
+    },
+  );
 
   it("rejects when the API request fails", async () => {
     const payload = createJobPostingCreatePayload();
@@ -151,36 +159,43 @@ describe("createJobPosting", () => {
 
     await expect(createJobPosting(payload)).rejects.toThrow("Request failed");
 
-    expect(mockedApiPost).toHaveBeenCalledWith("/v1/jobs/postings/", payload);
+    expect(mockedApiPost).toHaveBeenCalledWith("/v1/jobs/postings/", payload, {
+      signal: undefined,
+    });
   });
 });
 
 describe("updateJobPosting", () => {
-  it("sends a patch request to the job posting detail endpoint", async () => {
-    const payload = {
-      title: "Senior Backend Engineer",
-      active_hiring: true,
-    };
+  it.each([false, true])(
+    "sends a patch request to the job posting detail endpoint (signal: %s)",
+    async (withSignal) => {
+      const signal = withSignal ? new AbortController().signal : undefined;
+      const payload = {
+        title: "Senior Backend Engineer",
+        active_hiring: true,
+      };
 
-    const jobPosting = createJobPostingDetailRead({
-      id: "1",
-      title: "Senior Backend Engineer",
-      active_hiring: true,
-    });
+      const jobPosting = createJobPostingDetailRead({
+        id: "1",
+        title: "Senior Backend Engineer",
+        active_hiring: true,
+      });
 
-    mockedApiPatch.mockResolvedValueOnce({
-      data: jobPosting,
-    });
+      mockedApiPatch.mockResolvedValueOnce({
+        data: jobPosting,
+      });
 
-    const result = await updateJobPosting("1", payload);
+      const result = await updateJobPosting("1", payload, signal);
 
-    expect(mockedApiPatch).toHaveBeenCalledTimes(1);
-    expect(mockedApiPatch).toHaveBeenCalledWith(
-      "/v1/jobs/postings/1/",
-      payload,
-    );
-    expect(result).toEqual(jobPosting);
-  });
+      expect(mockedApiPatch).toHaveBeenCalledTimes(1);
+      expect(mockedApiPatch).toHaveBeenCalledWith(
+        "/v1/jobs/postings/1/",
+        payload,
+        { signal },
+      );
+      expect(result).toEqual(jobPosting);
+    },
+  );
 
   it("rejects when the API request fails", async () => {
     const payload = {
@@ -199,25 +214,33 @@ describe("updateJobPosting", () => {
     expect(mockedApiPatch).toHaveBeenCalledWith(
       "/v1/jobs/postings/1/",
       payload,
+      { signal: undefined },
     );
   });
 });
 
 describe("deleteJobPosting", () => {
-  it("deletes the job posting using its detail endpoint", async () => {
-    const jobPostingId = "0198a8a4-8c4b-7e20-b5b5-09fb41b977ee";
+  it.each([false, true])(
+    "deletes the job posting using its detail endpoint (signal: %s)",
+    async (withSignal) => {
+      const signal = withSignal ? new AbortController().signal : undefined;
+      const jobPostingId = "0198a8a4-8c4b-7e20-b5b5-09fb41b977ee";
 
-    mockedApiDelete.mockResolvedValueOnce({
-      data: undefined,
-    });
+      mockedApiDelete.mockResolvedValueOnce({
+        data: undefined,
+      });
 
-    await expect(deleteJobPosting(jobPostingId)).resolves.toBeUndefined();
+      await expect(
+        deleteJobPosting(jobPostingId, signal),
+      ).resolves.toBeUndefined();
 
-    expect(mockedApiDelete).toHaveBeenCalledOnce();
-    expect(mockedApiDelete).toHaveBeenCalledWith(
-      `/v1/jobs/postings/${jobPostingId}/`,
-    );
-  });
+      expect(mockedApiDelete).toHaveBeenCalledOnce();
+      expect(mockedApiDelete).toHaveBeenCalledWith(
+        `/v1/jobs/postings/${jobPostingId}/`,
+        { signal },
+      );
+    },
+  );
 
   it("propagates an error when deleting the job posting fails", async () => {
     const jobPostingId = "0198a8a4-8c4b-7e20-b5b5-09fb41b977ee";
@@ -230,6 +253,7 @@ describe("deleteJobPosting", () => {
     expect(mockedApiDelete).toHaveBeenCalledOnce();
     expect(mockedApiDelete).toHaveBeenCalledWith(
       `/v1/jobs/postings/${jobPostingId}/`,
+      { signal: undefined },
     );
   });
 });

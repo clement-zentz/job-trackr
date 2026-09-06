@@ -1,14 +1,21 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/features/jobs/candidacies/hooks/tests/useUpdateJobCandidacy.test.tsx
 
-import { renderHook } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { resetSessionBoundState } from "@/features/auth/cache";
+import { authKeys } from "@/features/auth/keys";
+import { createAuthUser } from "@/tests/factories/auth";
 import {
   createJobCandidacyDetailRead,
   createJobCandidacyUpdatePayload,
 } from "@/tests/factories/jobCandidacy";
-import { createTestQueryClient, createWrapperWithClient } from "@/tests/utils";
+import {
+  createDeferred,
+  createTestQueryClient,
+  createWrapperWithClient,
+} from "@/tests/utils";
 
 import { updateJobCandidacy } from "../../api/jobCandidaciesApi";
 import { jobCandidaciesKeys } from "../../keys";
@@ -50,7 +57,11 @@ describe("useUpdateJobCandidacy", () => {
 
     expect(resultData).toEqual(updatedCandidacy);
     expect(mockedUpdateJobCandidacy).toHaveBeenCalledOnce();
-    expect(mockedUpdateJobCandidacy).toHaveBeenCalledWith(candidacyId, payload);
+    expect(mockedUpdateJobCandidacy).toHaveBeenCalledWith(
+      candidacyId,
+      payload,
+      expect.any(AbortSignal),
+    );
   });
 
   it("stores the updated candidacy in the detail query cache", async () => {
@@ -133,5 +144,50 @@ describe("useUpdateJobCandidacy", () => {
 
     expect(setQueryDataSpy).not.toHaveBeenCalled();
     expect(invalidateQueriesSpy).not.toHaveBeenCalled();
+  });
+
+  it("ignores a late success after an auth boundary even if the request ignores abort", async () => {
+    const client = createTestQueryClient();
+    client.setQueryData(authKeys.session(), createAuthUser({ id: 1 }));
+    const record = createJobCandidacyDetailRead();
+    const deferred =
+      createDeferred<Awaited<ReturnType<typeof updateJobCandidacy>>>();
+    mockedUpdateJobCandidacy.mockReturnValueOnce(deferred.promise);
+    const { result } = renderHook(() => useUpdateJobCandidacy(), {
+      wrapper: createWrapperWithClient(client),
+    });
+    let pending!: Promise<Awaited<ReturnType<typeof updateJobCandidacy>>>;
+    act(() => {
+      pending = result.current.mutateAsync({
+        candidacyId: record.id,
+        payload: createJobCandidacyUpdatePayload(),
+      });
+    });
+    await waitFor(() => expect(mockedUpdateJobCandidacy).toHaveBeenCalled());
+    const signal = mockedUpdateJobCandidacy.mock.lastCall?.[2];
+    expect(signal?.aborted).toBe(false);
+
+    resetSessionBoundState(client);
+    client.setQueryData(authKeys.session(), createAuthUser({ id: 2 }));
+    client.setQueryData(jobCandidaciesKeys.lists(), ["user B data"]);
+    client.setQueryData(jobCandidaciesKeys.detail(record.id), {
+      ...record,
+      notes: "user B data",
+    });
+    const cachedQueries = client.getQueriesData({});
+    const setData = vi.spyOn(client, "setQueryData");
+    const invalidate = vi.spyOn(client, "invalidateQueries");
+    const remove = vi.spyOn(client, "removeQueries");
+    expect(signal?.aborted).toBe(true);
+
+    await act(async () => {
+      deferred.resolve(record);
+      await pending;
+    });
+
+    expect(setData).not.toHaveBeenCalled();
+    expect(invalidate).not.toHaveBeenCalled();
+    expect(remove).not.toHaveBeenCalled();
+    expect(client.getQueriesData({})).toEqual(cachedQueries);
   });
 });

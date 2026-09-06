@@ -34,10 +34,12 @@ export async function getJobPosting(id: string): Promise<JobPostingDetailRead> {
 
 export async function createJobPosting(
   payload: JobPostingCreatePayload,
+  signal?: AbortSignal,
 ): Promise<JobPostingDetailRead> {
   const response = await api.post<JobPostingDetailRead>(
     JOB_POSTINGS_ENDPOINT,
     payload,
+    { signal },
   );
 
   return response.data;
@@ -46,15 +48,20 @@ export async function createJobPosting(
 export async function updateJobPosting(
   id: string,
   payload: JobPostingUpdatePayload,
+  signal?: AbortSignal,
 ): Promise<JobPostingDetailRead> {
   const response = await api.patch<JobPostingDetailRead>(
     `${JOB_POSTINGS_ENDPOINT}${id}/`,
     payload,
+    { signal },
   );
 
   return response.data;
 }
 
-export async function deleteJobPosting(id: string): Promise<void> {
-  await api.delete(`${JOB_POSTINGS_ENDPOINT}${id}/`);
+export async function deleteJobPosting(
+  id: string,
+  signal?: AbortSignal,
+): Promise<void> {
+  await api.delete(`${JOB_POSTINGS_ENDPOINT}${id}/`, { signal });
 }

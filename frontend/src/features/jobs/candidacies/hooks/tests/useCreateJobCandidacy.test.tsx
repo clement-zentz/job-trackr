@@ -1,15 +1,22 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/features/jobs/candidacies/hooks/tests/useCreateJobCandidacy.test.tsx
 
-import { renderHook } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { resetSessionBoundState } from "@/features/auth/cache";
+import { authKeys } from "@/features/auth/keys";
 import { jobPostingsKeys } from "@/features/jobs/postings/keys";
+import { createAuthUser } from "@/tests/factories/auth";
 import {
   createJobCandidacyCreatePayload,
   createJobCandidacyDetailRead,
 } from "@/tests/factories/jobCandidacy";
-import { createTestQueryClient, createWrapperWithClient } from "@/tests/utils";
+import {
+  createDeferred,
+  createTestQueryClient,
+  createWrapperWithClient,
+} from "@/tests/utils";
 
 import { createJobCandidacy } from "../../api/jobCandidaciesApi";
 import { jobCandidaciesKeys } from "../../keys";
@@ -50,7 +57,10 @@ describe("useCreateJobCandidacy", () => {
 
     expect(resultData).toEqual(createdCandidacy);
     expect(mockedCreateJobCandidacy).toHaveBeenCalledOnce();
-    expect(mockedCreateJobCandidacy).toHaveBeenCalledWith(payload);
+    expect(mockedCreateJobCandidacy).toHaveBeenCalledWith(
+      payload,
+      expect.any(AbortSignal),
+    );
   });
 
   it("stores the created candidacy in the detail query cache", async () => {
@@ -139,5 +149,43 @@ describe("useCreateJobCandidacy", () => {
 
     expect(setQueryDataSpy).not.toHaveBeenCalled();
     expect(invalidateQueriesSpy).not.toHaveBeenCalled();
+  });
+
+  it("ignores a late success after an auth boundary even if the request ignores abort", async () => {
+    const client = createTestQueryClient();
+    client.setQueryData(authKeys.session(), createAuthUser({ id: 1 }));
+    const record = createJobCandidacyDetailRead();
+    const deferred =
+      createDeferred<Awaited<ReturnType<typeof createJobCandidacy>>>();
+    mockedCreateJobCandidacy.mockReturnValueOnce(deferred.promise);
+    const { result } = renderHook(() => useCreateJobCandidacy(), {
+      wrapper: createWrapperWithClient(client),
+    });
+    let pending!: Promise<Awaited<ReturnType<typeof createJobCandidacy>>>;
+    act(() => {
+      pending = result.current.mutateAsync(createJobCandidacyCreatePayload());
+    });
+    await waitFor(() => expect(mockedCreateJobCandidacy).toHaveBeenCalled());
+    const signal = mockedCreateJobCandidacy.mock.lastCall?.[1];
+    expect(signal?.aborted).toBe(false);
+
+    resetSessionBoundState(client);
+    client.setQueryData(authKeys.session(), createAuthUser({ id: 2 }));
+    client.setQueryData(jobCandidaciesKeys.lists(), ["user B data"]);
+    const cachedQueries = client.getQueriesData({});
+    const setData = vi.spyOn(client, "setQueryData");
+    const invalidate = vi.spyOn(client, "invalidateQueries");
+    const remove = vi.spyOn(client, "removeQueries");
+    expect(signal?.aborted).toBe(true);
+
+    await act(async () => {
+      deferred.resolve(record);
+      await pending;
+    });
+
+    expect(setData).not.toHaveBeenCalled();
+    expect(invalidate).not.toHaveBeenCalled();
+    expect(remove).not.toHaveBeenCalled();
+    expect(client.getQueriesData({})).toEqual(cachedQueries);
   });
 });
