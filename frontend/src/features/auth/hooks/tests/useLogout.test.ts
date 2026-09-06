@@ -16,6 +16,7 @@ import {
 } from "@/tests/utils";
 
 import { logout } from "../../api/authApi";
+import { registerSessionBoundMutation } from "../../cache";
 import { authKeys } from "../../keys";
 import { useLogout } from "../useLogout";
 
@@ -71,6 +72,7 @@ describe("useLogout", () => {
 
   it("removes non-auth queries after successful logout", async () => {
     const queryClient = createTestQueryClient();
+    const mutation = registerSessionBoundMutation(queryClient);
     const response = createUnauthenticatedAuthResponse({
       status: 200,
     });
@@ -86,6 +88,8 @@ describe("useLogout", () => {
     await result.current.mutateAsync();
 
     expect(queryClient.getQueryData(jobPostingsKeys.all)).toBeUndefined();
+    expect(mutation.signal.aborted).toBe(true);
+    expect(mutation.isCurrent()).toBe(false);
   });
 
   it("preserves other auth queries after successful logout", async () => {
@@ -111,6 +115,7 @@ describe("useLogout", () => {
 
   it("preserves cached queries when logout fails", async () => {
     const queryClient = createTestQueryClient();
+    const mutation = registerSessionBoundMutation(queryClient);
     const user = createAuthUser();
     const cachedJobPostings = ["cached-job-postings"];
 
@@ -129,6 +134,9 @@ describe("useLogout", () => {
     expect(queryClient.getQueryData(jobPostingsKeys.all)).toEqual(
       cachedJobPostings,
     );
+    expect(mutation.signal.aborted).toBe(false);
+    expect(mutation.isCurrent()).toBe(true);
+    mutation.release();
   });
 
   it("prevents an in-flight session query from restoring the authenticated user after logout", async () => {

@@ -138,23 +138,28 @@ describe("getJobCandidacy", () => {
 });
 
 describe("createJobCandidacy", () => {
-  it("posts the payload to the job candidacies endpoint", async () => {
-    const payload = createJobCandidacyCreatePayload();
-    const jobCandidacy = createJobCandidacyDetailRead();
+  it.each([false, true])(
+    "posts the payload to the job candidacies endpoint (signal: %s)",
+    async (withSignal) => {
+      const signal = withSignal ? new AbortController().signal : undefined;
+      const payload = createJobCandidacyCreatePayload();
+      const jobCandidacy = createJobCandidacyDetailRead();
 
-    mockedApiPost.mockResolvedValueOnce({
-      data: jobCandidacy,
-    });
+      mockedApiPost.mockResolvedValueOnce({
+        data: jobCandidacy,
+      });
 
-    const result = await createJobCandidacy(payload);
+      const result = await createJobCandidacy(payload, signal);
 
-    expect(mockedApiPost).toHaveBeenCalledOnce();
-    expect(mockedApiPost).toHaveBeenCalledWith(
-      "/v1/jobs/candidacies/",
-      payload,
-    );
-    expect(result).toEqual(jobCandidacy);
-  });
+      expect(mockedApiPost).toHaveBeenCalledOnce();
+      expect(mockedApiPost).toHaveBeenCalledWith(
+        "/v1/jobs/candidacies/",
+        payload,
+        { signal },
+      );
+      expect(result).toEqual(jobCandidacy);
+    },
+  );
 
   it("propagates an error when the API request fails", async () => {
     const payload = createJobCandidacyCreatePayload();
@@ -168,35 +173,41 @@ describe("createJobCandidacy", () => {
     expect(mockedApiPost).toHaveBeenCalledWith(
       "/v1/jobs/candidacies/",
       payload,
+      { signal: undefined },
     );
   });
 });
 
 describe("updateJobCandidacy", () => {
-  it("patches the candidacy and returns the updated data", async () => {
-    const candidacyId = "candidacy-1";
-    const payload = createJobCandidacyUpdatePayload();
-    const jobCandidacy = createJobCandidacyDetailRead({
-      id: candidacyId,
-      status: payload.status,
-      status_label: "Interview",
-      applied_on: payload.applied_on,
-      notes: payload.notes,
-    });
+  it.each([false, true])(
+    "patches the candidacy and returns the updated data (signal: %s)",
+    async (withSignal) => {
+      const signal = withSignal ? new AbortController().signal : undefined;
+      const candidacyId = "candidacy-1";
+      const payload = createJobCandidacyUpdatePayload();
+      const jobCandidacy = createJobCandidacyDetailRead({
+        id: candidacyId,
+        status: payload.status,
+        status_label: "Interview",
+        applied_on: payload.applied_on,
+        notes: payload.notes,
+      });
 
-    mockedApiPatch.mockResolvedValueOnce({
-      data: jobCandidacy,
-    });
+      mockedApiPatch.mockResolvedValueOnce({
+        data: jobCandidacy,
+      });
 
-    const result = await updateJobCandidacy(candidacyId, payload);
+      const result = await updateJobCandidacy(candidacyId, payload, signal);
 
-    expect(mockedApiPatch).toHaveBeenCalledOnce();
-    expect(mockedApiPatch).toHaveBeenCalledWith(
-      `/v1/jobs/candidacies/${candidacyId}/`,
-      payload,
-    );
-    expect(result).toEqual(jobCandidacy);
-  });
+      expect(mockedApiPatch).toHaveBeenCalledOnce();
+      expect(mockedApiPatch).toHaveBeenCalledWith(
+        `/v1/jobs/candidacies/${candidacyId}/`,
+        payload,
+        { signal },
+      );
+      expect(result).toEqual(jobCandidacy);
+    },
+  );
 
   it("propagates an error when the API request fails", async () => {
     const candidacyId = "candidacy-1";
@@ -211,21 +222,29 @@ describe("updateJobCandidacy", () => {
     expect(mockedApiPatch).toHaveBeenCalledWith(
       `/v1/jobs/candidacies/${candidacyId}/`,
       payload,
+      { signal: undefined },
     );
   });
 });
 
 describe("deleteJobCandidacy", () => {
-  it("deletes the job candidacy", async () => {
-    mockedApiDelete.mockResolvedValueOnce({
-      data: undefined,
-    });
+  it.each([false, true])(
+    "deletes the job candidacy (signal: %s)",
+    async (withSignal) => {
+      const signal = withSignal ? new AbortController().signal : undefined;
+      mockedApiDelete.mockResolvedValueOnce({
+        data: undefined,
+      });
 
-    await expect(deleteJobCandidacy("123")).resolves.toBeUndefined();
+      await expect(deleteJobCandidacy("123", signal)).resolves.toBeUndefined();
 
-    expect(mockedApiDelete).toHaveBeenCalledOnce();
-    expect(mockedApiDelete).toHaveBeenCalledWith("/v1/jobs/candidacies/123/");
-  });
+      expect(mockedApiDelete).toHaveBeenCalledOnce();
+      expect(mockedApiDelete).toHaveBeenCalledWith(
+        "/v1/jobs/candidacies/123/",
+        { signal },
+      );
+    },
+  );
 
   it("propagates the API error", async () => {
     const error = new Error("Request failed");

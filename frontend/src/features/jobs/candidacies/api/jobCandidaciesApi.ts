@@ -39,10 +39,12 @@ export async function getJobCandidacy(
 
 export async function createJobCandidacy(
   payload: JobCandidacyCreatePayload,
+  signal?: AbortSignal,
 ): Promise<JobCandidacyDetailRead> {
   const response = await api.post<JobCandidacyDetailRead>(
     JOB_CANDIDACIES_ENDPOINT,
     payload,
+    { signal },
   );
 
   return response.data;
@@ -51,15 +53,20 @@ export async function createJobCandidacy(
 export async function updateJobCandidacy(
   candidacyId: string,
   payload: JobCandidacyUpdatePayload,
+  signal?: AbortSignal,
 ): Promise<JobCandidacyDetailRead> {
   const response = await api.patch<JobCandidacyDetailRead>(
     `${JOB_CANDIDACIES_ENDPOINT}${candidacyId}/`,
     payload,
+    { signal },
   );
 
   return response.data;
 }
 
-export async function deleteJobCandidacy(candidacyId: string): Promise<void> {
-  await api.delete(`${JOB_CANDIDACIES_ENDPOINT}${candidacyId}/`);
+export async function deleteJobCandidacy(
+  candidacyId: string,
+  signal?: AbortSignal,
+): Promise<void> {
+  await api.delete(`${JOB_CANDIDACIES_ENDPOINT}${candidacyId}/`, { signal });
 }

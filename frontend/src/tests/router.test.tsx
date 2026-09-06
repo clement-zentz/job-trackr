@@ -1,7 +1,14 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/tests/router.test.tsx
 
-import { act, cleanup, screen, waitFor, within } from "@testing-library/react";
+import {
+  act,
+  cleanup,
+  renderHook,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { RouterProvider } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -12,9 +19,16 @@ import {
   verifyEmail,
 } from "@/features/auth/api/authApi";
 import { authKeys } from "@/features/auth/keys";
+import { createJobCandidacy } from "@/features/jobs/candidacies/api/jobCandidaciesApi";
+import { useCreateJobCandidacy } from "@/features/jobs/candidacies/hooks/useCreateJobCandidacy";
+import { jobCandidaciesKeys } from "@/features/jobs/candidacies/keys";
 import { jobPostingsKeys } from "@/features/jobs/postings/keys";
 import { router } from "@/router";
-import { renderWithQueryClient } from "@/tests/utils";
+import {
+  createDeferred,
+  createWrapperWithClient,
+  renderWithQueryClient,
+} from "@/tests/utils";
 
 import {
   createAuthenticatedAuthResponse,
@@ -22,6 +36,10 @@ import {
   createLoginPayload,
   createUnauthenticatedAuthResponse,
 } from "./factories/auth";
+import {
+  createJobCandidacyCreatePayload,
+  createJobCandidacyDetailRead,
+} from "./factories/jobCandidacy";
 
 vi.mock("@/features/auth/api/authApi", () => ({
   getCurrentSession: vi.fn(),
@@ -29,9 +47,18 @@ vi.mock("@/features/auth/api/authApi", () => ({
   verifyEmail: vi.fn(),
 }));
 
+vi.mock(
+  import("@/features/jobs/candidacies/api/jobCandidaciesApi"),
+  async (importOriginal) => ({
+    ...(await importOriginal()),
+    createJobCandidacy: vi.fn(),
+  }),
+);
+
 const mockedGetCurrentSession = vi.mocked(getCurrentSession);
 const mockedLogin = vi.mocked(login);
 const mockedVerifyEmail = vi.mocked(verifyEmail);
+const mockedCreateJobCandidacy = vi.mocked(createJobCandidacy);
 
 async function renderRouterAt(path: string) {
   await act(async () => {
@@ -46,6 +73,7 @@ describe("router", () => {
     mockedGetCurrentSession.mockReset();
     mockedLogin.mockReset();
     mockedVerifyEmail.mockReset();
+    mockedCreateJobCandidacy.mockReset();
 
     mockedGetCurrentSession.mockResolvedValue(
       createAuthenticatedAuthResponse(),
@@ -264,6 +292,19 @@ describe("router", () => {
 
     expect(queryClient.getQueryData(jobPostingsKey)).toEqual(cachedJobPostings);
 
+    const candidacy = createJobCandidacyDetailRead();
+    const deferred = createDeferred<typeof candidacy>();
+    mockedCreateJobCandidacy.mockReturnValueOnce(deferred.promise);
+    const { result } = renderHook(() => useCreateJobCandidacy(), {
+      wrapper: createWrapperWithClient(queryClient),
+    });
+    const pendingMutation = result.current.mutateAsync(
+      createJobCandidacyCreatePayload(),
+    );
+    await waitFor(() =>
+      expect(mockedCreateJobCandidacy).toHaveBeenCalledOnce(),
+    );
+
     mockedGetCurrentSession.mockResolvedValue(
       createUnauthenticatedAuthResponse(),
     );
@@ -283,6 +324,16 @@ describe("router", () => {
     expect(router.state.location.pathname).toBe("/login");
 
     expect(queryClient.getQueryData(authKeys.session())).toBeNull();
+    expect(queryClient.getQueryData(jobPostingsKey)).toBeUndefined();
+    expect(mockedCreateJobCandidacy.mock.lastCall?.[1]?.aborted).toBe(true);
+
+    await act(async () => {
+      deferred.resolve(candidacy);
+      await pendingMutation;
+    });
+    expect(
+      queryClient.getQueryData(jobCandidaciesKeys.detail(candidacy.id)),
+    ).toBeUndefined();
     expect(queryClient.getQueryData(jobPostingsKey)).toBeUndefined();
   });
 
@@ -385,6 +436,19 @@ describe("router", () => {
       "user A cached job",
     ]);
 
+    const candidacy = createJobCandidacyDetailRead();
+    const deferred = createDeferred<typeof candidacy>();
+    mockedCreateJobCandidacy.mockReturnValueOnce(deferred.promise);
+    const { result } = renderHook(() => useCreateJobCandidacy(), {
+      wrapper: createWrapperWithClient(queryClient),
+    });
+    const pendingMutation = result.current.mutateAsync(
+      createJobCandidacyCreatePayload(),
+    );
+    await waitFor(() =>
+      expect(mockedCreateJobCandidacy).toHaveBeenCalledOnce(),
+    );
+
     mockedGetCurrentSession.mockResolvedValue(userBResponse);
 
     await act(async () => {
@@ -400,6 +464,21 @@ describe("router", () => {
     expect(queryClient.getQueryData(authKeys.session())).toEqual(
       userBResponse.data.user,
     );
+
+    expect(mockedCreateJobCandidacy.mock.lastCall?.[1]?.aborted).toBe(true);
+    queryClient.setQueryData(jobPostingsKey, ["user B cached job"]);
+    const invalidate = vi.spyOn(queryClient, "invalidateQueries");
+    await act(async () => {
+      deferred.resolve(candidacy);
+      await pendingMutation;
+    });
+    expect(
+      queryClient.getQueryData(jobCandidaciesKeys.detail(candidacy.id)),
+    ).toBeUndefined();
+    expect(queryClient.getQueryData(jobPostingsKey)).toEqual([
+      "user B cached job",
+    ]);
+    expect(invalidate).not.toHaveBeenCalled();
 
     expect(router.state.location.pathname).toBe("/settings");
   });
