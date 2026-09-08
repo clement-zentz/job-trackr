@@ -1,8 +1,12 @@
 # frontend/.dockerignore
 
-.git
 node_modules/
-.env*
 dist/
 coverage/
+
+.env*
+npm-debug.log*
+
+.git
 .vscode/
+.vite/
