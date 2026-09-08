@@ -2,13 +2,39 @@
 # File: backend/job_trackr/job_trackr/settings/prod.py
 
 import environ
+from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
 
 from .base import *  # noqa: F403,F401
+from .base import MIDDLEWARE as BASE_MIDDLEWARE
 
 env = environ.Env()
 
 DEBUG = False
+
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+SECURE_HSTS_SECONDS = 3600
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+SECURE_HSTS_PRELOAD = False
+
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+
+MIDDLEWARE = [
+    BASE_MIDDLEWARE[0],
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    *BASE_MIDDLEWARE[1:],
+]
+
+STORAGES = {
+    **global_settings.STORAGES,
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 
