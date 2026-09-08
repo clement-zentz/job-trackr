@@ -25,6 +25,12 @@ logs/
 *.sqlite3
 
 # --- Environment ---
+.env
 .env.*
 *.env
 !*.env.example
+
+# --- Django ---
+media
+staticfiles
+**/staticfiles

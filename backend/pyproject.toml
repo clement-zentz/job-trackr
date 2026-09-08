@@ -14,6 +14,8 @@ dependencies = [
     "django-stubs-ext>=6.0.3",
     "django-environ>=0.13.0",
     "django-allauth[headless,headless-spec]>=65.19.1,<66",
+    "gunicorn>=26.2.0",
+    "whitenoise>=6.12.0",
 ]
 
 [dependency-groups]
@@ -134,6 +136,8 @@ known_first_party = [
 
 [tool.deptry.per_rule_ignores]
 DEP002 = [
+  "gunicorn", # Invoked by the production container command.
+  "whitenoise", # Loaded through Django middleware and storage settings.
   "psycopg",
   "django-allauth",
 ]
