@@ -3,10 +3,8 @@ name: CI
 
 on:
   workflow_dispatch:
+  workflow_call:
   pull_request:
-  push:
-    branches:
-      - main
 
 permissions:
   contents: read
@@ -40,7 +38,7 @@ jobs:
       DATABASE_URL: postgres://test_user:test_password@127.0.0.1:5433/test_database
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install uv
         uses: astral-sh/setup-uv@v6
@@ -54,7 +52,7 @@ jobs:
         run: uv sync --locked --all-groups
 
       - name: Lint
-        run: uv run --frozen ruff check .
+        run: uv run --frozen ruff check --no-fix .
 
       - name: Type check
         run: uv run --frozen mypy job_trackr scripts
@@ -74,7 +72,7 @@ jobs:
         working-directory: frontend
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up Node
         uses: actions/setup-node@v6
