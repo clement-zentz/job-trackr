@@ -23,6 +23,8 @@ from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import URLPattern, URLResolver, include, path
 
+from .health import health
+
 urlpatterns: list[URLPattern | URLResolver] = [
     path("admin/", admin.site.urls),
     # --- Django Allauth ---
@@ -30,6 +32,7 @@ urlpatterns: list[URLPattern | URLResolver] = [
     path("api/_allauth/", include("allauth.headless.urls")),
     # --- API ---
     path("api/v1/jobs/", include("apps.jobs.urls")),
+    path("api/health/", health),
 ]
 
 if settings.DEBUG:
