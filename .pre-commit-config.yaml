@@ -9,7 +9,7 @@ repos:
     hooks:
       - id: add-spdx-header
         name: Add SPDX license header to files
-        entry: python backend/scripts/python/add_header_to_file.py
+        entry: uv run --project backend --frozen python backend/scripts/python/add_header_to_file.py
         language: system
         pass_filenames: true
         files: \.(py|ts|tsx|js|jsx)$
