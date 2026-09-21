@@ -6,14 +6,14 @@ description = "Django backend for a job candidacy tracking dashboard."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "django>=6.0",
+    "django>=6.0.8,<6.1",
     "djangorestframework>=3.16",
     "psycopg[binary]>=3.2",
     "uuid6>=2025.0.1",
     "django-filter>=25.2",
     "django-stubs-ext>=6.0.3",
     "django-environ>=0.13.0",
-    "django-allauth[headless,headless-spec]>=65.19.1,<66",
+    "django-allauth[headless,headless-spec]>=65.19.4,<66",
     "gunicorn>=26.2.0",
     "whitenoise>=6.12.0",
 ]
