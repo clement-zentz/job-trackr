@@ -89,8 +89,7 @@ frontend-test:
 	cd frontend && npm run test:run
 
 pre-commit:
-	uv --directory backend run pre-commit run --all-files \
-		--config ../.pre-commit-config.yaml
+	pre-commit run --all-files
 
 # --- Dependencies ---
 backend-deptry:
