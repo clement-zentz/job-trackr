@@ -84,9 +84,9 @@ class JobCandidacyWriteSerializer(serializers.ModelSerializer[JobCandidacy]):
 
         if request is not None and request.user.is_authenticated:
             user = cast(User, request.user)
-            field = fields["job_posting"]
-            if isinstance(field, serializers.PrimaryKeyRelatedField):
-                field.queryset = JobPosting.objects.filter(owner=user)
+            fields["job_posting"] = serializers.PrimaryKeyRelatedField(
+                queryset=JobPosting.objects.filter(owner=user),
+            )
 
         return fields
 
