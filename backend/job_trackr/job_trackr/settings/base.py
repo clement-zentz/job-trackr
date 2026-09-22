@@ -160,3 +160,5 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
     ],
 }
+
+ADMIN_URL = "admin/"

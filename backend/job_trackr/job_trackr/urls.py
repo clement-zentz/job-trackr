@@ -26,7 +26,7 @@ from django.urls import URLPattern, URLResolver, include, path
 from .health import health
 
 urlpatterns: list[URLPattern | URLResolver] = [
-    path("admin/", admin.site.urls),
+    path(settings.ADMIN_URL, admin.site.urls),
     # --- Django Allauth ---
     path("accounts/", include("allauth.urls")),
     path("api/_allauth/", include("allauth.headless.urls")),
