@@ -19,6 +19,7 @@ trap cleanup EXIT
 docker network create "$smoke_id" >/dev/null
 docker run -d --name "$backend_name" --network "$smoke_id" --network-alias backend \
   -e DJANGO_SECRET_KEY=smoke-test-only-not-a-production-secret \
+  -e DJANGO_ADMIN_URL=admin/ \
   -e ALLOWED_HOSTS=backend \
   -e DATABASE_URL=postgres://unused:unused@127.0.0.1:5432/unused \
   -e EMAIL_HOST=localhost \

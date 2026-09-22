@@ -17,10 +17,6 @@ CSRF_COOKIE_SECURE = True
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-SECURE_HSTS_SECONDS = 3600
-SECURE_HSTS_INCLUDE_SUBDOMAINS = False
-SECURE_HSTS_PRELOAD = False
-
 SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 
 MIDDLEWARE = [
@@ -67,3 +63,13 @@ HEADLESS_FRONTEND_URLS = {
     "account_reset_password_from_key": f"{FRONTEND_URL}/reset-password/{{key}}",
     "account_signup": f"{FRONTEND_URL}/register",
 }
+
+ADMIN_URL = env.str("DJANGO_ADMIN_URL").strip().strip("/")
+
+if not ADMIN_URL:
+    raise ImproperlyConfigured("DJANGO_ADMIN_URL must not be empty")
+
+ADMIN_URL = f"{ADMIN_URL}/"
+
+# --- Django-Allauth security ---
+ALLAUTH_TRUSTED_CLIENT_IP_HEADER = "X-Real-IP"
