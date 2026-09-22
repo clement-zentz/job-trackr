@@ -2,7 +2,7 @@
 .PHONY: up build build-nc restart logs down down-v reset-compose prune-global bash psql \
 manage migrations migrate superuser django-check \
 backend-mypy test-db backend-test backend-coverage down-test frontend-test pre-commit \
-backend-deptry backend-upgrade backend-sync frontend-update frontend-outdated
+backend-deptry backend-upgrade backend-upgrade-package backend-sync frontend-update frontend-outdated
 
 COMPOSE_DEV=docker compose -f compose.dev.yml
 COMPOSE_TEST=docker compose -f compose.test.yml
@@ -75,10 +75,10 @@ test-db:
 	$(COMPOSE_TEST) up -d --wait database
 
 backend-test: test-db
-	uv --directory backend run pytest $(ARGS)
+	uv --directory backend run pytest $(TEST_BACKEND)
 
 backend-coverage: test-db
-	uv --directory backend run pytest $(ARGS) --cov \
+	uv --directory backend run pytest $(TEST_BACKEND) --cov \
 		--cov-report=term-missing \
 		--cov-report=html
 
@@ -86,7 +86,7 @@ down-test:
 	$(COMPOSE_TEST) down -v --remove-orphans
 
 frontend-test:
-	cd frontend && npm run test:run
+	cd frontend && npm run test:run -- $(TEST_FRONTEND)
 
 pre-commit:
 	pre-commit run --all-files
@@ -97,6 +97,9 @@ backend-deptry:
 
 backend-upgrade:
 	cd backend && uv lock --upgrade
+
+backend-upgrade-package:
+	cd backend && uv lock --upgrade-package $(PKG)
 
 backend-sync:
 	cd backend && uv sync --all-groups
