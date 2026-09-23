@@ -77,6 +77,11 @@ if not re.fullmatch(r"[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*", ADMIN_URL):
         "underscores, and path separators"
     )
 
+_reserved_admin_prefixes = {"accounts", "api"}
+
+if ADMIN_URL.split("/", 1)[0] in _reserved_admin_prefixes:
+    raise ImproperlyConfigured("DJANGO_ADMIN_URL must not use a reserved URL prefix")
+
 ADMIN_URL = f"{ADMIN_URL}/"
 
 # --- Django-Allauth security ---
