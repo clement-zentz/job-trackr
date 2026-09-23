@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/job_trackr/job_trackr/settings/prod.py
 
+import re
+
 import environ
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
@@ -68,6 +70,12 @@ ADMIN_URL = env.str("DJANGO_ADMIN_URL").strip().strip("/")
 
 if not ADMIN_URL:
     raise ImproperlyConfigured("DJANGO_ADMIN_URL must not be empty")
+
+if not re.fullmatch(r"[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*", ADMIN_URL):
+    raise ImproperlyConfigured(
+        "DJANGO_ADMIN_URL must contain only letters, numbers, hyphens, "
+        "underscores, and path separators"
+    )
 
 ADMIN_URL = f"{ADMIN_URL}/"
 
