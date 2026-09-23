@@ -89,7 +89,7 @@ frontend-test:
 	cd frontend && npm run test:run -- $(TEST_FRONTEND)
 
 pre-commit:
-	pre-commit run --all-files
+	uv tool run pre-commit@4.6.2 run --all-files
 
 # --- Dependencies ---
 backend-deptry:
