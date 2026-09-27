@@ -4,6 +4,7 @@ FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
   PYTHONUNBUFFERED=1 \
+  DJANGO_SETTINGS_MODULE=job_trackr.settings.dev \
   VIRTUAL_ENV=/app/.venv \
   PATH="/app/.venv/bin:$PATH"
 

@@ -28,7 +28,6 @@ logs/
 .env
 .env.*
 *.env
-!*.env.example
 
 # --- Django ---
 media

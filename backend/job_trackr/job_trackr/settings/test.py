@@ -5,17 +5,12 @@ import environ
 
 from .base import *  # noqa: F403,F401
 
-env = environ.Env(
-    DATABASE_URL=(
-        str,
-        "postgres://test_user:test_password@127.0.0.1:5433/test_database",
-    ),
-)
-
 SECRET_KEY = "django-insecure-test-key"
 
+DATABASE_URL = "postgres://test_user:test_password@127.0.0.1:5433/test_database"
+
 DATABASES = {
-    "default": env.db("DATABASE_URL"),
+    "default": environ.Env.db_url_config(DATABASE_URL),
 }
 
 # Speed up tests
