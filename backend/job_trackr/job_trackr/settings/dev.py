@@ -2,43 +2,29 @@
 # File: backend/job_trackr/job_trackr/settings/dev.py
 
 import environ
-from django.core.exceptions import ImproperlyConfigured
 
 from .base import *  # noqa: F403,F401
 
-env = environ.Env(
-    DJANGO_SECRET_KEY=(
-        str,
-        "django-insecure-dev-only-change-me",
-    ),
-    ALLOWED_HOSTS=(
-        list,
-        ["localhost", "127.0.0.1", "backend"],
-    ),
-    DATABASE_URL=(
-        str,
-        "postgres://dev_user:dev_password@database:5432/dev_database",
-    ),
-    CSRF_TRUSTED_ORIGINS=(
-        list,
-        ["http://localhost:5173", "http://127.0.0.1:5173"],
-    ),
-)
-
 DEBUG = True
 
-SECRET_KEY = env("DJANGO_SECRET_KEY")
+SECRET_KEY = "django-insecure-key-dev-only"
 
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "backend",
+]
 
-if not ALLOWED_HOSTS:
-    raise ImproperlyConfigured("ALLOWED_HOSTS must contain at least one host")
+DATABASE_URL = "postgres://dev_user:dev_password@database:5432/dev_database"
 
 DATABASES = {
-    "default": env.db("DATABASE_URL"),
+    "default": environ.Env.db_url_config(DATABASE_URL),
 }
 
-CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS")
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
 
 # --- Django-Allauth registration ---
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
