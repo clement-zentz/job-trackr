@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# backend/scripts/shell/chown_user_migrations.bash
+# backend/scripts/chown_user_migrations.bash
 
 # How to execute this script from the root directory:
 
-# sudo chmod 740 backend/scripts/shell/chown_user_migrations.bash
-# ./backend/scripts/shell/chown_user_migrations.bash
+# sudo chmod 740 backend/scripts/chown_user_migrations.bash
+# ./backend/scripts/chown_user_migrations.bash
 
 set -euo pipefail
 
