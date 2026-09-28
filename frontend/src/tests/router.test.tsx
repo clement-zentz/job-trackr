@@ -19,7 +19,10 @@ import {
   verifyEmail,
 } from "@/features/auth/api/authApi";
 import { authKeys } from "@/features/auth/keys";
-import { createJobCandidacy } from "@/features/jobs/candidacies/api/jobCandidaciesApi";
+import {
+  createJobCandidacy,
+  listJobCandidacies,
+} from "@/features/jobs/candidacies/api/jobCandidaciesApi";
 import { useCreateJobCandidacy } from "@/features/jobs/candidacies/hooks/useCreateJobCandidacy";
 import { jobCandidaciesKeys } from "@/features/jobs/candidacies/keys";
 import { jobPostingsKeys } from "@/features/jobs/postings/keys";
@@ -40,6 +43,7 @@ import {
   createJobCandidacyCreatePayload,
   createJobCandidacyDetailRead,
 } from "./factories/jobCandidacy";
+import { createPaginatedResponse } from "./factories/paginatedResponse";
 
 vi.mock("@/features/auth/api/authApi", () => ({
   getCurrentSession: vi.fn(),
@@ -52,6 +56,7 @@ vi.mock(
   async (importOriginal) => ({
     ...(await importOriginal()),
     createJobCandidacy: vi.fn(),
+    listJobCandidacies: vi.fn(),
   }),
 );
 
@@ -59,6 +64,7 @@ const mockedGetCurrentSession = vi.mocked(getCurrentSession);
 const mockedLogin = vi.mocked(login);
 const mockedVerifyEmail = vi.mocked(verifyEmail);
 const mockedCreateJobCandidacy = vi.mocked(createJobCandidacy);
+const mockedListJobCandidacies = vi.mocked(listJobCandidacies);
 
 async function renderRouterAt(path: string) {
   await act(async () => {
@@ -74,10 +80,12 @@ describe("router", () => {
     mockedLogin.mockReset();
     mockedVerifyEmail.mockReset();
     mockedCreateJobCandidacy.mockReset();
+    mockedListJobCandidacies.mockReset();
 
     mockedGetCurrentSession.mockResolvedValue(
       createAuthenticatedAuthResponse(),
     );
+    mockedListJobCandidacies.mockResolvedValue(createPaginatedResponse([]));
   });
 
   afterEach(async () => {
@@ -96,6 +104,22 @@ describe("router", () => {
     await renderRouterAt("/");
 
     expect(await screen.findByText("Loading...")).toBeInTheDocument();
+  });
+
+  it("redirects authenticated users from the index to job candidacies using replace", async () => {
+    await renderRouterAt("/");
+
+    expect(
+      await screen.findByRole("heading", { name: "Job Candidacies" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", {
+        name: "Job Candidacies",
+        current: "page",
+      }),
+    ).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe("/jobs/candidacies");
+    expect(router.state.historyAction).toBe("REPLACE");
   });
 
   it.each([
@@ -119,18 +143,21 @@ describe("router", () => {
   });
 
   it.each(["/login", "/register", "/forgot-password"])(
-    "redirects authenticated users away from %s",
+    "redirects authenticated users from %s to job candidacies",
     async (path) => {
       await renderRouterAt(path);
 
       expect(
         await screen.findByRole("link", {
-          name: "Dashboard",
+          name: "Job Candidacies",
           current: "page",
         }),
       ).toBeInTheDocument();
 
-      expect(router.state.location.pathname).toBe("/");
+      expect(
+        screen.getByRole("heading", { name: "Job Candidacies" }),
+      ).toBeInTheDocument();
+      expect(router.state.location.pathname).toBe("/jobs/candidacies");
     },
   );
 
@@ -169,21 +196,27 @@ describe("router", () => {
     expect(router.state.location.pathname).toBe("/reset-password/reset-key");
   });
 
-  it("redirects unauthenticated users from protected routes to login", async () => {
-    mockedGetCurrentSession.mockResolvedValue(
-      createUnauthenticatedAuthResponse(),
-    );
+  it.each(["/", "/account", "/jobs/candidacies", "/jobs/postings"])(
+    "redirects unauthenticated users from %s to login",
+    async (path) => {
+      mockedGetCurrentSession.mockResolvedValue(
+        createUnauthenticatedAuthResponse(),
+      );
 
-    await renderRouterAt("/settings");
+      await renderRouterAt(path);
 
-    expect(
-      await screen.findByRole("heading", {
-        name: "Sign in",
-      }),
-    ).toBeInTheDocument();
+      expect(
+        await screen.findByRole("heading", {
+          name: "Sign in",
+        }),
+      ).toBeInTheDocument();
 
-    expect(router.state.location.pathname).toBe("/login");
-  });
+      expect(router.state.location.pathname).toBe("/login");
+      expect(router.state.location.state).toMatchObject({
+        from: { pathname: path },
+      });
+    },
+  );
 
   it("returns the user to the protected route after successful login", async () => {
     const loginPayload = createLoginPayload();
@@ -206,7 +239,7 @@ describe("router", () => {
       return authenticatedAuthResponse;
     });
 
-    await renderRouterAt("/settings");
+    await renderRouterAt("/account");
 
     expect(
       await screen.findByRole("heading", {
@@ -229,8 +262,8 @@ describe("router", () => {
 
     const main = await screen.findByRole("main");
 
-    expect(within(main).getByText("Settings")).toBeInTheDocument();
-    expect(router.state.location.pathname).toBe("/settings");
+    expect(within(main).getByText("Account")).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe("/account");
 
     expect(mockedLogin).toHaveBeenCalledWith(loginPayload);
     expect(mockedLogin).toHaveBeenCalledTimes(1);
@@ -279,11 +312,11 @@ describe("router", () => {
       createAuthenticatedAuthResponse(),
     );
 
-    const { queryClient } = await renderRouterAt("/settings");
+    const { queryClient } = await renderRouterAt("/account");
 
     expect(
       await screen.findByRole("link", {
-        name: "Settings",
+        name: "Account",
         current: "page",
       }),
     ).toBeInTheDocument();
@@ -342,7 +375,7 @@ describe("router", () => {
 
     mockedGetCurrentSession.mockRejectedValueOnce(error);
 
-    await renderRouterAt("/settings");
+    await renderRouterAt("/account");
 
     expect(
       await screen.findByText(
@@ -356,7 +389,7 @@ describe("router", () => {
       }),
     ).toBeInTheDocument();
 
-    expect(router.state.location.pathname).toBe("/settings");
+    expect(router.state.location.pathname).toBe("/account");
 
     expect(
       screen.queryByRole("heading", {
@@ -370,7 +403,7 @@ describe("router", () => {
       .mockRejectedValueOnce(new Error("Session request failed"))
       .mockResolvedValueOnce(createAuthenticatedAuthResponse());
 
-    await renderRouterAt("/settings");
+    await renderRouterAt("/account");
 
     expect(
       await screen.findByText(
@@ -388,12 +421,12 @@ describe("router", () => {
 
     expect(
       await screen.findByRole("link", {
-        name: "Settings",
+        name: "Account",
         current: "page",
       }),
     ).toBeInTheDocument();
 
-    expect(router.state.location.pathname).toBe("/settings");
+    expect(router.state.location.pathname).toBe("/account");
   });
 
   it("clears non-auth queries when the authenticated user changes", async () => {
@@ -421,11 +454,11 @@ describe("router", () => {
 
     mockedGetCurrentSession.mockResolvedValue(userAResponse);
 
-    const { queryClient } = await renderRouterAt("/settings");
+    const { queryClient } = await renderRouterAt("/account");
 
     expect(
       await screen.findByRole("link", {
-        name: "Settings",
+        name: "Account",
         current: "page",
       }),
     ).toBeInTheDocument();
@@ -480,6 +513,6 @@ describe("router", () => {
     ]);
     expect(invalidate).not.toHaveBeenCalled();
 
-    expect(router.state.location.pathname).toBe("/settings");
+    expect(router.state.location.pathname).toBe("/account");
   });
 });
