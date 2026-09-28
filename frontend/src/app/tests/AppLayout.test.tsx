@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/app/tests/AppLayout.test.tsx
 
-import { screen } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import { createMemoryRouter, RouterProvider } from "react-router-dom";
 import { describe, expect, it } from "vitest";
 
@@ -18,7 +18,7 @@ function renderAppLayout() {
         children: [
           {
             index: true,
-            element: <div>Dashboard content</div>,
+            element: <div>Nested route content</div>,
           },
         ],
       },
@@ -35,8 +35,13 @@ describe("AppLayout", () => {
   it("renders the app shell and nested route content", () => {
     renderAppLayout();
 
-    expect(screen.getByRole("link", { name: "Dashboard" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Job Trackr" })).toHaveAttribute(
+      "href",
+      "/",
+    );
     expect(screen.getByText("Top bar menu")).toBeInTheDocument();
-    expect(screen.getByText("Dashboard content")).toBeInTheDocument();
+    expect(
+      within(screen.getByRole("main")).getByText("Nested route content"),
+    ).toBeInTheDocument();
   });
 });

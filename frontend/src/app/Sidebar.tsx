@@ -4,10 +4,9 @@
 import { Link, NavLink } from "react-router-dom";
 
 const navItems = [
-  { to: "/", label: "Dashboard" },
   { to: "/jobs/postings", label: "Job Postings" },
   { to: "/jobs/candidacies", label: "Job Candidacies" },
-  { to: "/settings", label: "Settings" },
+  { to: "/account", label: "Account" },
 ];
 
 export function Sidebar() {

@@ -16,6 +16,15 @@ function renderSidebar() {
 }
 
 describe("Sidebar", () => {
+  it("links the app name to the index route", () => {
+    renderSidebar();
+
+    expect(screen.getByRole("link", { name: "Job Trackr" })).toHaveAttribute(
+      "href",
+      "/",
+    );
+  });
+
   it("links to the job postings page", () => {
     renderSidebar();
 
@@ -31,5 +40,25 @@ describe("Sidebar", () => {
     expect(
       screen.getByRole("link", { name: "Job Candidacies" }),
     ).toHaveAttribute("href", "/jobs/candidacies");
+  });
+
+  it("links to the account page", () => {
+    renderSidebar();
+
+    expect(screen.getByRole("link", { name: "Account" })).toHaveAttribute(
+      "href",
+      "/account",
+    );
+  });
+
+  it("omits the removed dashboard and settings links", () => {
+    renderSidebar();
+
+    expect(
+      screen.queryByRole("link", { name: "Dashboard" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: "Settings" }),
+    ).not.toBeInTheDocument();
   });
 });
