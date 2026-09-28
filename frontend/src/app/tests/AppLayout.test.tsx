@@ -39,7 +39,11 @@ describe("AppLayout", () => {
       "href",
       "/",
     );
-    expect(screen.getByText("Top bar menu")).toBeInTheDocument();
+    expect(
+      within(screen.getByRole("banner")).getByRole("button", {
+        name: "Sign out",
+      }),
+    ).toBeInTheDocument();
     expect(
       within(screen.getByRole("main")).getByText("Nested route content"),
     ).toBeInTheDocument();

@@ -5,17 +5,8 @@ import { LogoutButton } from "@/features/auth/components/form/LogoutButton";
 
 export function TopBar() {
   return (
-    <header className="flex h-14 items-center justify-between border-b bg-white px-4">
-      <span className="text-sm font-medium">Top bar menu</span>
-
-      <div className="flex items-center gap-2">
-        {/* Placeholder for search / filters / add button */}
-        <button className="rounded bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700">
-          + Action
-        </button>
-
-        <LogoutButton />
-      </div>
+    <header className="flex h-14 items-center justify-end border-b bg-white px-4">
+      <LogoutButton />
     </header>
   );
 }
