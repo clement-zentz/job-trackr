@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# File: backend/scripts/python/tests/test_add_header_to_file_shebang.py
+# File: backend/scripts/tests/test_add_header_to_file_shebang.py
 
 from __future__ import annotations
 
 from pathlib import Path
 
-from scripts.python.add_header_to_file import main
+from scripts.add_header_to_file import main
 
 
 def _write(tmp_path: Path, rel: str, content: str) -> Path:

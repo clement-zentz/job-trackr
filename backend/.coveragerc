@@ -15,8 +15,8 @@ omit =
     */manage.py
     */asgi.py
     */wsgi.py
-    scripts/python/generate_*.py
-    scripts/python/*_logging.py
+    scripts/generate_*.py
+    scripts/*_logging.py
 
 [report]
 show_missing = True

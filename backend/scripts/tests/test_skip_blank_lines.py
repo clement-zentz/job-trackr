@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# File: backend/scripts/python/tests/test_skip_blank_lines.py
+# File: backend/scripts/tests/test_skip_blank_lines.py
 
-from scripts.python.add_header_to_file import skip_blank_lines
+from scripts.add_header_to_file import skip_blank_lines
 
 
 def test_skip_blank_lines_no_blank_lines() -> None:

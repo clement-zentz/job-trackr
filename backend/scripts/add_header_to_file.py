@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# File: backend/scripts/python/add_header_to_file.py
+# File: backend/scripts/add_header_to_file.py
 
 import sys
 from pathlib import Path
