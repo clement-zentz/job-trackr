@@ -99,7 +99,7 @@ def test_partial_update_user_account(
     response = authenticated_client.patch(
         account_url,
         {
-            "username": "updated-user",
+            "username": "Updated-User",
             "first_name": "Updated",
             "last_name": "Name",
         },
@@ -176,12 +176,12 @@ def test_update_rejects_case_insensitive_duplicate_username(
     account_url,
     user,
 ):
-    UserFactory(username="ExistingUser")
+    UserFactory(username="existinguser")
 
     response = authenticated_client.patch(
         account_url,
         {
-            "username": "existinguser",
+            "username": "EXISTINGUSER",
         },
         format="json",
     )
