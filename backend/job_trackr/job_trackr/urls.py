@@ -31,6 +31,7 @@ urlpatterns: list[URLPattern | URLResolver] = [
     path("accounts/", include("allauth.urls")),
     path("api/_allauth/", include("allauth.headless.urls")),
     # --- API ---
+    path("api/v1/account/", include("apps.users.urls")),
     path("api/v1/jobs/", include("apps.jobs.urls")),
     path("api/health/", health),
 ]
