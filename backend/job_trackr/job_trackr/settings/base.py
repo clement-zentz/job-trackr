@@ -69,6 +69,7 @@ ACCOUNT_SIGNUP_FIELDS = [
 ]
 
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_CHANGE_EMAIL = True
 # --------------------------------
 
 
