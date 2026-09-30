@@ -299,3 +299,80 @@ def test_allauth_session_authenticates_drf_and_assigns_owner(
     job_posting = JobPosting.objects.get(pk=response.data["id"])
 
     assert job_posting.owner == verified_user
+
+
+def test_change_email_applies_new_address_only_after_verification(
+    api_client,
+    verified_user,
+):
+    original_email = verified_user.email
+    new_email = "updated@example.com"
+
+    login_response = login(
+        api_client,
+        username=verified_user.username,
+    )
+
+    assert login_response.status_code == status.HTTP_200_OK
+
+    response = api_client.post(
+        auth_url("manage_email"),
+        {
+            "email": new_email,
+        },
+        format="json",
+        **csrf_headers(api_client),
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+
+    verified_user.refresh_from_db()
+
+    assert verified_user.email == original_email
+
+    original_email_address = EmailAddress.objects.get(
+        user=verified_user,
+        email=original_email,
+    )
+    new_email_address = EmailAddress.objects.get(
+        user=verified_user,
+        email=new_email,
+    )
+
+    assert original_email_address.verified is True
+    assert original_email_address.primary is True
+
+    assert new_email_address.verified is False
+    assert new_email_address.primary is False
+
+    confirmation = EmailConfirmationHMAC.create(new_email_address)
+
+    response = api_client.post(
+        auth_url("verify_email"),
+        {
+            "key": confirmation.key,
+        },
+        format="json",
+        **csrf_headers(api_client),
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+
+    verified_user.refresh_from_db()
+    new_email_address.refresh_from_db()
+
+    assert verified_user.email == new_email
+
+    assert new_email_address.verified is True
+    assert new_email_address.primary is True
+
+    assert not EmailAddress.objects.filter(
+        pk=original_email_address.pk,
+    ).exists()
+
+    assert (
+        EmailAddress.objects.filter(
+            user=verified_user,
+        ).count()
+        == 1
+    )
