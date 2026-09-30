@@ -38,7 +38,7 @@ def user():
 
 @pytest.fixture
 def authenticated_client(api_client, user):
-    api_client.force_authenticate(user=user)
+    api_client.force_login(user=user)
     return api_client
 
 
