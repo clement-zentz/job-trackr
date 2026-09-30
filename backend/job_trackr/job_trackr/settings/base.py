@@ -70,6 +70,8 @@ ACCOUNT_SIGNUP_FIELDS = [
 
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_CHANGE_EMAIL = True
+
+ACCOUNT_ADAPTER = "apps.users.auth.adapters.AccountAdapter"
 # --------------------------------
 
 

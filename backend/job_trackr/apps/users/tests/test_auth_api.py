@@ -117,7 +117,7 @@ def test_signup_creates_unverified_user_and_sends_verification_email(
     api_client,
 ):
     payload = {
-        "username": "new-user",
+        "username": "New-User",
         "email": "new-user@example.com",
         "password": PASSWORD,
     }
@@ -134,8 +134,9 @@ def test_signup_creates_unverified_user_and_sends_verification_email(
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
     assert response.json()["meta"]["is_authenticated"] is False
 
-    user = UserModel.objects.get(username=payload["username"])
+    user = UserModel.objects.get(username="new-user")
 
+    assert user.username == "new-user"
     assert user.email == payload["email"]
     assert user.check_password(PASSWORD)
 
