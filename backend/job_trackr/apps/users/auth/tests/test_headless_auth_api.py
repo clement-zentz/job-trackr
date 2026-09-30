@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# File: backend/job_trackr/apps/users/tests/test_auth_api.py
+# File: backend/job_trackr/apps/users/auth/tests/test_headless_auth_api.py
 
 from typing import TYPE_CHECKING, TypedDict, cast
 
