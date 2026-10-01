@@ -231,3 +231,25 @@ def test_full_update_user_account_is_not_allowed(
     )
 
     assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+
+
+def test_update_rejects_username_exceeding_max_length_after_lowercasing(
+    authenticated_client,
+    account_url,
+    user,
+):
+    response = authenticated_client.patch(
+        account_url,
+        {
+            "username": "İ" * 150,
+        },
+        format="json",
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "username" in response.data
+    assert response.data["username"][0].code == "max_length"
+
+    user.refresh_from_db()
+
+    assert user.username == "testuser"
