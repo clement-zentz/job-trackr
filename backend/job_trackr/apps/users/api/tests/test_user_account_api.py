@@ -253,3 +253,25 @@ def test_update_rejects_username_exceeding_max_length_after_lowercasing(
     user.refresh_from_db()
 
     assert user.username == "testuser"
+
+
+def test_update_rejects_username_invalid_after_lowercasing(
+    authenticated_client,
+    account_url,
+    user,
+):
+    response = authenticated_client.patch(
+        account_url,
+        {
+            "username": "İpek",
+        },
+        format="json",
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "username" in response.data
+    assert response.data["username"][0].code == "invalid"
+
+    user.refresh_from_db()
+
+    assert user.username == "testuser"

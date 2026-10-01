@@ -3,8 +3,10 @@
 
 from typing import cast
 
-from django.db import IntegrityError, transaction
+from django.core.exceptions import ValidationError as DjangoValidationError
+from django.db import IntegrityError, models, transaction
 from rest_framework import serializers
+from rest_framework.exceptions import ErrorDetail
 
 from apps.users.models import User
 
@@ -76,6 +78,25 @@ class UserAccountSerializer(serializers.ModelSerializer[User]):
                 ),
                 code="max_length",
             )
+
+        model_username_field = cast(
+            models.CharField[str, str],
+            User._meta.get_field("username"),
+        )
+
+        try:
+            model_username_field.run_validators(value)
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError(
+                [
+                    ErrorDetail(
+                        message,
+                        code=error.code or "invalid",
+                    )
+                    for error in exc.error_list
+                    for message in error.messages
+                ]
+            ) from exc
 
         users = User.objects.filter(username=value)
 
