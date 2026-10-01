@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # File: backend/job_trackr/apps/users/api/serializers.py
 
+from typing import cast
+
 from django.db import IntegrityError, transaction
 from rest_framework import serializers
 
@@ -53,6 +55,20 @@ class UserAccountSerializer(serializers.ModelSerializer[User]):
 
     def validate_username(self, value: str) -> str:
         value = value.lower()
+
+        username_field = cast(
+            serializers.CharField,
+            self.fields["username"],
+        )
+        max_length = username_field.max_length
+
+        if max_length is not None and len(value) > max_length:
+            raise serializers.ValidationError(
+                username_field.error_messages["max_length"].format(
+                    max_length=max_length
+                ),
+                code="max_length",
+            )
 
         users = User.objects.filter(username=value)
 
