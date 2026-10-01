@@ -7,7 +7,7 @@ from allauth.account.adapter import DefaultAccountAdapter
 from allauth.core.exceptions import ImmediateHttpResponse
 from allauth.headless.internal.restkit.response import ErrorResponse
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError, transaction
+from django.db import IntegrityError, models, transaction
 from django.http import HttpRequest
 
 from apps.users.models import User
@@ -27,8 +27,14 @@ class AccountAdapter(DefaultAccountAdapter):  # type: ignore[misc]
         if isinstance(username, str):
             normalized_username = username.lower()
 
+            model_username_field = cast(
+                models.CharField[str, str],
+                User._meta.get_field("username"),
+            )
+
             try:
                 form.fields["username"].run_validators(normalized_username)
+                model_username_field.run_validators(normalized_username)
             except ValidationError as exc:
                 form.add_error("username", exc)
 

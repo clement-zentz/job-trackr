@@ -161,3 +161,30 @@ def test_save_user_rejects_username_exceeding_max_length_after_normalization(
     assert error["param"] == "username"
 
     assert user.pk is None
+
+
+def test_save_user_rejects_username_invalid_after_normalization(
+    signup_request,
+):
+    form = make_signup_form(username="İpek")
+    user = User()
+
+    with pytest.raises(ImmediateHttpResponse) as exc_info:
+        AccountAdapter().save_user(
+            signup_request,
+            user,
+            form,
+        )
+
+    response = exc_info.value.response
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    body = json.loads(response.content)
+    error = body["errors"][0]
+
+    assert len(body["errors"]) == 1
+    assert error["code"] == "invalid"
+    assert error["param"] == "username"
+
+    assert user.pk is None
