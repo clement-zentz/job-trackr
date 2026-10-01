@@ -6,6 +6,7 @@ from typing import Any, cast
 from allauth.account.adapter import DefaultAccountAdapter
 from allauth.core.exceptions import ImmediateHttpResponse
 from allauth.headless.internal.restkit.response import ErrorResponse
+from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 from django.http import HttpRequest
 
@@ -24,7 +25,21 @@ class AccountAdapter(DefaultAccountAdapter):  # type: ignore[misc]
         username = form.cleaned_data.get("username")
 
         if isinstance(username, str):
-            form.cleaned_data["username"] = username.lower()
+            normalized_username = username.lower()
+
+            try:
+                form.fields["username"].run_validators(normalized_username)
+            except ValidationError as exc:
+                form.add_error("username", exc)
+
+                raise ImmediateHttpResponse(
+                    response=ErrorResponse(
+                        request,
+                        input=form,
+                    )
+                ) from exc
+
+            form.cleaned_data["username"] = normalized_username
 
         try:
             with transaction.atomic():

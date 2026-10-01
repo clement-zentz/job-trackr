@@ -23,7 +23,7 @@ pytestmark = pytest.mark.django_db
 
 
 class SignupForm(forms.Form):
-    username = forms.CharField()
+    username = forms.CharField(max_length=150)
     email = forms.EmailField()
     password = forms.CharField()
 
@@ -133,3 +133,31 @@ def test_save_user_reraises_unrelated_integrity_error(
 
 def test_custom_account_adapter_is_configured():
     assert isinstance(get_adapter(), AccountAdapter)
+
+
+def test_save_user_rejects_username_exceeding_max_length_after_normalization(
+    signup_request,
+):
+    form = make_signup_form(username="İ" * 150)
+    user = User()
+
+    with pytest.raises(ImmediateHttpResponse) as exc_info:
+        AccountAdapter().save_user(
+            signup_request,
+            user,
+            form,
+        )
+
+    response = exc_info.value.response
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    body = json.loads(response.content)
+
+    error = body["errors"][0]
+
+    assert len(body["errors"]) == 1
+    assert error["code"] == "max_length"
+    assert error["param"] == "username"
+
+    assert user.pk is None
