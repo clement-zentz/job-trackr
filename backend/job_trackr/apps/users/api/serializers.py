@@ -33,9 +33,14 @@ class UserAccountSerializer(serializers.ModelSerializer[User]):
         instance: User,
         validated_data: dict[str, object],
     ) -> User:
+        update_fields = set(validated_data)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
         try:
             with transaction.atomic():
-                return super().update(instance, validated_data)
+                instance.save(update_fields=update_fields)
         except IntegrityError as exc:
             username = validated_data.get("username")
 
@@ -52,6 +57,8 @@ class UserAccountSerializer(serializers.ModelSerializer[User]):
                     ) from exc
 
             raise
+
+        return instance
 
     def validate_username(self, value: str) -> str:
         value = value.lower()
