@@ -7,10 +7,14 @@ from django.contrib.auth.models import AbstractUser
 
 
 class User(AbstractUser):
+    def _normalize_username(self) -> None:
+        if isinstance(self.username, str):
+            self.username = self.username.lower()
+
     def full_clean(self, *args: Any, **kwargs: Any) -> None:
-        self.username = self.username.lower()
+        self._normalize_username()
         super().full_clean(*args, **kwargs)
 
     def save(self, *args: Any, **kwargs: Any) -> None:
-        self.username = self.username.lower()
+        self._normalize_username()
         super().save(*args, **kwargs)
