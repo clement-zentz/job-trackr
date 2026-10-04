@@ -13,6 +13,7 @@ import userEvent from "@testing-library/user-event";
 import { RouterProvider } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { getUserAccount } from "@/features/account/api/accountApi";
 import {
   getCurrentSession,
   login,
@@ -33,6 +34,7 @@ import {
   renderWithQueryClient,
 } from "@/tests/utils";
 
+import { createUserAccountRead } from "./factories/account";
 import {
   createAuthenticatedAuthResponse,
   createAuthUser,
@@ -51,6 +53,10 @@ vi.mock("@/features/auth/api/authApi", () => ({
   verifyEmail: vi.fn(),
 }));
 
+vi.mock("@/features/account/api/accountApi", () => ({
+  getUserAccount: vi.fn(),
+}));
+
 vi.mock(
   import("@/features/jobs/candidacies/api/jobCandidaciesApi"),
   async (importOriginal) => ({
@@ -63,6 +69,9 @@ vi.mock(
 const mockedGetCurrentSession = vi.mocked(getCurrentSession);
 const mockedLogin = vi.mocked(login);
 const mockedVerifyEmail = vi.mocked(verifyEmail);
+
+const mockedGetUserAccount = vi.mocked(getUserAccount);
+
 const mockedCreateJobCandidacy = vi.mocked(createJobCandidacy);
 const mockedListJobCandidacies = vi.mocked(listJobCandidacies);
 
@@ -79,12 +88,18 @@ describe("router", () => {
     mockedGetCurrentSession.mockReset();
     mockedLogin.mockReset();
     mockedVerifyEmail.mockReset();
+
+    mockedGetUserAccount.mockReset();
+
     mockedCreateJobCandidacy.mockReset();
     mockedListJobCandidacies.mockReset();
 
     mockedGetCurrentSession.mockResolvedValue(
       createAuthenticatedAuthResponse(),
     );
+
+    mockedGetUserAccount.mockResolvedValue(createUserAccountRead());
+
     mockedListJobCandidacies.mockResolvedValue(createPaginatedResponse([]));
   });
 
@@ -260,9 +275,17 @@ describe("router", () => {
       }),
     );
 
-    const main = await screen.findByRole("main");
+    await waitFor(() => {
+      const main = within(screen.getByRole("main"));
 
-    expect(within(main).getByText("Account")).toBeInTheDocument();
+      expect(
+        main.getByRole("heading", { name: "Account" }),
+      ).toBeInTheDocument();
+      expect(
+        main.getByRole("heading", { name: "Profile" }),
+      ).toBeInTheDocument();
+    });
+
     expect(router.state.location.pathname).toBe("/account");
 
     expect(mockedLogin).toHaveBeenCalledWith(loginPayload);
@@ -512,6 +535,26 @@ describe("router", () => {
       "user B cached job",
     ]);
     expect(invalidate).not.toHaveBeenCalled();
+
+    expect(router.state.location.pathname).toBe("/account");
+  });
+
+  it("registers the account route", async () => {
+    mockedGetUserAccount.mockResolvedValue(
+      createUserAccountRead({
+        email: "john.doe@example.com",
+      }),
+    );
+
+    await renderRouterAt("/account");
+
+    expect(
+      await screen.findByRole("heading", {
+        name: "Account",
+      }),
+    ).toBeInTheDocument();
+
+    expect(await screen.findByText("john.doe@example.com")).toBeInTheDocument();
 
     expect(router.state.location.pathname).toBe("/account");
   });
