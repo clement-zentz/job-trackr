@@ -4,6 +4,7 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 
 import { AppLayout } from "@/app";
+import { accountRoutes } from "@/features/account";
 import { AuthBootstrap } from "@/features/auth/components/session/AuthBootstrap";
 import { GuestOnlyRoute } from "@/features/auth/components/session/GuestOnlyRoute";
 import { RequireAuth } from "@/features/auth/components/session/RequireAuth";
@@ -45,10 +46,7 @@ export const router = createBrowserRouter([
                 index: true,
                 element: <Navigate to="jobs/candidacies" replace />,
               },
-              {
-                path: "account",
-                element: <div className="p-6">Account</div>,
-              },
+              ...accountRoutes,
               {
                 path: "jobs",
                 children: [...jobPostingsRoutes, ...jobCandidaciesRoutes],
