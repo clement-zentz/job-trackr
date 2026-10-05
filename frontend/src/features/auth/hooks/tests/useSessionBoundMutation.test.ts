@@ -343,4 +343,45 @@ describe("useSessionBoundMutation", () => {
       onlineManager.setOnline(true);
     }
   });
+
+  it("lets an async callback recheck its session after an await", async () => {
+    const client = createTestQueryClient();
+    const callbackStarted = createDeferred<void>();
+    const resumeCallback = createDeferred<void>();
+    const observations: boolean[] = [];
+
+    const { result } = renderHook(
+      () =>
+        useSessionBoundMutation({
+          mutationFn: async () => "data",
+
+          onSuccess: async (_data, _variables, session) => {
+            observations.push(session.isCurrent());
+            callbackStarted.resolve(undefined);
+
+            await resumeCallback.promise;
+
+            observations.push(session.isCurrent());
+          },
+        }),
+      {
+        wrapper: createWrapperWithClient(client),
+      },
+    );
+
+    const pending = result.current.mutateAsync("job");
+
+    await callbackStarted.promise;
+
+    act(() => {
+      resetSessionBoundState(client);
+    });
+
+    await act(async () => {
+      resumeCallback.resolve(undefined);
+      await pending;
+    });
+
+    expect(observations).toEqual([true, false]);
+  });
 });

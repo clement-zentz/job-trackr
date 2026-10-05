@@ -181,4 +181,79 @@ describe("useUpdateAccount", () => {
     expect(invalidateSpy).not.toHaveBeenCalled();
     expect(queryClient.getQueriesData({})).toEqual(cachedQueries);
   });
+
+  it("does not restore stale account data when the session changes while cancelling the account query", async () => {
+    const queryClient = createTestQueryClient();
+
+    queryClient.setQueryData(authKeys.session(), createAuthUser({ id: 1 }));
+
+    const previousAccount = createUserAccountRead({
+      id: 1,
+      username: "user.a",
+    });
+
+    const updatedAccount = createUserAccountRead({
+      id: 1,
+      username: "user.a.updated",
+    });
+
+    queryClient.setQueryData(accountKeys.detail(), previousAccount);
+
+    mockedUpdateUserAccount.mockResolvedValue(updatedAccount);
+
+    const cancellation = createDeferred<void>();
+
+    const cancelQueriesSpy = vi
+      .spyOn(queryClient, "cancelQueries")
+      .mockImplementationOnce(() => cancellation.promise);
+
+    const invalidateQueriesSpy = vi.spyOn(queryClient, "invalidateQueries");
+
+    const { result } = renderHook(() => useUpdateAccount(), {
+      wrapper: createWrapperWithClient(queryClient),
+    });
+
+    const pending = result.current.mutateAsync(
+      createUserAccountUpdatePayload({
+        username: "user.a.updated",
+      }),
+    );
+
+    await waitFor(() => {
+      expect(cancelQueriesSpy).toHaveBeenCalledWith({
+        queryKey: accountKeys.detail(),
+      });
+    });
+
+    act(() => {
+      resetSessionBoundState(queryClient);
+
+      queryClient.setQueryData(authKeys.session(), createAuthUser({ id: 2 }));
+
+      queryClient.setQueryData(
+        accountKeys.detail(),
+        createUserAccountRead({
+          id: 2,
+          username: "user.b",
+          email: "user.b@example.com",
+        }),
+      );
+    });
+
+    await act(async () => {
+      cancellation.resolve(undefined);
+      await pending;
+    });
+
+    expect(queryClient.getQueryData(accountKeys.detail())).toEqual(
+      expect.objectContaining({
+        id: 2,
+        username: "user.b",
+      }),
+    );
+
+    expect(invalidateQueriesSpy).not.toHaveBeenCalledWith({
+      queryKey: authKeys.session(),
+    });
+  });
 });

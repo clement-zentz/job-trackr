@@ -1,18 +1,47 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/features/auth/hooks/useSessionBoundMutation.ts
 
-import type { MutateOptions, UseMutationOptions } from "@tanstack/react-query";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLayoutEffect } from "react";
 
 import {
   registerSessionBoundMutation,
+  type SessionBoundMutationContext,
   subscribeToAuthGeneration,
 } from "../cache";
 
-type Callbacks<TData, TVariables> = Pick<
-  UseMutationOptions<TData, Error, TVariables>,
-  "onSuccess" | "onError" | "onSettled"
+interface SessionBoundCallbacks<TData, TVariables, TCallbackResult = unknown> {
+  onSuccess?: (
+    data: TData,
+    variables: TVariables,
+    session: SessionBoundMutationContext,
+  ) => TCallbackResult;
+
+  onError?: (
+    error: Error,
+    variables: TVariables,
+    session: SessionBoundMutationContext,
+  ) => TCallbackResult;
+
+  onSettled?: (
+    data: TData | undefined,
+    error: Error | null,
+    variables: TVariables,
+    session: SessionBoundMutationContext,
+  ) => TCallbackResult;
+}
+
+type SessionBoundMutationOptions<TData, TVariables> = SessionBoundCallbacks<
+  TData,
+  TVariables
+> & {
+  mutationFn: (variables: TVariables, signal: AbortSignal) => Promise<TData>;
+};
+
+type SessionBoundMutateOptions<TData, TVariables> = SessionBoundCallbacks<
+  TData,
+  TVariables,
+  void
 >;
 
 interface MutationVariables<TVariables> {
@@ -20,56 +49,79 @@ interface MutationVariables<TVariables> {
   registration: ReturnType<typeof registerSessionBoundMutation>;
 }
 
-function guardCallbacks<TData, TVariables>(
-  callbacks: Callbacks<TData, TVariables>,
-): Callbacks<TData, MutationVariables<TVariables>> {
+function guardCallbacks<TData, TVariables, TCallbackResult>(
+  callbacks: SessionBoundCallbacks<TData, TVariables, TCallbackResult>,
+) {
   return {
-    onSuccess: (data, { variables, registration }, result, context) => {
-      if (registration.isCurrent()) {
-        return callbacks.onSuccess?.(data, variables, result, context);
+    onSuccess: (
+      data: TData,
+      { variables, registration }: MutationVariables<TVariables>,
+    ) => {
+      if (!registration.isCurrent()) {
+        return;
       }
+
+      return callbacks.onSuccess?.(data, variables, registration);
     },
-    onError: (error, { variables, registration }, result, context) => {
-      if (registration.isCurrent()) {
-        return callbacks.onError?.(error, variables, result, context);
+
+    onError: (
+      error: Error,
+      { variables, registration }: MutationVariables<TVariables>,
+    ) => {
+      if (!registration.isCurrent()) {
+        return;
       }
+
+      return callbacks.onError?.(error, variables, registration);
     },
-    onSettled: (data, error, { variables, registration }, result, context) => {
-      if (registration.isCurrent()) {
-        return callbacks.onSettled?.(data, error, variables, result, context);
+
+    onSettled: (
+      data: TData | undefined,
+      error: Error | null,
+      { variables, registration }: MutationVariables<TVariables>,
+    ) => {
+      if (!registration.isCurrent()) {
+        return;
       }
+
+      return callbacks.onSettled?.(data, error, variables, registration);
     },
   };
 }
 
 /**
  * Session-bound mutations for protected application data.
- * Only mutationFn and guarded onSuccess/onError/onSettled callbacks are exposed;
+ *
+ * Callbacks are prevented from starting after their captured auth generation
+ * becomes stale. Async callbacks also receive their session context so they can
+ * recheck session.isCurrent() after their own await boundaries.
+ *
  * onMutate, mutation keys and per-hook retry options need separate isolation
  * guarantees before being added. QueryClient defaults still apply.
- * mutateAsync keeps normal promise semantics; use the guarded callbacks for
+ *
+ * mutateAsync keeps normal promise semantics; use guarded callbacks for
  * session-dependent side effects.
  */
 export function useSessionBoundMutation<TData, TVariables>(
-  options: Callbacks<TData, TVariables> & {
-    mutationFn: (variables: TVariables, signal: AbortSignal) => Promise<TData>;
-  },
+  options: SessionBoundMutationOptions<TData, TVariables>,
 ) {
   const queryClient = useQueryClient();
-  const callbacks = guardCallbacks(options);
-  const mutation = useMutation({
-    mutationFn: ({
-      variables,
-      registration,
-    }: MutationVariables<TVariables>) => {
+
+  const callbacks = guardCallbacks<TData, TVariables, unknown>(options);
+
+  const mutation = useMutation<TData, Error, MutationVariables<TVariables>>({
+    mutationFn: ({ variables, registration }) => {
       // Paused mutations and retries must keep their original session, too.
       registration.signal.throwIfAborted();
+
       return options.mutationFn(variables, registration.signal);
     },
+
     ...callbacks,
-    onSettled: async (data, error, variables, result, context) => {
+
+    onSettled: async (data, error, variables) => {
       try {
-        await callbacks.onSettled?.(data, error, variables, result, context);
+        await callbacks.onSettled?.(data, error, variables);
       } finally {
         variables.registration.release();
       }
@@ -77,6 +129,7 @@ export function useSessionBoundMutation<TData, TVariables>(
   });
 
   const { reset } = mutation;
+
   useLayoutEffect(
     () => subscribeToAuthGeneration(queryClient, reset),
     [queryClient, reset],
@@ -91,19 +144,25 @@ export function useSessionBoundMutation<TData, TVariables>(
 
   return {
     ...mutation,
+
     variables: mutation.variables?.variables,
+
     mutate: (
       variables: TVariables,
-      mutateOptions?: MutateOptions<TData, Error, TVariables>,
+      mutateOptions?: SessionBoundMutateOptions<TData, TVariables>,
     ) =>
-      mutation.mutate(prepare(variables), guardCallbacks(mutateOptions ?? {})),
+      mutation.mutate(
+        prepare(variables),
+        guardCallbacks<TData, TVariables, void>(mutateOptions ?? {}),
+      ),
+
     mutateAsync: (
       variables: TVariables,
-      mutateOptions?: MutateOptions<TData, Error, TVariables>,
+      mutateOptions?: SessionBoundMutateOptions<TData, TVariables>,
     ) =>
       mutation.mutateAsync(
         prepare(variables),
-        guardCallbacks(mutateOptions ?? {}),
+        guardCallbacks<TData, TVariables, void>(mutateOptions ?? {}),
       ),
   };
 }
