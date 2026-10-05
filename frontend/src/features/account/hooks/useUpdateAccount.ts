@@ -17,10 +17,14 @@ export function useUpdateAccount() {
     mutationFn: (payload: UserAccountUpdatePayload, signal) =>
       updateUserAccount(payload, signal),
 
-    onSuccess: async (updatedAccount) => {
+    onSuccess: async (updatedAccount, _payload, session) => {
       await queryClient.cancelQueries({
         queryKey: accountKeys.detail(),
       });
+
+      if (!session.isCurrent()) {
+        return;
+      }
 
       queryClient.setQueryData(accountKeys.detail(), updatedAccount);
 
