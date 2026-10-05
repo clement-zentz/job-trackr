@@ -2,6 +2,7 @@
 // File: frontend/src/features/account/pages/AccountPage.tsx
 
 import axios from "axios";
+import { useState } from "react";
 
 import { AccountForm } from "../components/form/AccountForm";
 import {
@@ -10,7 +11,7 @@ import {
 } from "../components/form/accountFormMappers";
 import { useAccount } from "../hooks/useAccount";
 import { useUpdateAccount } from "../hooks/useUpdateAccount";
-import type { UserAccountUpdatePayload } from "../types";
+import type { UserAccountFormValues, UserAccountUpdatePayload } from "../types";
 
 const mainClassName = "mx-auto max-w-3xl px-4 py-8";
 const h1ClassName = "text-2xl font-bold text-slate-900";
@@ -18,6 +19,11 @@ const h1ClassName = "text-2xl font-bold text-slate-900";
 type AccountErrorData = Partial<
   Record<keyof UserAccountUpdatePayload, string[]>
 >;
+
+interface SavedAccountForm {
+  accountId: number;
+  values: UserAccountFormValues;
+}
 
 const fieldLabels: Record<keyof UserAccountUpdatePayload, string> = {
   username: "Username",
@@ -63,16 +69,19 @@ export function AccountPage() {
   const accountQuery = useAccount();
   const updateAccount = useUpdateAccount();
 
-  if (accountQuery.isLoading) {
-    return (
-      <div className={mainClassName}>
-        <h1 className={h1ClassName}>Account</h1>
-        <p className="mt-4">Loading account...</p>
-      </div>
-    );
-  }
+  const [savedAccountForm, setSavedAccountForm] =
+    useState<SavedAccountForm | null>(null);
 
-  if (accountQuery.isError || !accountQuery.data) {
+  if (!accountQuery.data) {
+    if (accountQuery.isLoading) {
+      return (
+        <div className={mainClassName}>
+          <h1 className={h1ClassName}>Account</h1>
+          <p className="mt-4">Loading account...</p>
+        </div>
+      );
+    }
+
     return (
       <div className={mainClassName}>
         <h1 className={h1ClassName}>Account</h1>
@@ -84,12 +93,10 @@ export function AccountPage() {
   const account = accountQuery.data;
   const initialValues = userAccountToFormValues(account);
 
-  const formKey = [
-    account.id,
-    account.username,
-    account.first_name,
-    account.last_name,
-  ].join(":");
+  const savedValues =
+    savedAccountForm?.accountId === account.id
+      ? savedAccountForm.values
+      : undefined;
 
   return (
     <div className={mainClassName}>
@@ -101,12 +108,22 @@ export function AccountPage() {
         </p>
       </div>
 
+      {accountQuery.isError && (
+        <p
+          role="alert"
+          className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+        >
+          Could not refresh account information. Showing previously loaded data.
+        </p>
+      )}
+
       <section>
         <h2 className="mb-3 text-lg font-semibold text-slate-900">Profile</h2>
 
         <AccountForm
-          key={formKey}
+          key={account.id}
           initialValues={initialValues}
+          savedValues={savedValues}
           isSubmitting={updateAccount.isPending}
           error={getUpdateErrorMessage(updateAccount.error)}
           status={
@@ -121,7 +138,14 @@ export function AccountPage() {
               return;
             }
 
-            updateAccount.mutate(payload);
+            updateAccount.mutate(payload, {
+              onSuccess: (updatedAccount) => {
+                setSavedAccountForm({
+                  accountId: updatedAccount.id,
+                  values: userAccountToFormValues(updatedAccount),
+                });
+              },
+            });
           }}
         />
       </section>

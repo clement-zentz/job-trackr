@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/features/account/components/form/AccountForm.tsx
 
-import { type SubmitEventHandler, useState } from "react";
+import { type SubmitEventHandler, useLayoutEffect, useReducer } from "react";
 
 import { InputField } from "@/components/form";
 
@@ -27,35 +27,143 @@ const submitButtonClassName = `
 
 interface AccountFormProps {
   initialValues: UserAccountFormValues;
+  savedValues?: UserAccountFormValues;
   onSubmit: (values: UserAccountFormValues) => void;
   isSubmitting?: boolean;
   error?: string;
   status?: string;
 }
 
+interface FormState {
+  values: UserAccountFormValues;
+  baseline: UserAccountFormValues;
+}
+
+type FormAction =
+  | {
+      type: "edit";
+      field: keyof UserAccountFormValues;
+      value: string;
+    }
+  | {
+      type: "server-refresh";
+      values: UserAccountFormValues;
+    }
+  | {
+      type: "save-success";
+      values: UserAccountFormValues;
+    };
+
+function mergeServerValues(
+  state: FormState,
+  serverValues: UserAccountFormValues,
+): FormState {
+  return {
+    values: {
+      username:
+        state.values.username === state.baseline.username
+          ? serverValues.username
+          : state.values.username,
+
+      first_name:
+        state.values.first_name === state.baseline.first_name
+          ? serverValues.first_name
+          : state.values.first_name,
+
+      last_name:
+        state.values.last_name === state.baseline.last_name
+          ? serverValues.last_name
+          : state.values.last_name,
+    },
+
+    baseline: serverValues,
+  };
+}
+
+function formReducer(state: FormState, action: FormAction): FormState {
+  switch (action.type) {
+    case "edit":
+      return {
+        ...state,
+        values: {
+          ...state.values,
+          [action.field]: action.value,
+        },
+      };
+
+    case "server-refresh":
+      return mergeServerValues(state, action.values);
+
+    case "save-success":
+      return {
+        values: action.values,
+        baseline: action.values,
+      };
+  }
+}
+
+function areValuesEqual(
+  left: UserAccountFormValues,
+  right: UserAccountFormValues,
+) {
+  return (
+    left.username === right.username &&
+    left.first_name === right.first_name &&
+    left.last_name === right.last_name
+  );
+}
+
 export function AccountForm({
   initialValues,
+  savedValues,
   onSubmit,
   isSubmitting = false,
   error,
   status,
 }: AccountFormProps) {
-  const [form, setForm] = useState<UserAccountFormValues>(initialValues);
+  const [state, dispatch] = useReducer(formReducer, {
+    values: initialValues,
+    baseline: initialValues,
+  });
 
-  const updateField = <K extends keyof UserAccountFormValues>(
-    field: K,
-    value: UserAccountFormValues[K],
-  ) => {
-    setForm((current) => ({
-      ...current,
-      [field]: value,
-    }));
+  const {
+    username: initialUsername,
+    first_name: initialFirstName,
+    last_name: initialLastName,
+  } = initialValues;
+
+  useLayoutEffect(() => {
+    dispatch({
+      type: "server-refresh",
+      values: {
+        username: initialUsername,
+        first_name: initialFirstName,
+        last_name: initialLastName,
+      },
+    });
+  }, [initialUsername, initialFirstName, initialLastName]);
+
+  useLayoutEffect(() => {
+    if (!savedValues) {
+      return;
+    }
+
+    dispatch({
+      type: "save-success",
+      values: savedValues,
+    });
+  }, [savedValues]);
+
+  const form = state.values;
+  const isDirty = !areValuesEqual(form, state.baseline);
+
+  const updateField = (field: keyof UserAccountFormValues, value: string) => {
+    dispatch({
+      type: "edit",
+      field,
+      value,
+    });
   };
-
-  const isDirty =
-    form.username !== initialValues.username ||
-    form.first_name !== initialValues.first_name ||
-    form.last_name !== initialValues.last_name;
 
   const handleSubmit: SubmitEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
