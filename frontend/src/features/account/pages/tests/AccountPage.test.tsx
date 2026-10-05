@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/features/account/pages/tests/AccountPage.test.tsx
 
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createUserAccountRead } from "@/tests/factories/account";
@@ -225,9 +225,14 @@ describe("AccountPage", () => {
       username: "john.updated",
     });
 
-    expect(mutate).toHaveBeenCalledWith({
-      username: "john.updated",
-    });
+    expect(mutate).toHaveBeenCalledWith(
+      {
+        username: "john.updated",
+      },
+      {
+        onSuccess: expect.any(Function),
+      },
+    );
 
     expect(mutate).toHaveBeenCalledTimes(1);
   });
@@ -344,5 +349,70 @@ describe("AccountPage", () => {
     render(<AccountPage />);
 
     expect(screen.getByText("invalid-date")).toBeInTheDocument();
+  });
+
+  it("keeps rendering cached account data when a background refresh fails", () => {
+    const account = createUserAccountRead();
+
+    mockAccountQuery({
+      isError: true,
+      data: account,
+    });
+
+    render(<AccountPage />);
+
+    expect(screen.getByTestId("account-form")).toBeInTheDocument();
+
+    expect(
+      screen.getByText(
+        "Could not refresh account information. Showing previously loaded data.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("passes normalized saved values back to the form after a successful update", () => {
+    const account = createUserAccountRead({
+      id: 1,
+      username: "john.doe",
+      first_name: "John",
+      last_name: "Doe",
+    });
+
+    const normalizedAccount = createUserAccountRead({
+      id: 1,
+      username: "john.doe",
+      first_name: "John",
+      last_name: "Doe",
+    });
+
+    mockAccountQuery({ data: account });
+
+    render(<AccountPage />);
+
+    getAccountFormProps().onSubmit({
+      ...userAccountToFormValues(account),
+      username: "JOHN.DOE",
+    });
+
+    const mutateOptions = mutate.mock.lastCall?.[1];
+
+    expect(mutateOptions?.onSuccess).toEqual(expect.any(Function));
+
+    act(() => {
+      mutateOptions?.onSuccess?.(
+        normalizedAccount,
+        { username: "JOHN.DOE" },
+        {
+          signal: new AbortController().signal,
+          isCurrent: () => true,
+        },
+      );
+    });
+
+    expect(getAccountFormProps()).toEqual(
+      expect.objectContaining({
+        savedValues: userAccountToFormValues(normalizedAccount),
+      }),
+    );
   });
 });
