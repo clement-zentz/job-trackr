@@ -1,7 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/features/account/components/form/AccountForm.tsx
 
-import { type SubmitEventHandler, useLayoutEffect, useReducer } from "react";
+import {
+  type SubmitEventHandler,
+  useLayoutEffect,
+  useReducer,
+  useRef,
+} from "react";
 
 import { InputField } from "@/components/form";
 
@@ -27,7 +32,7 @@ const submitButtonClassName = `
 
 interface AccountFormProps {
   initialValues: UserAccountFormValues;
-  savedValues?: UserAccountFormValues;
+  saveSucceeded?: boolean;
   onSubmit: (values: UserAccountFormValues) => void;
   isSubmitting?: boolean;
   error?: string;
@@ -115,7 +120,7 @@ function areValuesEqual(
 
 export function AccountForm({
   initialValues,
-  savedValues,
+  saveSucceeded = false,
   onSubmit,
   isSubmitting = false,
   error,
@@ -125,6 +130,8 @@ export function AccountForm({
     values: initialValues,
     baseline: initialValues,
   });
+
+  const previousSaveSucceeded = useRef(saveSucceeded);
 
   const {
     username: initialUsername,
@@ -144,15 +151,19 @@ export function AccountForm({
   }, [initialUsername, initialFirstName, initialLastName]);
 
   useLayoutEffect(() => {
-    if (!savedValues) {
-      return;
+    if (saveSucceeded && !previousSaveSucceeded.current) {
+      dispatch({
+        type: "save-success",
+        values: {
+          username: initialUsername,
+          first_name: initialFirstName,
+          last_name: initialLastName,
+        },
+      });
     }
 
-    dispatch({
-      type: "save-success",
-      values: savedValues,
-    });
-  }, [savedValues]);
+    previousSaveSucceeded.current = saveSucceeded;
+  }, [saveSucceeded, initialUsername, initialFirstName, initialLastName]);
 
   const form = state.values;
   const isDirty = !areValuesEqual(form, state.baseline);

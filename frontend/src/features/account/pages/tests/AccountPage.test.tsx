@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/features/account/pages/tests/AccountPage.test.tsx
 
-import { act, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createUserAccountRead } from "@/tests/factories/account";
@@ -198,6 +198,7 @@ describe("AccountPage", () => {
     expect(getAccountFormProps()).toEqual(
       expect.objectContaining({
         initialValues: userAccountToFormValues(account),
+        saveSucceeded: false,
         isSubmitting: true,
         error: undefined,
         status: undefined,
@@ -225,14 +226,9 @@ describe("AccountPage", () => {
       username: "john.updated",
     });
 
-    expect(mutate).toHaveBeenCalledWith(
-      {
-        username: "john.updated",
-      },
-      {
-        onSuccess: expect.any(Function),
-      },
-    );
+    expect(mutate).toHaveBeenCalledWith({
+      username: "john.updated",
+    });
 
     expect(mutate).toHaveBeenCalledTimes(1);
   });
@@ -253,7 +249,7 @@ describe("AccountPage", () => {
     expect(mutate).not.toHaveBeenCalled();
   });
 
-  it("passes the success message to the form after an update", () => {
+  it("passes the successful update state to the form", () => {
     mockUpdateAccount({
       isSuccess: true,
     });
@@ -262,6 +258,7 @@ describe("AccountPage", () => {
 
     expect(getAccountFormProps()).toEqual(
       expect.objectContaining({
+        saveSucceeded: true,
         status: "Account updated successfully.",
       }),
     );
@@ -370,7 +367,7 @@ describe("AccountPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("passes normalized saved values back to the form after a successful update", () => {
+  it("passes normalized account values and success state to the form after an update", () => {
     const account = createUserAccountRead({
       id: 1,
       username: "john.doe",
@@ -380,38 +377,31 @@ describe("AccountPage", () => {
 
     const normalizedAccount = createUserAccountRead({
       id: 1,
-      username: "john.doe",
+      username: "john.updated",
       first_name: "John",
       last_name: "Doe",
     });
 
     mockAccountQuery({ data: account });
 
-    render(<AccountPage />);
+    const { rerender } = render(<AccountPage />);
 
     getAccountFormProps().onSubmit({
       ...userAccountToFormValues(account),
-      username: "JOHN.DOE",
+      username: "JOHN.UPDATED",
     });
 
-    const mutateOptions = mutate.mock.lastCall?.[1];
+    expect(mutate).toHaveBeenCalledWith({ username: "JOHN.UPDATED" });
 
-    expect(mutateOptions?.onSuccess).toEqual(expect.any(Function));
+    mockAccountQuery({ data: normalizedAccount });
+    mockUpdateAccount({ isSuccess: true });
 
-    act(() => {
-      mutateOptions?.onSuccess?.(
-        normalizedAccount,
-        { username: "JOHN.DOE" },
-        {
-          signal: new AbortController().signal,
-          isCurrent: () => true,
-        },
-      );
-    });
+    rerender(<AccountPage />);
 
     expect(getAccountFormProps()).toEqual(
       expect.objectContaining({
-        savedValues: userAccountToFormValues(normalizedAccount),
+        initialValues: userAccountToFormValues(normalizedAccount),
+        saveSucceeded: true,
       }),
     );
   });

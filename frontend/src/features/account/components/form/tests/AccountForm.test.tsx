@@ -246,7 +246,7 @@ describe("AccountForm", () => {
     expect(screen.getByLabelText("Last name")).toHaveValue("Smith");
   });
 
-  it("resets to normalized values after a successful save", async () => {
+  it("resets to normalized values when a save succeeds", async () => {
     const user = userEvent.setup();
 
     const { rerender } = renderAccountForm();
@@ -261,7 +261,7 @@ describe("AccountForm", () => {
     rerender(
       <AccountForm
         initialValues={initialValues}
-        savedValues={{ ...initialValues }}
+        saveSucceeded
         onSubmit={vi.fn()}
       />,
     );
@@ -269,5 +269,64 @@ describe("AccountForm", () => {
     expect(screen.getByLabelText("Username")).toHaveValue("john.doe");
 
     expect(screen.getByRole("button", { name: "Save changes" })).toBeDisabled();
+  });
+
+  it("uses fresher server values when they arrive before save completion", async () => {
+    const user = userEvent.setup();
+
+    const { rerender } = renderAccountForm();
+
+    await user.clear(screen.getByLabelText("First name"));
+    await user.type(screen.getByLabelText("First name"), "Johnny");
+
+    rerender(
+      <AccountForm
+        initialValues={{
+          username: "john.doe",
+          first_name: "Johnny",
+          last_name: "Fresh",
+        }}
+        saveSucceeded
+        onSubmit={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByLabelText("First name")).toHaveValue("Johnny");
+    expect(screen.getByLabelText("Last name")).toHaveValue("Fresh");
+
+    expect(screen.getByRole("button", { name: "Save changes" })).toBeDisabled();
+  });
+
+  it("does not reset new edits while the previous save remains successful", async () => {
+    const user = userEvent.setup();
+
+    const { rerender } = renderAccountForm();
+
+    rerender(
+      <AccountForm
+        initialValues={initialValues}
+        saveSucceeded
+        onSubmit={vi.fn()}
+      />,
+    );
+
+    await user.clear(screen.getByLabelText("First name"));
+    await user.type(screen.getByLabelText("First name"), "Johnny");
+
+    rerender(
+      <AccountForm
+        initialValues={{
+          ...initialValues,
+          last_name: "Fresh",
+        }}
+        saveSucceeded
+        onSubmit={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByLabelText("First name")).toHaveValue("Johnny");
+    expect(screen.getByLabelText("Last name")).toHaveValue("Fresh");
+
+    expect(screen.getByRole("button", { name: "Save changes" })).toBeEnabled();
   });
 });
