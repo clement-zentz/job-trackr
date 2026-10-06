@@ -2,7 +2,6 @@
 // File: frontend/src/features/account/pages/AccountPage.tsx
 
 import axios from "axios";
-import { useState } from "react";
 
 import { AccountForm } from "../components/form/AccountForm";
 import {
@@ -11,7 +10,7 @@ import {
 } from "../components/form/accountFormMappers";
 import { useAccount } from "../hooks/useAccount";
 import { useUpdateAccount } from "../hooks/useUpdateAccount";
-import type { UserAccountFormValues, UserAccountUpdatePayload } from "../types";
+import type { UserAccountUpdatePayload } from "../types";
 
 const mainClassName = "mx-auto max-w-3xl px-4 py-8";
 const h1ClassName = "text-2xl font-bold text-slate-900";
@@ -19,11 +18,6 @@ const h1ClassName = "text-2xl font-bold text-slate-900";
 type AccountErrorData = Partial<
   Record<keyof UserAccountUpdatePayload, string[]>
 >;
-
-interface SavedAccountForm {
-  accountId: number;
-  values: UserAccountFormValues;
-}
 
 const fieldLabels: Record<keyof UserAccountUpdatePayload, string> = {
   username: "Username",
@@ -69,9 +63,6 @@ export function AccountPage() {
   const accountQuery = useAccount();
   const updateAccount = useUpdateAccount();
 
-  const [savedAccountForm, setSavedAccountForm] =
-    useState<SavedAccountForm | null>(null);
-
   if (!accountQuery.data) {
     if (accountQuery.isLoading) {
       return (
@@ -92,11 +83,6 @@ export function AccountPage() {
 
   const account = accountQuery.data;
   const initialValues = userAccountToFormValues(account);
-
-  const savedValues =
-    savedAccountForm?.accountId === account.id
-      ? savedAccountForm.values
-      : undefined;
 
   return (
     <div className={mainClassName}>
@@ -123,7 +109,7 @@ export function AccountPage() {
         <AccountForm
           key={account.id}
           initialValues={initialValues}
-          savedValues={savedValues}
+          saveSucceeded={updateAccount.isSuccess}
           isSubmitting={updateAccount.isPending}
           error={getUpdateErrorMessage(updateAccount.error)}
           status={
@@ -138,14 +124,7 @@ export function AccountPage() {
               return;
             }
 
-            updateAccount.mutate(payload, {
-              onSuccess: (updatedAccount) => {
-                setSavedAccountForm({
-                  accountId: updatedAccount.id,
-                  values: userAccountToFormValues(updatedAccount),
-                });
-              },
-            });
+            updateAccount.mutate(payload);
           }}
         />
       </section>
@@ -158,6 +137,7 @@ export function AccountPage() {
         <dl className="divide-y divide-slate-200 rounded-lg border border-slate-200 bg-white shadow-sm">
           <div className="px-6 py-4">
             <dt className="text-sm font-medium text-slate-500">Email</dt>
+
             <dd className="mt-1 text-sm text-slate-900">
               {account.email || "Not provided"}
             </dd>
@@ -165,6 +145,7 @@ export function AccountPage() {
 
           <div className="px-6 py-4">
             <dt className="text-sm font-medium text-slate-500">Member since</dt>
+
             <dd className="mt-1 text-sm text-slate-900">
               {formatDate(account.date_joined)}
             </dd>
