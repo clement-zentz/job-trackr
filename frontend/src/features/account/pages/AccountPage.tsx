@@ -109,7 +109,7 @@ export function AccountPage() {
         <AccountForm
           key={account.id}
           initialValues={initialValues}
-          saveSucceeded={updateAccount.isSuccess}
+          saveRevision={updateAccount.saveRevision}
           isSubmitting={updateAccount.isPending}
           error={getUpdateErrorMessage(updateAccount.error)}
           status={

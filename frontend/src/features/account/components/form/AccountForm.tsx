@@ -32,7 +32,7 @@ const submitButtonClassName = `
 
 interface AccountFormProps {
   initialValues: UserAccountFormValues;
-  saveSucceeded?: boolean;
+  saveRevision?: number;
   onSubmit: (values: UserAccountFormValues) => void;
   isSubmitting?: boolean;
   error?: string;
@@ -120,7 +120,7 @@ function areValuesEqual(
 
 export function AccountForm({
   initialValues,
-  saveSucceeded = false,
+  saveRevision = 0,
   onSubmit,
   isSubmitting = false,
   error,
@@ -131,7 +131,7 @@ export function AccountForm({
     baseline: initialValues,
   });
 
-  const previousSaveSucceeded = useRef(saveSucceeded);
+  const previousSaveRevision = useRef(saveRevision);
 
   const {
     username: initialUsername,
@@ -151,7 +151,7 @@ export function AccountForm({
   }, [initialUsername, initialFirstName, initialLastName]);
 
   useLayoutEffect(() => {
-    if (saveSucceeded && !previousSaveSucceeded.current) {
+    if (saveRevision !== previousSaveRevision.current) {
       dispatch({
         type: "save-success",
         values: {
@@ -162,8 +162,8 @@ export function AccountForm({
       });
     }
 
-    previousSaveSucceeded.current = saveSucceeded;
-  }, [saveSucceeded, initialUsername, initialFirstName, initialLastName]);
+    previousSaveRevision.current = saveRevision;
+  }, [saveRevision, initialUsername, initialFirstName, initialLastName]);
 
   const form = state.values;
   const isDirty = !areValuesEqual(form, state.baseline);

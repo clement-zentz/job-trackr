@@ -2,6 +2,7 @@
 // File: frontend/src/features/account/hooks/useUpdateAccount.ts
 
 import { useQueryClient } from "@tanstack/react-query";
+import { useReducer } from "react";
 
 import { useSessionBoundMutation } from "@/features/auth/hooks/useSessionBoundMutation";
 import { authKeys } from "@/features/auth/keys";
@@ -13,7 +14,12 @@ import type { UserAccountUpdatePayload } from "../types";
 export function useUpdateAccount() {
   const queryClient = useQueryClient();
 
-  return useSessionBoundMutation({
+  const [saveRevision, incrementSaveRevision] = useReducer(
+    (revision: number) => revision + 1,
+    0,
+  );
+
+  const mutation = useSessionBoundMutation({
     mutationFn: (payload: UserAccountUpdatePayload, signal) =>
       updateUserAccount(payload, signal),
 
@@ -28,9 +34,13 @@ export function useUpdateAccount() {
 
       queryClient.setQueryData(accountKeys.detail(), updatedAccount);
 
+      incrementSaveRevision();
+
       await queryClient.invalidateQueries({
         queryKey: authKeys.session(),
       });
     },
   });
+
+  return { ...mutation, saveRevision };
 }
