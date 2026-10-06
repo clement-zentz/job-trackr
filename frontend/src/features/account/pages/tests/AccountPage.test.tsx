@@ -49,6 +49,7 @@ function mockUpdateAccount(
     isSuccess: false,
     error: null,
     mutate,
+    saveRevision: 0,
     ...overrides,
   } as ReturnType<typeof useUpdateAccount>);
 }
@@ -198,7 +199,7 @@ describe("AccountPage", () => {
     expect(getAccountFormProps()).toEqual(
       expect.objectContaining({
         initialValues: userAccountToFormValues(account),
-        saveSucceeded: false,
+        saveRevision: 0,
         isSubmitting: true,
         error: undefined,
         status: undefined,
@@ -258,7 +259,6 @@ describe("AccountPage", () => {
 
     expect(getAccountFormProps()).toEqual(
       expect.objectContaining({
-        saveSucceeded: true,
         status: "Account updated successfully.",
       }),
     );
@@ -367,41 +367,16 @@ describe("AccountPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("passes normalized account values and success state to the form after an update", () => {
-    const account = createUserAccountRead({
-      id: 1,
-      username: "john.doe",
-      first_name: "John",
-      last_name: "Doe",
+  it("passes the account save revision to the form", () => {
+    mockUpdateAccount({
+      saveRevision: 2,
     });
 
-    const normalizedAccount = createUserAccountRead({
-      id: 1,
-      username: "john.updated",
-      first_name: "John",
-      last_name: "Doe",
-    });
-
-    mockAccountQuery({ data: account });
-
-    const { rerender } = render(<AccountPage />);
-
-    getAccountFormProps().onSubmit({
-      ...userAccountToFormValues(account),
-      username: "JOHN.UPDATED",
-    });
-
-    expect(mutate).toHaveBeenCalledWith({ username: "JOHN.UPDATED" });
-
-    mockAccountQuery({ data: normalizedAccount });
-    mockUpdateAccount({ isSuccess: true });
-
-    rerender(<AccountPage />);
+    render(<AccountPage />);
 
     expect(getAccountFormProps()).toEqual(
       expect.objectContaining({
-        initialValues: userAccountToFormValues(normalizedAccount),
-        saveSucceeded: true,
+        saveRevision: 2,
       }),
     );
   });

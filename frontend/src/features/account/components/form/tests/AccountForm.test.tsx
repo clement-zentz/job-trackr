@@ -246,7 +246,7 @@ describe("AccountForm", () => {
     expect(screen.getByLabelText("Last name")).toHaveValue("Smith");
   });
 
-  it("resets to normalized values when a save succeeds", async () => {
+  it("resets the form after consecutive successful saves", async () => {
     const user = userEvent.setup();
 
     const { rerender } = renderAccountForm();
@@ -256,18 +256,31 @@ describe("AccountForm", () => {
     await user.clear(username);
     await user.type(username, "JOHN.DOE");
 
-    expect(screen.getByRole("button", { name: "Save changes" })).toBeEnabled();
-
     rerender(
       <AccountForm
         initialValues={initialValues}
-        saveSucceeded
+        saveRevision={1}
         onSubmit={vi.fn()}
       />,
     );
 
     expect(screen.getByLabelText("Username")).toHaveValue("john.doe");
+    expect(screen.getByRole("button", { name: "Save changes" })).toBeDisabled();
 
+    await user.clear(screen.getByLabelText("Username"));
+    await user.type(screen.getByLabelText("Username"), "John.Doe");
+
+    expect(screen.getByRole("button", { name: "Save changes" })).toBeEnabled();
+
+    rerender(
+      <AccountForm
+        initialValues={initialValues}
+        saveRevision={2}
+        onSubmit={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByLabelText("Username")).toHaveValue("john.doe");
     expect(screen.getByRole("button", { name: "Save changes" })).toBeDisabled();
   });
 
@@ -286,7 +299,7 @@ describe("AccountForm", () => {
           first_name: "Johnny",
           last_name: "Fresh",
         }}
-        saveSucceeded
+        saveRevision={1}
         onSubmit={vi.fn()}
       />,
     );
@@ -297,18 +310,12 @@ describe("AccountForm", () => {
     expect(screen.getByRole("button", { name: "Save changes" })).toBeDisabled();
   });
 
-  it("does not reset new edits while the previous save remains successful", async () => {
+  it("does not reset new edits while the save revision is unchanged", async () => {
     const user = userEvent.setup();
 
-    const { rerender } = renderAccountForm();
-
-    rerender(
-      <AccountForm
-        initialValues={initialValues}
-        saveSucceeded
-        onSubmit={vi.fn()}
-      />,
-    );
+    const { rerender } = renderAccountForm({
+      saveRevision: 1,
+    });
 
     await user.clear(screen.getByLabelText("First name"));
     await user.type(screen.getByLabelText("First name"), "Johnny");
@@ -319,7 +326,7 @@ describe("AccountForm", () => {
           ...initialValues,
           last_name: "Fresh",
         }}
-        saveSucceeded
+        saveRevision={1}
         onSubmit={vi.fn()}
       />,
     );

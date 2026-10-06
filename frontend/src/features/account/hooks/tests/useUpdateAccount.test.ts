@@ -106,9 +106,13 @@ describe("useUpdateAccount", () => {
       wrapper: createWrapperWithClient(queryClient),
     });
 
+    expect(result.current.saveRevision).toBe(0);
+
     await expect(
       result.current.mutateAsync(createUserAccountUpdatePayload()),
     ).rejects.toThrow("Update failed");
+
+    expect(result.current.saveRevision).toBe(0);
 
     expect(cancelQueriesSpy).not.toHaveBeenCalled();
     expect(invalidateQueriesSpy).not.toHaveBeenCalled();
@@ -135,6 +139,8 @@ describe("useUpdateAccount", () => {
     const { result } = renderHook(() => useUpdateAccount(), {
       wrapper: createWrapperWithClient(queryClient),
     });
+
+    expect(result.current.saveRevision).toBe(0);
 
     let pending!: Promise<Awaited<ReturnType<typeof updateUserAccount>>>;
 
@@ -180,9 +186,11 @@ describe("useUpdateAccount", () => {
     expect(setDataSpy).not.toHaveBeenCalled();
     expect(invalidateSpy).not.toHaveBeenCalled();
     expect(queryClient.getQueriesData({})).toEqual(cachedQueries);
+
+    expect(result.current.saveRevision).toBe(0);
   });
 
-  it("does not restore stale account data when the session changes while cancelling the account query", async () => {
+  it("does not restore stale account data or increment the save revision when the session changes while cancelling the account query", async () => {
     const queryClient = createTestQueryClient();
 
     queryClient.setQueryData(authKeys.session(), createAuthUser({ id: 1 }));
@@ -212,6 +220,8 @@ describe("useUpdateAccount", () => {
     const { result } = renderHook(() => useUpdateAccount(), {
       wrapper: createWrapperWithClient(queryClient),
     });
+
+    expect(result.current.saveRevision).toBe(0);
 
     const pending = result.current.mutateAsync(
       createUserAccountUpdatePayload({
@@ -255,5 +265,49 @@ describe("useUpdateAccount", () => {
     expect(invalidateQueriesSpy).not.toHaveBeenCalledWith({
       queryKey: authKeys.session(),
     });
+
+    expect(result.current.saveRevision).toBe(0);
+  });
+
+  it("increments the save revision after every successful update", async () => {
+    const queryClient = createTestQueryClient();
+
+    const firstUpdatedAccount = createUserAccountRead({
+      username: "first.updated",
+    });
+
+    const secondUpdatedAccount = createUserAccountRead({
+      username: "second.updated",
+    });
+
+    mockedUpdateUserAccount
+      .mockResolvedValueOnce(firstUpdatedAccount)
+      .mockResolvedValueOnce(secondUpdatedAccount);
+
+    const { result } = renderHook(() => useUpdateAccount(), {
+      wrapper: createWrapperWithClient(queryClient),
+    });
+
+    expect(result.current.saveRevision).toBe(0);
+
+    await act(async () => {
+      await result.current.mutateAsync(
+        createUserAccountUpdatePayload({
+          username: "first.updated",
+        }),
+      );
+    });
+
+    expect(result.current.saveRevision).toBe(1);
+
+    await act(async () => {
+      await result.current.mutateAsync(
+        createUserAccountUpdatePayload({
+          username: "second.updated",
+        }),
+      );
+    });
+
+    expect(result.current.saveRevision).toBe(2);
   });
 });
