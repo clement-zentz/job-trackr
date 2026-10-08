@@ -6,6 +6,7 @@ import { api } from "@/api/client";
 import type { UserAccountRead, UserAccountUpdatePayload } from "../types";
 
 const ACCOUNT_ENDPOINT = "/v1/account/";
+const ALLAUTH_EMAIL_ENDPOINT = "/_allauth/browser/v1/account/email";
 
 export async function getUserAccount(
   signal?: AbortSignal,
@@ -26,4 +27,11 @@ export async function updateUserAccount(
   });
 
   return response.data;
+}
+
+export async function requestEmailChange(
+  email: string,
+  signal?: AbortSignal,
+): Promise<void> {
+  await api.post(ALLAUTH_EMAIL_ENDPOINT, { email }, { signal });
 }
