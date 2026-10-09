@@ -1,51 +1,22 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/features/account/pages/AccountPage.tsx
 
-import axios from "axios";
-
 import { AccountForm } from "../components/form/AccountForm";
 import {
   formValuesToUpdatePayload,
   userAccountToFormValues,
 } from "../components/form/accountFormMappers";
+import { EmailChangeForm } from "../components/form/EmailChangeForm";
+import {
+  getAccountUpdateErrorMessage,
+  getEmailChangeErrorMessage,
+} from "../errors";
 import { useAccount } from "../hooks/useAccount";
+import { useChangeEmail } from "../hooks/useChangeEmail";
 import { useUpdateAccount } from "../hooks/useUpdateAccount";
-import type { UserAccountUpdatePayload } from "../types";
 
 const mainClassName = "mx-auto max-w-3xl px-4 py-8";
 const h1ClassName = "text-2xl font-bold text-slate-900";
-
-type AccountErrorData = Partial<
-  Record<keyof UserAccountUpdatePayload, string[]>
->;
-
-const fieldLabels: Record<keyof UserAccountUpdatePayload, string> = {
-  username: "Username",
-  first_name: "First name",
-  last_name: "Last name",
-};
-
-function getUpdateErrorMessage(error: Error | null) {
-  if (!error) {
-    return undefined;
-  }
-
-  if (axios.isAxiosError<AccountErrorData>(error)) {
-    const data = error.response?.data;
-
-    if (data) {
-      for (const field of ["username", "first_name", "last_name"] as const) {
-        const message = data[field]?.[0];
-
-        if (message) {
-          return `${fieldLabels[field]}: ${message}`;
-        }
-      }
-    }
-  }
-
-  return "Could not update account.";
-}
 
 function formatDate(value: string) {
   const date = new Date(value);
@@ -62,6 +33,7 @@ function formatDate(value: string) {
 export function AccountPage() {
   const accountQuery = useAccount();
   const updateAccount = useUpdateAccount();
+  const changeEmail = useChangeEmail();
 
   if (!accountQuery.data) {
     if (accountQuery.isLoading) {
@@ -111,7 +83,7 @@ export function AccountPage() {
           initialValues={initialValues}
           saveRevision={updateAccount.saveRevision}
           isSubmitting={updateAccount.isPending}
-          error={getUpdateErrorMessage(updateAccount.error)}
+          error={getAccountUpdateErrorMessage(updateAccount.error)}
           status={
             updateAccount.isSuccess
               ? "Account updated successfully."
@@ -126,6 +98,23 @@ export function AccountPage() {
 
             updateAccount.mutate(payload);
           }}
+        />
+      </section>
+
+      <section className="mt-8">
+        <h2 className="mb-3 text-lg font-semibold text-slate-900">
+          Change email
+        </h2>
+        <EmailChangeForm
+          currentEmail={account.email}
+          isSubmitting={changeEmail.isPending}
+          error={getEmailChangeErrorMessage(changeEmail.error)}
+          status={
+            changeEmail.isSuccess
+              ? "Verification email sent. Check your new email address to confirm the change."
+              : undefined
+          }
+          onSubmit={(email) => changeEmail.mutate(email)}
         />
       </section>
 
@@ -151,10 +140,6 @@ export function AccountPage() {
             </dd>
           </div>
         </dl>
-
-        <p className="mt-2 text-xs text-slate-500">
-          Your email address cannot currently be changed from account settings.
-        </p>
       </section>
     </div>
   );
