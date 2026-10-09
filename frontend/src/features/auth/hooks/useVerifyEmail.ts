@@ -4,6 +4,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { verifyEmail } from "../api/authApi";
+import { invalidateSessionBoundQueries } from "../cache";
 import { authKeys } from "../keys";
 
 export const useVerifyEmail = () => {
@@ -20,6 +21,10 @@ export const useVerifyEmail = () => {
         : null;
 
       queryClient.setQueryData(authKeys.session(), user);
+
+      if (response.meta.is_authenticated) {
+        await invalidateSessionBoundQueries(queryClient);
+      }
     },
   });
 };
