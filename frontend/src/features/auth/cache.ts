@@ -86,7 +86,7 @@ export function resetSessionBoundState(queryClient: QueryClient) {
   controllers.forEach((controller) => controller.abort());
 
   queryClient.removeQueries({
-    predicate: (query) => query.queryKey[0] !== authKeys.all[0],
+    predicate: isSessionBoundQuery,
   });
 }
 
@@ -118,5 +118,15 @@ export function subscribeToAuthSession(queryClient: QueryClient) {
       previousUserId = userId;
       resetSessionBoundState(queryClient);
     }
+  });
+}
+
+function isSessionBoundQuery(query: { queryKey: readonly unknown[] }) {
+  return query.queryKey[0] !== authKeys.all[0];
+}
+
+export function invalidateSessionBoundQueries(queryClient: QueryClient) {
+  return queryClient.invalidateQueries({
+    predicate: isSessionBoundQuery,
   });
 }

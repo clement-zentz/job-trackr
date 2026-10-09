@@ -7,11 +7,39 @@ import { createAuthUser } from "@/tests/factories/auth";
 import { createTestQueryClient } from "@/tests/utils";
 
 import {
+  invalidateSessionBoundQueries,
   registerSessionBoundMutation,
   resetSessionBoundState,
   subscribeToAuthSession,
 } from "../cache";
 import { authKeys } from "../keys";
+
+describe("invalidateSessionBoundQueries", () => {
+  it("invalidates non-auth queries while preserving auth queries and session state", async () => {
+    const queryClient = createTestQueryClient();
+    const user = createAuthUser();
+    const jobPostingsKey = ["job-postings", "list"] as const;
+    const mutation = registerSessionBoundMutation(queryClient);
+
+    queryClient.setQueryData(authKeys.session(), user);
+    queryClient.setQueryData(jobPostingsKey, ["cached job"]);
+
+    await invalidateSessionBoundQueries(queryClient);
+
+    expect(queryClient.getQueryState(authKeys.session())?.isInvalidated).toBe(
+      false,
+    );
+
+    expect(queryClient.getQueryState(jobPostingsKey)?.isInvalidated).toBe(true);
+
+    expect(queryClient.getQueryData(jobPostingsKey)).toEqual(["cached job"]);
+
+    expect(mutation.isCurrent()).toBe(true);
+    expect(mutation.signal.aborted).toBe(false);
+
+    mutation.release();
+  });
+});
 
 describe("resetSessionBoundState", () => {
   it("removes non-auth queries while preserving auth queries", () => {
