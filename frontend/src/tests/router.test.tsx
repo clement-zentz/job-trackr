@@ -554,7 +554,9 @@ describe("router", () => {
       }),
     ).toBeInTheDocument();
 
-    expect(await screen.findByText("john.doe@example.com")).toBeInTheDocument();
+    expect(
+      await screen.findByText("john.doe@example.com", { selector: "dd" }),
+    ).toBeInTheDocument();
 
     expect(router.state.location.pathname).toBe("/account");
   });

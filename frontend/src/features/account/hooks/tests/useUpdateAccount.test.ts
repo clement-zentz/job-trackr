@@ -47,7 +47,13 @@ describe("useUpdateAccount", () => {
       wrapper: createWrapperWithClient(queryClient),
     });
 
-    const resultData = await result.current.mutateAsync(payload);
+    let resultData:
+      | Awaited<ReturnType<typeof result.current.mutateAsync>>
+      | undefined;
+
+    await act(async () => {
+      resultData = await result.current.mutateAsync(payload);
+    });
 
     expect(resultData).toEqual(updatedAccount);
     expect(mockedUpdateUserAccount).toHaveBeenCalledWith(
@@ -76,7 +82,9 @@ describe("useUpdateAccount", () => {
       wrapper: createWrapperWithClient(queryClient),
     });
 
-    await result.current.mutateAsync(createUserAccountUpdatePayload());
+    await act(async () => {
+      await result.current.mutateAsync(createUserAccountUpdatePayload());
+    });
 
     expect(cancelQueriesSpy).toHaveBeenCalledWith({
       queryKey: accountKeys.detail(),
