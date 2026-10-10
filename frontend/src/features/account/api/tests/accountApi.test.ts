@@ -9,17 +9,23 @@ import {
   createUserAccountUpdatePayload,
 } from "@/tests/factories/account";
 
-import { getUserAccount, updateUserAccount } from "../accountApi";
+import {
+  getUserAccount,
+  requestEmailChange,
+  updateUserAccount,
+} from "../accountApi";
 
 vi.mock("@/api/client", () => ({
   api: {
     get: vi.fn(),
     patch: vi.fn(),
+    post: vi.fn(),
   },
 }));
 
 const mockedApiGet = vi.mocked(api.get);
 const mockedApiPatch = vi.mocked(api.patch);
+const mockedApiPost = vi.mocked(api.post);
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -100,5 +106,44 @@ describe("updateUserAccount", () => {
     expect(mockedApiPatch).toHaveBeenCalledWith("/v1/account/", payload, {
       signal: undefined,
     });
+  });
+});
+
+describe("requestEmailChange", () => {
+  it.each([false, true])(
+    "posts the new email to the email change endpoint (signal: %s)",
+    async (withSignal) => {
+      const signal = withSignal ? new AbortController().signal : undefined;
+      const email = "new.email@example.com";
+
+      mockedApiPost.mockResolvedValueOnce({
+        data: undefined,
+      });
+
+      await expect(requestEmailChange(email, signal)).resolves.toBeUndefined();
+
+      expect(mockedApiPost).toHaveBeenCalledOnce();
+      expect(mockedApiPost).toHaveBeenCalledWith(
+        "/_allauth/browser/v1/account/email",
+        { email },
+        { signal },
+      );
+    },
+  );
+
+  it("propagates an API error", async () => {
+    const email = "new.email@example.com";
+    const error = new Error("Failed to request email change");
+
+    mockedApiPost.mockRejectedValueOnce(error);
+
+    await expect(requestEmailChange(email)).rejects.toBe(error);
+
+    expect(mockedApiPost).toHaveBeenCalledOnce();
+    expect(mockedApiPost).toHaveBeenCalledWith(
+      "/_allauth/browser/v1/account/email",
+      { email },
+      { signal: undefined },
+    );
   });
 });

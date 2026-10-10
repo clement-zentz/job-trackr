@@ -48,9 +48,14 @@ describe("useVerifyEmail", () => {
     expect(mockedVerifyEmail).toHaveBeenCalledWith(key);
   });
 
-  it("stores the authenticated user in the session query cache", async () => {
+  it("stores the authenticated user and invalidates session-bound queries", async () => {
     const queryClient = createTestQueryClient();
     const response = createAuthenticatedAuthResponse();
+    const applicationKey = ["application-data"] as const;
+
+    queryClient.setQueryData(applicationKey, {
+      email: "old@example.com",
+    });
 
     mockedVerifyEmail.mockResolvedValueOnce(response);
 
@@ -63,11 +68,16 @@ describe("useVerifyEmail", () => {
     expect(queryClient.getQueryData(authKeys.session())).toEqual(
       response.data.user,
     );
+
+    expect(queryClient.getQueryState(applicationKey)?.isInvalidated).toBe(true);
   });
 
-  it("stores null in the session query cache when verification is unauthenticated", async () => {
+  it("stores null without invalidating session-bound queries when verification is unauthenticated", async () => {
     const queryClient = createTestQueryClient();
     const response = createUnauthenticatedAuthResponse();
+    const applicationKey = ["application-data"] as const;
+
+    queryClient.setQueryData(applicationKey, ["cached data"]);
 
     mockedVerifyEmail.mockResolvedValueOnce(response);
 
@@ -78,6 +88,10 @@ describe("useVerifyEmail", () => {
     await result.current.mutateAsync("email-verification-key");
 
     expect(queryClient.getQueryData(authKeys.session())).toBeNull();
+
+    expect(queryClient.getQueryState(applicationKey)?.isInvalidated).toBe(
+      false,
+    );
   });
 
   it("stores null when an authenticated response has no user", async () => {

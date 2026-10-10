@@ -8,7 +8,9 @@ import { createUserAccountRead } from "@/tests/factories/account";
 
 import { AccountForm } from "../../components/form/AccountForm";
 import { userAccountToFormValues } from "../../components/form/accountFormMappers";
+import { EmailChangeForm } from "../../components/form/EmailChangeForm";
 import { useAccount } from "../../hooks/useAccount";
+import { useChangeEmail } from "../../hooks/useChangeEmail";
 import { useUpdateAccount } from "../../hooks/useUpdateAccount";
 import { AccountPage } from "../AccountPage";
 
@@ -24,11 +26,22 @@ vi.mock("../../hooks/useUpdateAccount", () => ({
   useUpdateAccount: vi.fn(),
 }));
 
+vi.mock("../../components/form/EmailChangeForm", () => ({
+  EmailChangeForm: vi.fn(() => <div data-testid="email-change-form" />),
+}));
+
+vi.mock("../../hooks/useChangeEmail", () => ({
+  useChangeEmail: vi.fn(),
+}));
+
 const accountFormMock = vi.mocked(AccountForm);
 const useAccountMock = vi.mocked(useAccount);
 const useUpdateAccountMock = vi.mocked(useUpdateAccount);
+const emailChangeFormMock = vi.mocked(EmailChangeForm);
+const useChangeEmailMock = vi.mocked(useChangeEmail);
 
 const mutate = vi.fn();
+const changeEmailMutate = vi.fn();
 
 function mockAccountQuery(
   overrides: Partial<ReturnType<typeof useAccount>> = {},
@@ -62,7 +75,27 @@ function getAccountFormProps() {
   return props!;
 }
 
-function createAxiosError(data: Record<string, string[]>): Error {
+function mockChangeEmail(
+  overrides: Partial<ReturnType<typeof useChangeEmail>> = {},
+) {
+  useChangeEmailMock.mockReturnValue({
+    isPending: false,
+    isSuccess: false,
+    error: null,
+    mutate: changeEmailMutate,
+    ...overrides,
+  } as ReturnType<typeof useChangeEmail>);
+}
+
+function getEmailChangeFormProps() {
+  const props = emailChangeFormMock.mock.lastCall?.[0];
+
+  expect(props).toBeDefined();
+
+  return props!;
+}
+
+function createAxiosError(data: unknown): Error {
   return Object.assign(new Error("Request failed"), {
     isAxiosError: true,
     response: {
@@ -77,6 +110,7 @@ describe("AccountPage", () => {
 
     mockAccountQuery();
     mockUpdateAccount();
+    mockChangeEmail();
   });
 
   it("renders the loading state", () => {
@@ -94,6 +128,8 @@ describe("AccountPage", () => {
     expect(screen.getByText("Loading account...")).toBeInTheDocument();
 
     expect(screen.queryByTestId("account-form")).not.toBeInTheDocument();
+
+    expect(screen.queryByTestId("email-change-form")).not.toBeInTheDocument();
   });
 
   it("renders an error when the account query fails", () => {
@@ -111,6 +147,8 @@ describe("AccountPage", () => {
     expect(screen.getByText("Could not load account.")).toBeInTheDocument();
 
     expect(screen.queryByTestId("account-form")).not.toBeInTheDocument();
+
+    expect(screen.queryByTestId("email-change-form")).not.toBeInTheDocument();
   });
 
   it("renders the error fallback when the account data is missing", () => {
@@ -123,6 +161,8 @@ describe("AccountPage", () => {
     expect(screen.getByText("Could not load account.")).toBeInTheDocument();
 
     expect(screen.queryByTestId("account-form")).not.toBeInTheDocument();
+
+    expect(screen.queryByTestId("email-change-form")).not.toBeInTheDocument();
   });
 
   it("renders the loaded account", () => {
@@ -173,10 +213,10 @@ describe("AccountPage", () => {
     expect(screen.getByText(expectedDate)).toBeInTheDocument();
 
     expect(
-      screen.getByText(
-        "Your email address cannot currently be changed from account settings.",
-      ),
+      screen.getByRole("heading", { name: "Change email" }),
     ).toBeInTheDocument();
+
+    expect(screen.getByTestId("email-change-form")).toBeInTheDocument();
   });
 
   it("passes the account values and mutation state to the form", () => {
@@ -264,7 +304,7 @@ describe("AccountPage", () => {
     );
   });
 
-  it("passes the first field validation error to the form", () => {
+  it("passes the account update API error message to the form", () => {
     mockUpdateAccount({
       error: createAxiosError({
         username: ["A user with that username already exists."],
@@ -273,55 +313,11 @@ describe("AccountPage", () => {
 
     render(<AccountPage />);
 
-    expect(getAccountFormProps()).toEqual(
-      expect.objectContaining({
-        error: "Username: A user with that username already exists.",
-      }),
-    );
-  });
-
-  it("maps first-name and last-name validation errors", () => {
-    mockUpdateAccount({
-      error: createAxiosError({
-        first_name: ["This value is invalid."],
-      }),
-    });
-
-    const { rerender } = render(<AccountPage />);
-
-    expect(getAccountFormProps()).toEqual(
-      expect.objectContaining({
-        error: "First name: This value is invalid.",
-      }),
+    expect(getAccountFormProps().error).toBe(
+      "Username: A user with that username already exists.",
     );
 
-    mockUpdateAccount({
-      error: createAxiosError({
-        last_name: ["This value is invalid."],
-      }),
-    });
-
-    rerender(<AccountPage />);
-
-    expect(getAccountFormProps()).toEqual(
-      expect.objectContaining({
-        error: "Last name: This value is invalid.",
-      }),
-    );
-  });
-
-  it("passes a generic error when the update error has no field message", () => {
-    mockUpdateAccount({
-      error: new Error("Request failed"),
-    });
-
-    render(<AccountPage />);
-
-    expect(getAccountFormProps()).toEqual(
-      expect.objectContaining({
-        error: "Could not update account.",
-      }),
-    );
+    expect(getEmailChangeFormProps().error).toBeUndefined();
   });
 
   it("renders the email fallback when no email is provided", () => {
@@ -379,5 +375,98 @@ describe("AccountPage", () => {
         saveRevision: 2,
       }),
     );
+  });
+
+  it("passes the current email and mutation state to the email change form", () => {
+    const account = createUserAccountRead({
+      email: "current@example.com",
+    });
+
+    mockAccountQuery({ data: account });
+    mockChangeEmail({ isPending: true });
+
+    render(<AccountPage />);
+
+    expect(
+      screen.getByRole("heading", { name: "Change email" }),
+    ).toBeInTheDocument();
+
+    expect(screen.getByTestId("email-change-form")).toBeInTheDocument();
+
+    expect(getEmailChangeFormProps()).toEqual(
+      expect.objectContaining({
+        currentEmail: "current@example.com",
+        isSubmitting: true,
+        error: undefined,
+        status: undefined,
+      }),
+    );
+
+    expect(getAccountFormProps().isSubmitting).toBe(false);
+  });
+
+  it("submits the new email without triggering the account update mutation", () => {
+    render(<AccountPage />);
+
+    getEmailChangeFormProps().onSubmit("new@example.com");
+
+    expect(changeEmailMutate).toHaveBeenCalledExactlyOnceWith(
+      "new@example.com",
+    );
+
+    expect(mutate).not.toHaveBeenCalled();
+  });
+
+  it("passes the email verification status without changing the displayed account email", () => {
+    mockAccountQuery({
+      data: createUserAccountRead({
+        email: "current@example.com",
+      }),
+    });
+
+    mockChangeEmail({ isSuccess: true });
+
+    render(<AccountPage />);
+
+    expect(getEmailChangeFormProps().status).toBe(
+      "Verification email sent. Check your new email address to confirm the change.",
+    );
+
+    expect(screen.getByText("current@example.com")).toBeInTheDocument();
+
+    expect(getAccountFormProps().status).toBeUndefined();
+  });
+
+  it("passes the email change API error message to the form", () => {
+    mockChangeEmail({
+      error: createAxiosError({
+        errors: [
+          {
+            message: "This email address is already in use.",
+          },
+        ],
+      }),
+    });
+
+    render(<AccountPage />);
+
+    expect(getEmailChangeFormProps().error).toBe(
+      "This email address is already in use.",
+    );
+
+    expect(getAccountFormProps().error).toBeUndefined();
+  });
+
+  it("passes an empty current email when no email is provided", () => {
+    mockAccountQuery({
+      data: createUserAccountRead({
+        email: "",
+      }),
+    });
+
+    render(<AccountPage />);
+
+    expect(getEmailChangeFormProps().currentEmail).toBe("");
+    expect(screen.getByText("Not provided")).toBeInTheDocument();
   });
 });
