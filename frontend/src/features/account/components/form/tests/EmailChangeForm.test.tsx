@@ -278,4 +278,32 @@ describe("EmailChangeForm", () => {
 
     expect(onResend).toHaveBeenCalledExactlyOnceWith("new@example.com");
   });
+
+  it("prevents submission and resend when only the email casing differs", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    const onResend = vi.fn();
+
+    renderEmailChangeForm({ onSubmit, onResend });
+
+    const emailInput = screen.getByLabelText("New email");
+
+    await user.type(emailInput, "CURRENT@EXAMPLE.COM");
+
+    const submitButton = screen.getByRole("button", {
+      name: "Change email",
+    });
+    const resendButton = screen.getByRole("button", {
+      name: "Resend verification",
+    });
+
+    expect(submitButton).toBeDisabled();
+    expect(resendButton).toBeDisabled();
+
+    // Verify that the submission guard also rejects direct form submission.
+    fireEvent.submit(emailInput.closest("form")!);
+
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(onResend).not.toHaveBeenCalled();
+  });
 });
