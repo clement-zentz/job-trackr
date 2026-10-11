@@ -45,7 +45,8 @@ export function EmailChangeForm({
   const normalizedEmail = email.trim();
 
   const canSubmit =
-    normalizedEmail.length > 0 && normalizedEmail !== currentEmail.trim();
+    normalizedEmail.length > 0 &&
+    normalizedEmail.toLowerCase() !== currentEmail.trim().toLowerCase();
 
   const handleSubmit: SubmitEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
