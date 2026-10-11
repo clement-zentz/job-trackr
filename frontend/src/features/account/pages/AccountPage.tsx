@@ -111,10 +111,13 @@ export function AccountPage() {
           error={getEmailChangeErrorMessage(changeEmail.error)}
           status={
             changeEmail.isSuccess
-              ? "Verification email sent. Check your new email address to confirm the change."
+              ? changeEmail.variables?.action === "resend"
+                ? "Verification email resent. Check your inbox."
+                : "Verification email sent. Check your new email address to confirm the change."
               : undefined
           }
-          onSubmit={(email) => changeEmail.mutate(email)}
+          onSubmit={(email) => changeEmail.mutate({ email, action: "change" })}
+          onResend={(email) => changeEmail.mutate({ email, action: "resend" })}
         />
       </section>
 

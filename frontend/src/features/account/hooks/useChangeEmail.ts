@@ -3,10 +3,18 @@
 
 import { useSessionBoundMutation } from "@/features/auth/hooks/useSessionBoundMutation";
 
-import { requestEmailChange } from "../api/accountApi";
+import { requestEmailChange, resendEmailVerification } from "../api/accountApi";
+
+type EmailChangeRequest = {
+  email: string;
+  action: "change" | "resend";
+};
 
 export function useChangeEmail() {
   return useSessionBoundMutation({
-    mutationFn: (email: string, signal) => requestEmailChange(email, signal),
+    mutationFn: ({ email, action }: EmailChangeRequest, signal) =>
+      action === "resend"
+        ? resendEmailVerification(email, signal)
+        : requestEmailChange(email, signal),
   });
 }

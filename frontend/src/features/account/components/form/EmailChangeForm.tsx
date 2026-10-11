@@ -26,6 +26,7 @@ const submitButtonClassName = `
 interface EmailChangeFormProps {
   currentEmail: string;
   onSubmit: (email: string) => void;
+  onResend: (email: string) => void;
   isSubmitting?: boolean;
   error?: string;
   status?: string;
@@ -34,6 +35,7 @@ interface EmailChangeFormProps {
 export function EmailChangeForm({
   currentEmail,
   onSubmit,
+  onResend,
   isSubmitting = false,
   error,
   status,
@@ -85,7 +87,7 @@ export function EmailChangeForm({
         label="New email"
         type="email"
         value={email}
-        onChange={setEmail}
+        onChange={(value) => setEmail(value.trim())}
         autoComplete="email"
         required
         disabled={isSubmitting}
@@ -102,6 +104,28 @@ export function EmailChangeForm({
         disabled={isSubmitting || !canSubmit}
       >
         {isSubmitting ? "Sending verification..." : "Change email"}
+      </button>
+
+      <p className="text-sm text-slate-500">
+        Didn't receive the verification email? Enter your pending email address
+        above and click "Resend verification".
+      </p>
+
+      <button
+        type="button"
+        className={submitButtonClassName}
+        disabled={isSubmitting || !canSubmit}
+        onClick={(event) => {
+          if (
+            !isSubmitting &&
+            canSubmit &&
+            event.currentTarget.form?.reportValidity()
+          ) {
+            onResend(normalizedEmail);
+          }
+        }}
+      >
+        {isSubmitting ? "Resending verification..." : "Resend verification"}
       </button>
     </form>
   );

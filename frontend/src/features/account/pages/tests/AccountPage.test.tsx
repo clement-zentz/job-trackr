@@ -410,9 +410,10 @@ describe("AccountPage", () => {
 
     getEmailChangeFormProps().onSubmit("new@example.com");
 
-    expect(changeEmailMutate).toHaveBeenCalledExactlyOnceWith(
-      "new@example.com",
-    );
+    expect(changeEmailMutate).toHaveBeenCalledExactlyOnceWith({
+      email: "new@example.com",
+      action: "change",
+    });
 
     expect(mutate).not.toHaveBeenCalled();
   });
@@ -424,7 +425,13 @@ describe("AccountPage", () => {
       }),
     });
 
-    mockChangeEmail({ isSuccess: true });
+    mockChangeEmail({
+      isSuccess: true,
+      variables: {
+        email: "new@example.com",
+        action: "change",
+      },
+    });
 
     render(<AccountPage />);
 
@@ -468,5 +475,44 @@ describe("AccountPage", () => {
 
     expect(getEmailChangeFormProps().currentEmail).toBe("");
     expect(screen.getByText("Not provided")).toBeInTheDocument();
+  });
+
+  it("resends verification without triggering the account update mutation", () => {
+    render(<AccountPage />);
+
+    getEmailChangeFormProps().onResend("pending@example.com");
+
+    expect(changeEmailMutate).toHaveBeenCalledExactlyOnceWith({
+      email: "pending@example.com",
+      action: "resend",
+    });
+
+    expect(mutate).not.toHaveBeenCalled();
+  });
+
+  it("displays the resend success message without changing the account email", () => {
+    mockAccountQuery({
+      data: createUserAccountRead({
+        email: "current@example.com",
+      }),
+    });
+
+    mockChangeEmail({
+      isSuccess: true,
+      variables: {
+        email: "pending@example.com",
+        action: "resend",
+      },
+    });
+
+    render(<AccountPage />);
+
+    expect(getEmailChangeFormProps().status).toBe(
+      "Verification email resent. Check your inbox.",
+    );
+
+    expect(screen.getByText("current@example.com")).toBeInTheDocument();
+
+    expect(getAccountFormProps().status).toBeUndefined();
   });
 });

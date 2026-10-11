@@ -3,15 +3,29 @@
 
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type { ComponentProps } from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { EmailChangeForm } from "../EmailChangeForm";
 
 const currentEmail = "current@example.com";
 
+function renderEmailChangeForm(
+  props: Partial<ComponentProps<typeof EmailChangeForm>> = {},
+) {
+  return render(
+    <EmailChangeForm
+      currentEmail={currentEmail}
+      onSubmit={vi.fn()}
+      onResend={vi.fn()}
+      {...props}
+    />,
+  );
+}
+
 describe("EmailChangeForm", () => {
   it("renders the current email and new email field", () => {
-    render(<EmailChangeForm currentEmail={currentEmail} onSubmit={vi.fn()} />);
+    renderEmailChangeForm({ onSubmit: vi.fn() });
 
     expect(screen.getByText(currentEmail)).toBeInTheDocument();
 
@@ -25,7 +39,10 @@ describe("EmailChangeForm", () => {
   });
 
   it("shows a fallback when the current email is missing", () => {
-    render(<EmailChangeForm currentEmail="" onSubmit={vi.fn()} />);
+    renderEmailChangeForm({
+      currentEmail: "",
+      onSubmit: vi.fn(),
+    });
 
     expect(screen.getByText("Not provided")).toBeInTheDocument();
   });
@@ -33,7 +50,7 @@ describe("EmailChangeForm", () => {
   it("enables submission when a different email is entered", async () => {
     const user = userEvent.setup();
 
-    render(<EmailChangeForm currentEmail={currentEmail} onSubmit={vi.fn()} />);
+    renderEmailChangeForm({ onSubmit: vi.fn() });
 
     const submitButton = screen.getByRole("button", {
       name: "Change email",
@@ -46,39 +63,47 @@ describe("EmailChangeForm", () => {
     expect(submitButton).toBeEnabled();
   });
 
-  it("prevents submission when the new email matches the current email", async () => {
+  it("prevents submission and resend when the new email matches the current email", async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
 
-    render(<EmailChangeForm currentEmail={currentEmail} onSubmit={onSubmit} />);
+    renderEmailChangeForm({ onSubmit });
 
     const emailInput = screen.getByLabelText("New email");
 
     await user.type(screen.getByLabelText("New email"), currentEmail);
 
     expect(screen.getByRole("button", { name: "Change email" })).toBeDisabled();
+    expect(
+      screen.getByRole("button", { name: "Resend verification" }),
+    ).toBeDisabled();
 
     fireEvent.submit(emailInput.closest("form")!);
 
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
-  it("prevents submission when the email is blank or whitespace-only", async () => {
+  it("prevents submission and resend when the email is blank or whitespace-only", async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
 
-    render(<EmailChangeForm currentEmail={currentEmail} onSubmit={onSubmit} />);
+    renderEmailChangeForm({ onSubmit });
 
     const emailInput = screen.getByLabelText("New email");
     const submitButton = screen.getByRole("button", {
       name: "Change email",
     });
+    const resendButton = screen.getByRole("button", {
+      name: "Resend verification",
+    });
 
     expect(submitButton).toBeDisabled();
+    expect(resendButton).toBeDisabled();
 
     await user.type(emailInput, "   ");
 
     expect(submitButton).toBeDisabled();
+    expect(resendButton).toBeDisabled();
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
@@ -86,7 +111,7 @@ describe("EmailChangeForm", () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
 
-    render(<EmailChangeForm currentEmail={currentEmail} onSubmit={onSubmit} />);
+    renderEmailChangeForm({ onSubmit });
 
     await user.type(screen.getByLabelText("New email"), "  new@example.com  ");
 
@@ -100,7 +125,7 @@ describe("EmailChangeForm", () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
 
-    render(<EmailChangeForm currentEmail={currentEmail} onSubmit={onSubmit} />);
+    renderEmailChangeForm({ onSubmit });
 
     const emailInput = screen.getByLabelText("New email");
 
@@ -114,14 +139,11 @@ describe("EmailChangeForm", () => {
   });
 
   it("renders error and status messages", () => {
-    render(
-      <EmailChangeForm
-        currentEmail={currentEmail}
-        onSubmit={vi.fn()}
-        error="Unable to change email."
-        status="Verification email sent."
-      />,
-    );
+    renderEmailChangeForm({
+      onSubmit: vi.fn(),
+      error: "Unable to change email.",
+      status: "Verification email sent.",
+    });
 
     expect(screen.getByRole("alert")).toHaveTextContent(
       "Unable to change email.",
@@ -131,13 +153,12 @@ describe("EmailChangeForm", () => {
     );
   });
 
-  it("disables submission while the request is pending", async () => {
+  it("disables submission and resend while the request is pending", async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
+    const onResend = vi.fn();
 
-    const { rerender } = render(
-      <EmailChangeForm currentEmail={currentEmail} onSubmit={onSubmit} />,
-    );
+    const { rerender } = renderEmailChangeForm({ onSubmit });
 
     const emailInput = screen.getByLabelText("New email");
 
@@ -147,6 +168,7 @@ describe("EmailChangeForm", () => {
       <EmailChangeForm
         currentEmail={currentEmail}
         onSubmit={onSubmit}
+        onResend={onResend}
         isSubmitting
       />,
     );
@@ -159,6 +181,12 @@ describe("EmailChangeForm", () => {
       }),
     ).toBeDisabled();
 
+    expect(
+      screen.getByRole("button", {
+        name: "Resending verification...",
+      }),
+    ).toBeDisabled();
+
     const form = emailInput.closest("form");
 
     expect(form).toHaveAttribute("aria-busy", "true");
@@ -166,5 +194,88 @@ describe("EmailChangeForm", () => {
     fireEvent.submit(form!);
 
     expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("resends the normalized email without submitting the form", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    const onResend = vi.fn();
+
+    renderEmailChangeForm({ onSubmit, onResend });
+
+    await user.type(
+      screen.getByLabelText("New email"),
+      "  pending@example.com  ",
+    );
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "Resend verification",
+      }),
+    );
+
+    expect(onResend).toHaveBeenCalledExactlyOnceWith("pending@example.com");
+
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("does not resend verification for an invalid email", async () => {
+    const user = userEvent.setup();
+    const onResend = vi.fn();
+
+    renderEmailChangeForm({ onResend });
+
+    const emailInput = screen.getByLabelText("New email");
+
+    await user.type(emailInput, "invalid-email");
+
+    expect(emailInput).toBeInvalid();
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "Resend verification",
+      }),
+    );
+
+    expect(onResend).not.toHaveBeenCalled();
+  });
+
+  it("normalizes surrounding Unicode whitespace before submitting", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    const onResend = vi.fn();
+
+    render(
+      <EmailChangeForm
+        currentEmail="current@example.com"
+        onSubmit={onSubmit}
+        onResend={onResend}
+      />,
+    );
+
+    const emailInput = screen.getByRole("textbox", {
+      name: "New email",
+    });
+
+    // Non-breaking spaces (U+00A0) are not stripped by native
+    // email input sanitization.
+    fireEvent.change(emailInput, {
+      target: {
+        value: "\u00A0new@example.com\u00A0",
+      },
+    });
+
+    // The controlled input should immediately contain the normalized value.
+    expect(emailInput).toHaveValue("new@example.com");
+
+    await user.click(screen.getByRole("button", { name: "Change email" }));
+
+    expect(onSubmit).toHaveBeenCalledExactlyOnceWith("new@example.com");
+
+    await user.click(
+      screen.getByRole("button", { name: "Resend verification" }),
+    );
+
+    expect(onResend).toHaveBeenCalledExactlyOnceWith("new@example.com");
   });
 });
