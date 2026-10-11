@@ -35,3 +35,10 @@ export async function requestEmailChange(
 ): Promise<void> {
   await api.post(ALLAUTH_EMAIL_ENDPOINT, { email }, { signal });
 }
+
+export async function resendEmailVerification(
+  email: string,
+  signal?: AbortSignal,
+): Promise<void> {
+  await api.put(ALLAUTH_EMAIL_ENDPOINT, { email }, { signal });
+}

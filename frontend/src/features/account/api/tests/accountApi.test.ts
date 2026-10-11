@@ -12,6 +12,7 @@ import {
 import {
   getUserAccount,
   requestEmailChange,
+  resendEmailVerification,
   updateUserAccount,
 } from "../accountApi";
 
@@ -20,12 +21,14 @@ vi.mock("@/api/client", () => ({
     get: vi.fn(),
     patch: vi.fn(),
     post: vi.fn(),
+    put: vi.fn(),
   },
 }));
 
 const mockedApiGet = vi.mocked(api.get);
 const mockedApiPatch = vi.mocked(api.patch);
 const mockedApiPost = vi.mocked(api.post);
+const mockedApiPut = vi.mocked(api.put);
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -141,6 +144,47 @@ describe("requestEmailChange", () => {
 
     expect(mockedApiPost).toHaveBeenCalledOnce();
     expect(mockedApiPost).toHaveBeenCalledWith(
+      "/_allauth/browser/v1/account/email",
+      { email },
+      { signal: undefined },
+    );
+  });
+});
+
+describe("resendEmailVerification", () => {
+  it.each([false, true])(
+    "puts the email to the verification endpoint (signal: %s)",
+    async (withSignal) => {
+      const signal = withSignal ? new AbortController().signal : undefined;
+      const email = "pending@example.com";
+
+      mockedApiPut.mockResolvedValueOnce({
+        data: undefined,
+      });
+
+      await expect(
+        resendEmailVerification(email, signal),
+      ).resolves.toBeUndefined();
+
+      expect(mockedApiPut).toHaveBeenCalledExactlyOnceWith(
+        "/_allauth/browser/v1/account/email",
+        { email },
+        { signal },
+      );
+
+      expect(mockedApiPost).not.toHaveBeenCalled();
+    },
+  );
+
+  it("propagates an API error", async () => {
+    const email = "pending@example.com";
+    const error = new Error("Failed to resend verification");
+
+    mockedApiPut.mockRejectedValueOnce(error);
+
+    await expect(resendEmailVerification(email)).rejects.toBe(error);
+
+    expect(mockedApiPut).toHaveBeenCalledExactlyOnceWith(
       "/_allauth/browser/v1/account/email",
       { email },
       { signal: undefined },
