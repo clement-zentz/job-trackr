@@ -548,4 +548,22 @@ describe("AccountPage", () => {
 
     expect(getAccountFormProps().status).toBeUndefined();
   });
+
+  it("passes the resend fallback error to the email change form", () => {
+    mockChangeEmail({
+      error: new Error("Network error"),
+      variables: {
+        email: "pending@example.com",
+        action: "resend",
+      },
+    });
+
+    render(<AccountPage />);
+
+    expect(getEmailChangeFormProps().error).toBe(
+      "Could not resend verification email.",
+    );
+
+    expect(getAccountFormProps().error).toBeUndefined();
+  });
 });
