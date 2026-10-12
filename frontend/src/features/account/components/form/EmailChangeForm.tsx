@@ -28,6 +28,7 @@ interface EmailChangeFormProps {
   onSubmit: (email: string) => void;
   onResend: (email: string) => void;
   isSubmitting?: boolean;
+  pendingAction?: "change" | "resend";
   error?: string;
   status?: string;
 }
@@ -37,6 +38,7 @@ export function EmailChangeForm({
   onSubmit,
   onResend,
   isSubmitting = false,
+  pendingAction,
   error,
   status,
 }: EmailChangeFormProps) {
@@ -104,7 +106,9 @@ export function EmailChangeForm({
         className={submitButtonClassName}
         disabled={isSubmitting || !canSubmit}
       >
-        {isSubmitting ? "Sending verification..." : "Change email"}
+        {isSubmitting && pendingAction === "change"
+          ? "Sending verification..."
+          : "Change email"}
       </button>
 
       <p className="text-sm text-slate-500">
@@ -126,7 +130,9 @@ export function EmailChangeForm({
           }
         }}
       >
-        {isSubmitting ? "Resending verification..." : "Resend verification"}
+        {isSubmitting && pendingAction === "resend"
+          ? "Resending verification..."
+          : "Resend verification"}
       </button>
     </form>
   );

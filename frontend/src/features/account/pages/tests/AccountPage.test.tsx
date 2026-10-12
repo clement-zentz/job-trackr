@@ -377,32 +377,65 @@ describe("AccountPage", () => {
     );
   });
 
-  it("passes the current email and mutation state to the email change form", () => {
-    const account = createUserAccountRead({
-      email: "current@example.com",
-    });
+  it.each([
+    ["change", "new@example.com"],
+    ["resend", "pending@example.com"],
+  ] as const)(
+    "passes the %s pending action to the email change form",
+    (action, email) => {
+      const account = createUserAccountRead({
+        email: "current@example.com",
+      });
 
-    mockAccountQuery({ data: account });
-    mockChangeEmail({ isPending: true });
+      mockAccountQuery({ data: account });
+
+      mockChangeEmail({
+        isPending: true,
+        variables: {
+          email,
+          action,
+        },
+      });
+
+      render(<AccountPage />);
+
+      expect(
+        screen.getByRole("heading", { name: "Change email" }),
+      ).toBeInTheDocument();
+
+      expect(screen.getByTestId("email-change-form")).toBeInTheDocument();
+
+      expect(getEmailChangeFormProps()).toEqual(
+        expect.objectContaining({
+          currentEmail: "current@example.com",
+          isSubmitting: true,
+          pendingAction: action,
+          error: undefined,
+          status: undefined,
+        }),
+      );
+
+      expect(getAccountFormProps().isSubmitting).toBe(false);
+    },
+  );
+
+  it("does not pass a pending action when the email mutation is idle", () => {
+    mockChangeEmail({
+      isPending: false,
+      variables: {
+        email: "pending@example.com",
+        action: "resend",
+      },
+    });
 
     render(<AccountPage />);
 
-    expect(
-      screen.getByRole("heading", { name: "Change email" }),
-    ).toBeInTheDocument();
-
-    expect(screen.getByTestId("email-change-form")).toBeInTheDocument();
-
     expect(getEmailChangeFormProps()).toEqual(
       expect.objectContaining({
-        currentEmail: "current@example.com",
-        isSubmitting: true,
-        error: undefined,
-        status: undefined,
+        isSubmitting: false,
+        pendingAction: undefined,
       }),
     );
-
-    expect(getAccountFormProps().isSubmitting).toBe(false);
   });
 
   it("submits the new email without triggering the account update mutation", () => {

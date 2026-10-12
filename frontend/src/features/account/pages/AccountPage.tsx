@@ -108,6 +108,9 @@ export function AccountPage() {
         <EmailChangeForm
           currentEmail={account.email}
           isSubmitting={changeEmail.isPending}
+          pendingAction={
+            changeEmail.isPending ? changeEmail.variables?.action : undefined
+          }
           error={getEmailChangeErrorMessage(changeEmail.error)}
           status={
             changeEmail.isSuccess
