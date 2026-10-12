@@ -111,7 +111,10 @@ export function AccountPage() {
           pendingAction={
             changeEmail.isPending ? changeEmail.variables?.action : undefined
           }
-          error={getEmailChangeErrorMessage(changeEmail.error)}
+          error={getEmailChangeErrorMessage(
+            changeEmail.error,
+            changeEmail.variables?.action,
+          )}
           status={
             changeEmail.isSuccess
               ? changeEmail.variables?.action === "resend"

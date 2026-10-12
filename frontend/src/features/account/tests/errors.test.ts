@@ -117,4 +117,26 @@ describe("getEmailChangeErrorMessage", () => {
       "Could not change email address.",
     );
   });
+
+  it.each([
+    ["change", "Could not change email address."],
+    ["resend", "Could not resend verification email."],
+  ] as const)(
+    "returns the correct fallback for a failed %s request",
+    (action, expectedMessage) => {
+      const error = new Error("Network error");
+
+      expect(getEmailChangeErrorMessage(error, action)).toBe(expectedMessage);
+    },
+  );
+
+  it("prioritizes the API error message for resend failures", () => {
+    const error = createAxiosError({
+      errors: [{ message: "Too many verification requests." }],
+    });
+
+    expect(getEmailChangeErrorMessage(error, "resend")).toBe(
+      "Too many verification requests.",
+    );
+  });
 });

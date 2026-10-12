@@ -39,7 +39,10 @@ export function getAccountUpdateErrorMessage(error: Error | null) {
   return "Could not update account.";
 }
 
-export function getEmailChangeErrorMessage(error: Error | null) {
+export function getEmailChangeErrorMessage(
+  error: Error | null,
+  action: "change" | "resend" = "change",
+) {
   if (!error) {
     return undefined;
   }
@@ -52,5 +55,7 @@ export function getEmailChangeErrorMessage(error: Error | null) {
     }
   }
 
-  return "Could not change email address.";
+  return action === "resend"
+    ? "Could not resend verification email."
+    : "Could not change email address.";
 }
