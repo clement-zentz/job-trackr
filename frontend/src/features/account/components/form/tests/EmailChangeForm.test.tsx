@@ -153,49 +153,6 @@ describe("EmailChangeForm", () => {
     );
   });
 
-  it("disables submission and resend while the request is pending", async () => {
-    const user = userEvent.setup();
-    const onSubmit = vi.fn();
-    const onResend = vi.fn();
-
-    const { rerender } = renderEmailChangeForm({ onSubmit });
-
-    const emailInput = screen.getByLabelText("New email");
-
-    await user.type(emailInput, "new@example.com");
-
-    rerender(
-      <EmailChangeForm
-        currentEmail={currentEmail}
-        onSubmit={onSubmit}
-        onResend={onResend}
-        isSubmitting
-      />,
-    );
-
-    expect(emailInput).toBeDisabled();
-
-    expect(
-      screen.getByRole("button", {
-        name: "Sending verification...",
-      }),
-    ).toBeDisabled();
-
-    expect(
-      screen.getByRole("button", {
-        name: "Resending verification...",
-      }),
-    ).toBeDisabled();
-
-    const form = emailInput.closest("form");
-
-    expect(form).toHaveAttribute("aria-busy", "true");
-
-    fireEvent.submit(form!);
-
-    expect(onSubmit).not.toHaveBeenCalled();
-  });
-
   it("resends the normalized email without submitting the form", async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
@@ -306,4 +263,52 @@ describe("EmailChangeForm", () => {
     expect(onSubmit).not.toHaveBeenCalled();
     expect(onResend).not.toHaveBeenCalled();
   });
+
+  it.each([
+    ["change", "Sending verification...", "Resend verification"],
+    ["resend", "Resending verification...", "Change email"],
+  ] as const)(
+    "shows the pending label only for the %s operation",
+    async (pendingAction, activeLabel, inactiveLabel) => {
+      const user = userEvent.setup();
+      const onSubmit = vi.fn();
+      const onResend = vi.fn();
+
+      const { rerender } = renderEmailChangeForm({
+        onSubmit,
+        onResend,
+      });
+
+      const emailInput = screen.getByLabelText("New email");
+
+      await user.type(emailInput, "new@example.com");
+
+      rerender(
+        <EmailChangeForm
+          currentEmail={currentEmail}
+          onSubmit={onSubmit}
+          onResend={onResend}
+          isSubmitting
+          pendingAction={pendingAction}
+        />,
+      );
+
+      expect(emailInput).toBeDisabled();
+
+      expect(screen.getByRole("button", { name: activeLabel })).toBeDisabled();
+
+      expect(
+        screen.getByRole("button", { name: inactiveLabel }),
+      ).toBeDisabled();
+
+      const form = emailInput.closest("form");
+
+      expect(form).toHaveAttribute("aria-busy", "true");
+
+      fireEvent.submit(form!);
+
+      expect(onSubmit).not.toHaveBeenCalled();
+      expect(onResend).not.toHaveBeenCalled();
+    },
+  );
 });
