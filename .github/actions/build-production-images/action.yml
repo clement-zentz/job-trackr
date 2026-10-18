@@ -33,4 +33,6 @@ runs:
 
     - name: Smoke test production containers
       shell: bash
+      env:
+        SMOKE_SKIP_BUILD: "1"
       run: bash .github/scripts/smoke-images.sh

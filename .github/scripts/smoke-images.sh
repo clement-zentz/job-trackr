@@ -3,36 +3,41 @@
 
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+
 # Run the images with their default production commands on an isolated network.
-smoke_id="job-trackr-smoke-$$"
-backend_name="${smoke_id}-backend"
-frontend_name="${smoke_id}-frontend"
+PROJECT="job-trackr-smoke-$$"
+BACKEND_PYTHON=/app/.venv/bin/python
+
+COMPOSE=(
+  docker compose
+  --project-name "${PROJECT}"
+  -f "${REPO_ROOT}/compose.test-prod.yml"
+)
 
 cleanup() {
-  docker logs "$backend_name" || true
-  docker logs "$frontend_name" || true
-  docker rm -f "$frontend_name" "$backend_name" >/dev/null 2>&1 || true
-  docker network rm "$smoke_id" >/dev/null 2>&1 || true
+  local status=$?
+
+  if ((status != 0)); then
+    "${COMPOSE[@]}" logs --no-color backend frontend || true
+  fi
+
+  "${COMPOSE[@]}" down --volumes --remove-orphans || true
 }
+
 trap cleanup EXIT
 
-docker network create "$smoke_id" >/dev/null
-docker run -d --name "$backend_name" --network "$smoke_id" --network-alias backend \
-  -e DJANGO_SECRET_KEY=smoke-test-only-not-a-production-secret \
-  -e DJANGO_ADMIN_URL=admin/ \
-  -e ALLOWED_HOSTS=backend \
-  -e DATABASE_URL=postgres://unused:unused@127.0.0.1:5432/unused \
-  -e EMAIL_HOST=localhost \
-  -e EMAIL_HOST_USER=unused \
-  -e EMAIL_HOST_PASSWORD=unused \
-  -e DEFAULT_FROM_EMAIL=smoke@example.com \
-  -e FRONTEND_URL=http://frontend \
-  job-trackr-backend:test >/dev/null
+# Build images unless they were already built by the caller.
+if [[ "${SMOKE_SKIP_BUILD:-0}" != "1" ]]; then
+  "${COMPOSE[@]}" build backend frontend
+fi
 
-docker run -d --name "$frontend_name" --network "$smoke_id" --network-alias frontend \
-  job-trackr-frontend:test >/dev/null
-docker exec "$frontend_name" nginx -t
+# Start the services using the existing images.
+"${COMPOSE[@]}" up -d --no-build --wait backend frontend
 
-# The public configuration endpoint does not need a database or SMTP connection.
-# Check backend endpoints directly and frontend assets and SPA routes through nginx.
-docker exec -i "$backend_name" python - < "$(dirname "${BASH_SOURCE[0]}")/smoke-images.py"
+# Test the frontend nginx configuration.
+"${COMPOSE[@]}" exec -T frontend nginx -t
+
+# Test the backend Django configuration.
+"${COMPOSE[@]}" exec -T backend "$BACKEND_PYTHON" - < "$SCRIPT_DIR/smoke-images.py"

@@ -1,0 +1,48 @@
+# compose.test-prod.yml
+
+services:
+  backend:
+    image: job-trackr-backend:test
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    environment:
+      DJANGO_SETTINGS_MODULE: job_trackr.settings.prod
+      DJANGO_SECRET_KEY: migration-test-only-secret
+      DJANGO_ADMIN_URL: admin
+      ALLOWED_HOSTS: localhost,backend
+
+      DATABASE_URL: postgres://test_user:test_password@database:5432/migration_test
+
+      EMAIL_HOST: localhost
+      EMAIL_HOST_USER: unused
+      EMAIL_HOST_PASSWORD: unused
+      DEFAULT_FROM_EMAIL: smoke@example.com
+      FRONTEND_URL: http://frontend
+
+  frontend:
+    image: job-trackr-frontend:test
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    depends_on:
+      - backend
+
+  database:
+    profiles:
+      - migrations
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_password
+      POSTGRES_DB: migration_test
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB
+      interval: 1s
+      timeout: 5s
+      retries: 30
+      start_period: 2s
