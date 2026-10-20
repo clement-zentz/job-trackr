@@ -1,6 +1,6 @@
 # .github/actions/build-production-images/action.yml
 name: Build production images
-description: Build and smoke test the production Docker images
+description: Build and validate production images and database migrations
 
 runs:
   using: composite
@@ -36,3 +36,9 @@ runs:
       env:
         SMOKE_SKIP_BUILD: "1"
       run: bash .github/scripts/smoke-images.sh
+
+    - name: Test production migrations
+      shell: bash
+      env:
+        SMOKE_SKIP_BUILD: "1"
+      run: bash .github/scripts/test-production-migrations.sh
