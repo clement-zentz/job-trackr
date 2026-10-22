@@ -2,6 +2,7 @@
 // File: frontend/src/features/jobs/postings/components/tests/JobPostingList.test.tsx
 
 import { fireEvent, render, screen } from "@testing-library/react";
+import { AxiosError, type AxiosResponse } from "axios";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -12,6 +13,7 @@ import type { PaginatedResponse } from "@/types/pagination";
 import {
   DEFAULT_JOB_POSTINGS_PAGE_SIZE,
   getJobPostingDetailPath,
+  JOB_POSTINGS_CREATE_PATH,
   JOB_POSTINGS_LIST_PATH,
 } from "../../constants";
 import { useJobPostings } from "../../hooks/useJobPostings";
@@ -32,6 +34,7 @@ type MockUseJobPostingsState = {
   isLoading?: boolean;
   isError?: boolean;
   isFetching?: boolean;
+  isPlaceholderData?: boolean;
   error?: Error | null;
   status?: ReturnType<typeof useJobPostings>["status"];
 };
@@ -42,6 +45,7 @@ function mockUseJobPostings(queryState: MockUseJobPostingsState) {
     isLoading: false,
     isError: false,
     isFetching: false,
+    isPlaceholderData: false,
     error: null,
     status: "success",
     ...queryState,
@@ -63,6 +67,19 @@ function mockJobPostingsData({
     data: createPaginatedResponse(results, paginationOverrides),
     ...queryOverrides,
   });
+}
+
+function createNotFoundError(
+  detail = "Invalid page.",
+): AxiosError<{ detail: string }> {
+  const error = new AxiosError<{ detail: string }>("Not found");
+
+  error.response = {
+    status: 404,
+    data: { detail },
+  } as AxiosResponse<{ detail: string }>;
+
+  return error;
 }
 
 describe("JobPostingList", () => {
@@ -127,7 +144,9 @@ describe("JobPostingList", () => {
 
     renderJobPostingList();
 
-    expect(screen.getByText(/error loading jobs/i)).toBeInTheDocument();
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Error loading job postings.",
+    );
   });
 
   it("renders job list", () => {
@@ -164,26 +183,39 @@ describe("JobPostingList", () => {
 
     expect(screen.getByText(/failed to refresh results/i)).toBeInTheDocument();
 
-    // Still shows data
     expect(screen.getByText("Backend Engineer")).toBeInTheDocument();
   });
 
-  it("shows non-blocking error banner with empty state", () => {
+  it("shows stale empty results without onboarding after a failed refetch", () => {
     mockJobPostingsData({
       results: [],
       paginationOverrides: { count: 0 },
       queryOverrides: {
         isError: true,
-        error: new Error("Refetch failed"),
+        error: new Error("Refresh failed"),
         status: "error",
       },
     });
 
     renderJobPostingList();
 
-    expect(screen.getByText(/failed to refresh results/i)).toBeInTheDocument();
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Failed to refresh results. Showing previous data.",
+    );
 
-    expect(screen.getByText(/no job postings found/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "No job postings in the last successfully loaded results.",
+      ),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByText(/create your first job posting/i),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByRole("link", { name: "Create job posting" }),
+    ).not.toBeInTheDocument();
   });
 
   it("wraps each job posting card with a detail link", () => {
@@ -202,17 +234,108 @@ describe("JobPostingList", () => {
     });
 
     expect(detailLink).toHaveAttribute("href", getJobPostingDetailPath(job.id));
+
     expect(detailLink).toContainElement(
       screen.getByRole("heading", { name: /backend engineer/i }),
     );
   });
 
+  describe("empty states", () => {
+    it("shows onboarding guidance when no postings exist", () => {
+      mockJobPostingsData({
+        results: [],
+        paginationOverrides: { count: 0 },
+      });
+
+      renderJobPostingList();
+
+      expect(screen.getByText("No job postings found.")).toBeInTheDocument();
+
+      expect(
+        screen.getByText(/create your first job posting/i),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getByRole("link", { name: "Create job posting" }),
+      ).toHaveAttribute("href", JOB_POSTINGS_CREATE_PATH);
+    });
+
+    it("shows a no-results message when filters are active", () => {
+      mockJobPostingsData({
+        results: [],
+        paginationOverrides: { count: 0 },
+      });
+
+      renderWithParams({ search: "Python" });
+
+      expect(
+        screen.getByText("No job postings match your search or filters."),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.queryByText(/create your first job posting/i),
+      ).not.toBeInTheDocument();
+
+      expect(
+        screen.queryByRole("link", { name: "Create job posting" }),
+      ).not.toBeInTheDocument();
+    });
+
+    it("ignores whitespace-only search and ordering", () => {
+      mockJobPostingsData({
+        results: [],
+        paginationOverrides: { count: 0 },
+      });
+
+      renderWithParams({
+        search: "   ",
+        ordering: "company",
+      });
+
+      expect(screen.getByText("No job postings found.")).toBeInTheDocument();
+    });
+
+    it("recognizes false as an active boolean filter", () => {
+      mockJobPostingsData({
+        results: [],
+        paginationOverrides: { count: 0 },
+      });
+
+      renderWithParams({ easyApply: false });
+
+      expect(
+        screen.getByText("No job postings match your search or filters."),
+      ).toBeInTheDocument();
+    });
+
+    it("does not show onboarding for empty placeholder data", () => {
+      mockJobPostingsData({
+        results: [],
+        paginationOverrides: { count: 0 },
+        queryOverrides: {
+          isFetching: true,
+          isPlaceholderData: true,
+        },
+      });
+
+      renderWithParams({ search: "React" });
+
+      expect(screen.getByText("Loading page...")).toBeInTheDocument();
+
+      expect(
+        screen.queryByText("No job postings match your search or filters."),
+      ).not.toBeInTheDocument();
+
+      expect(
+        screen.queryByRole("link", { name: "Create job posting" }),
+      ).not.toBeInTheDocument();
+    });
+  });
+
   describe("pagination", () => {
     it("disables previous button when there is no previous page", () => {
       mockJobPostingsData({
-        paginationOverrides: {
-          previous: null,
-        },
+        paginationOverrides: { previous: null },
       });
 
       renderWithParams({ page: 1 });
@@ -222,9 +345,7 @@ describe("JobPostingList", () => {
 
     it("disables next button when there is no next page", () => {
       mockJobPostingsData({
-        paginationOverrides: {
-          next: null,
-        },
+        paginationOverrides: { next: null },
       });
 
       renderWithParams({ page: 2 });
@@ -262,9 +383,7 @@ describe("JobPostingList", () => {
 
     it("renders current page indicator", () => {
       mockJobPostingsData({
-        paginationOverrides: {
-          count: 45,
-        },
+        paginationOverrides: { count: 45 },
       });
 
       renderWithParams({ page: 2, pageSize: 20 });
@@ -274,9 +393,7 @@ describe("JobPostingList", () => {
 
     it("hides pagination and shows empty state when the list is empty", () => {
       mockJobPostingsData({
-        paginationOverrides: {
-          count: 0,
-        },
+        paginationOverrides: { count: 0 },
         results: [],
       });
 
@@ -317,6 +434,42 @@ describe("JobPostingList", () => {
       expect(screen.getByRole("button", { name: /previous/i })).toBeDisabled();
 
       expect(screen.getByRole("button", { name: /next/i })).toBeDisabled();
+    });
+
+    it("offers recovery when DRF returns 404 for an invalid page", () => {
+      mockUseJobPostings({
+        isError: true,
+        error: createNotFoundError(),
+        status: "error",
+      });
+
+      renderWithParams({ page: 99 });
+
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        "This page is no longer available.",
+      );
+
+      fireEvent.click(screen.getByRole("button", { name: "Go to first page" }));
+
+      expect(onPageChange).toHaveBeenCalledWith(1);
+    });
+
+    it("does not treat unrelated 404 errors as invalid pages", () => {
+      mockUseJobPostings({
+        isError: true,
+        error: createNotFoundError("Not found."),
+        status: "error",
+      });
+
+      renderWithParams({ page: 99 });
+
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        "Error loading job postings.",
+      );
+
+      expect(
+        screen.queryByRole("button", { name: "Go to first page" }),
+      ).not.toBeInTheDocument();
     });
   });
 });
