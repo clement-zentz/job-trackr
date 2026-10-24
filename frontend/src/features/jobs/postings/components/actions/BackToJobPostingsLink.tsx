@@ -11,17 +11,19 @@ const baseLinkClassName = `
 
 type BackToJobPostingsLinkProps = {
   className?: string;
+  text?: string;
 };
 
 export function BackToJobPostingsLink({
   className = "",
+  text = "Back to job postings",
 }: BackToJobPostingsLinkProps) {
   return (
     <Link
       to={JOB_POSTINGS_LIST_PATH}
       className={`${baseLinkClassName} ${className}`.trim()}
     >
-      Back to job postings
+      {text}
     </Link>
   );
 }
