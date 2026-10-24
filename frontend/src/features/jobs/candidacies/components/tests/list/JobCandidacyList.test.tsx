@@ -1,11 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // File: frontend/src/features/jobs/candidacies/components/tests/list/JobCandidacyList.test.tsx
 
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { AxiosError, type AxiosResponse } from "axios";
 import type { ComponentProps } from "react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 
+import {
+  JOB_POSTINGS_CREATE_PATH,
+  JOB_POSTINGS_LIST_PATH,
+} from "@/features/jobs/postings/constants";
 import { createJobCandidacyListItemRead } from "@/tests/factories/jobCandidacy";
 import { createPaginatedResponse } from "@/tests/factories/paginatedResponse";
 import type { PaginatedResponse } from "@/types/pagination";
@@ -56,6 +61,7 @@ type MockUseJobCandidaciesState = {
   isLoading?: boolean;
   isError?: boolean;
   isFetching?: boolean;
+  isPlaceholderData?: boolean;
   error?: Error | null;
   status?: ReturnType<typeof useJobCandidacies>["status"];
 };
@@ -72,6 +78,7 @@ function mockUseJobCandidacies(queryState: MockUseJobCandidaciesState) {
     isLoading: false,
     isError: false,
     isFetching: false,
+    isPlaceholderData: false,
     error: null,
     status: "success",
     ...queryState,
@@ -87,6 +94,19 @@ function mockJobCandidaciesData({
     data: createPaginatedResponse(results, paginationOverrides),
     ...queryOverrides,
   });
+}
+
+function createNotFoundError(
+  detail = "Invalid page.",
+): AxiosError<{ detail: string }> {
+  const error = new AxiosError<{ detail: string }>("Not Found");
+
+  error.response = {
+    status: 404,
+    data: { detail },
+  } as AxiosResponse<{ detail: string }>;
+
+  return error;
 }
 
 describe("JobCandidacyList", () => {
@@ -172,16 +192,12 @@ describe("JobCandidacyList", () => {
   it("renders one card for each candidacy", () => {
     const firstCandidacy = createJobCandidacyListItemRead({
       id: "candidacy-1",
-      job_posting: {
-        id: "job-1",
-      },
+      job_posting: { id: "job-1" },
     });
 
     const secondCandidacy = createJobCandidacyListItemRead({
       id: "candidacy-2",
-      job_posting: {
-        id: "job-2",
-      },
+      job_posting: { id: "job-2" },
     });
 
     mockJobCandidaciesData({
@@ -196,22 +212,136 @@ describe("JobCandidacyList", () => {
     expect(screen.getByText("candidacy-2")).toBeInTheDocument();
   });
 
-  it("shows the empty state without rendering cards or pagination", () => {
+  describe("empty states", () => {
+    it("shows onboarding guidance when no candidacies exist", () => {
+      mockJobCandidaciesData({
+        results: [],
+        paginationOverrides: { count: 0 },
+      });
+
+      renderJobCandidacyList();
+
+      expect(screen.getByText("No job candidacies found.")).toBeInTheDocument();
+
+      expect(
+        screen.getByText(/create a job posting or select an existing one/i),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getByRole("link", { name: "Create job posting" }),
+      ).toHaveAttribute("href", JOB_POSTINGS_CREATE_PATH);
+
+      expect(
+        screen.getByRole("link", { name: "See job postings" }),
+      ).toHaveAttribute("href", JOB_POSTINGS_LIST_PATH);
+
+      expect(
+        screen.queryByTestId("job-candidacy-card"),
+      ).not.toBeInTheDocument();
+
+      expect(
+        screen.queryByTestId("job-candidacy-pagination"),
+      ).not.toBeInTheDocument();
+
+      expect(jobCandidacyPaginationMock).not.toHaveBeenCalled();
+    });
+
+    it("shows a no-results message when filters are active", () => {
+      mockJobCandidaciesData({
+        results: [],
+        paginationOverrides: { count: 0 },
+      });
+
+      renderJobCandidacyList({
+        page: 1,
+        search: "React",
+      });
+
+      expect(
+        screen.getByText("No job candidacies match your search or filters."),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.queryByRole("link", { name: "Create job posting" }),
+      ).not.toBeInTheDocument();
+
+      expect(
+        screen.queryByRole("link", { name: "See job postings" }),
+      ).not.toBeInTheDocument();
+    });
+
+    it("ignores whitespace-only search and ordering", () => {
+      mockJobCandidaciesData({
+        results: [],
+        paginationOverrides: { count: 0 },
+      });
+
+      renderJobCandidacyList({
+        page: 1,
+        search: "   ",
+        ordering: "-applied_on",
+      });
+
+      expect(screen.getByText("No job candidacies found.")).toBeInTheDocument();
+    });
+
+    it("does not show onboarding for empty placeholder data", () => {
+      mockJobCandidaciesData({
+        results: [],
+        paginationOverrides: { count: 0 },
+        queryOverrides: {
+          isFetching: true,
+          isPlaceholderData: true,
+        },
+      });
+
+      renderJobCandidacyList({
+        page: 1,
+        search: "Python",
+      });
+
+      expect(screen.getByText("Loading page...")).toBeInTheDocument();
+
+      expect(
+        screen.queryByText("No job candidacies match your search or filters."),
+      ).not.toBeInTheDocument();
+
+      expect(
+        screen.queryByRole("link", { name: "Create job posting" }),
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  it("does not show onboarding when an empty cached result fails to refresh", () => {
     mockJobCandidaciesData({
       results: [],
-      paginationOverrides: {
-        count: 0,
+      paginationOverrides: { count: 0 },
+      queryOverrides: {
+        isError: true,
+        error: new Error("Refresh failed"),
+        status: "error",
       },
     });
 
     renderJobCandidacyList();
 
-    expect(screen.getByText("No job candidacies found.")).toBeInTheDocument();
-    expect(screen.queryByTestId("job-candidacy-card")).not.toBeInTheDocument();
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Failed to refresh candidacies. Showing previous data.",
+    );
+
     expect(
-      screen.queryByTestId("job-candidacy-pagination"),
+      screen.getByText(
+        "No job candidacies in the last successfully loaded results.",
+      ),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole("link", { name: "Create job posting" }),
     ).not.toBeInTheDocument();
-    expect(jobCandidacyPaginationMock).not.toHaveBeenCalled();
+
+    expect(
+      screen.queryByRole("link", { name: "See job postings" }),
+    ).not.toBeInTheDocument();
   });
 
   it("shows a refresh error while preserving previous results", () => {
@@ -246,9 +376,7 @@ describe("JobCandidacyList", () => {
 
     mockJobCandidaciesData({
       results: [candidacy],
-      queryOverrides: {
-        isFetching: true,
-      },
+      queryOverrides: { isFetching: true },
     });
 
     renderJobCandidacyList();
@@ -264,14 +392,10 @@ describe("JobCandidacyList", () => {
         previous: "http://api.test/candidacies?page=1",
         next: "http://api.test/candidacies?page=3",
       },
-      queryOverrides: {
-        isFetching: true,
-      },
+      queryOverrides: { isFetching: true },
     });
 
-    renderJobCandidacyList({
-      page: 2,
-    });
+    renderJobCandidacyList({ page: 2 });
 
     expect(jobCandidacyPaginationMock).toHaveBeenCalledOnce();
 
@@ -324,5 +448,90 @@ describe("JobCandidacyList", () => {
         name: `View details for ${candidacy.job_posting.title} at ${candidacy.job_posting.company}`,
       }),
     ).toHaveAttribute("href", getJobCandidacyDetailPath(candidacy.id));
+  });
+
+  describe("invalid page recovery", () => {
+    it("offers recovery when DRF returns HTTP 404", () => {
+      mockUseJobCandidacies({
+        isError: true,
+        error: createNotFoundError(),
+        status: "error",
+      });
+
+      renderJobCandidacyList({ page: 99 });
+
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        "This page is no longer available.",
+      );
+
+      fireEvent.click(screen.getByRole("button", { name: "Go to first page" }));
+
+      expect(onPageChange).toHaveBeenCalledWith(1);
+    });
+
+    it("prioritizes invalid-page recovery over cached results", () => {
+      mockJobCandidaciesData({
+        results: [
+          createJobCandidacyListItemRead({
+            id: "cached-candidacy",
+          }),
+        ],
+        paginationOverrides: {
+          count: DEFAULT_JOB_CANDIDACIES_PAGE_SIZE + 1,
+          previous: "http://api.test/candidacies?page=1",
+        },
+        queryOverrides: {
+          isError: true,
+          error: createNotFoundError(),
+          status: "error",
+        },
+      });
+
+      renderJobCandidacyList({ page: 2 });
+
+      expect(
+        screen.getByRole("button", { name: "Go to first page" }),
+      ).toBeInTheDocument();
+
+      expect(screen.queryByText("cached-candidacy")).not.toBeInTheDocument();
+    });
+
+    it("does not treat an unrelated error as an invalid page", () => {
+      mockUseJobCandidacies({
+        isError: true,
+        error: new Error("Network unavailable"),
+        status: "error",
+      });
+
+      renderJobCandidacyList({ page: 2 });
+
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        "Error loading candidacies.",
+      );
+
+      expect(
+        screen.queryByRole("button", { name: "Go to first page" }),
+      ).not.toBeInTheDocument();
+    });
+
+    it("does not treat an unrelated HTTP 404 as an invalid page", () => {
+      mockUseJobCandidacies({
+        isError: true,
+        error: createNotFoundError("Not found."),
+        status: "error",
+      });
+
+      renderJobCandidacyList({ page: 2 });
+
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        "Error loading candidacies.",
+      );
+
+      expect(
+        screen.queryByRole("button", {
+          name: "Go to first page",
+        }),
+      ).not.toBeInTheDocument();
+    });
   });
 });
