@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/candidacies/components/tests/list/JobCandidacyList.test.tsx
+// File: frontend/src/features/jobs/candidacies/components/list/tests/JobCandidacyList.test.tsx
 
 import { fireEvent, render, screen } from "@testing-library/react";
 import { AxiosError, type AxiosResponse } from "axios";

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/candidacies/components/tests/form/jobCandidacyFormMappers.test.ts
+// File: frontend/src/features/jobs/candidacies/components/form/tests/jobCandidacyFormMappers.test.ts
 
 import { afterEach, describe, expect, it, vi } from "vitest";
 

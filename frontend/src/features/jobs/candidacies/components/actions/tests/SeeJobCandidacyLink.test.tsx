@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/candidacies/components/tests/actions/SeeJobCandidacyLink.test.tsx
+// File: frontend/src/features/jobs/candidacies/components/actions/tests/SeeJobCandidacyLink.test.tsx
 
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";

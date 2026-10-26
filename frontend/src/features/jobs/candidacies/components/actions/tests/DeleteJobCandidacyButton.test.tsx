@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/candidacies/components/tests/actions/DeleteJobCandidacyButton.test.tsx
+// File: frontend/src/features/jobs/candidacies/components/actions/tests/DeleteJobCandidacyButton.test.tsx
 
 import { fireEvent, render, screen } from "@testing-library/react";
 import { useNavigate } from "react-router-dom";
