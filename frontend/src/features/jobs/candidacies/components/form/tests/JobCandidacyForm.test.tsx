@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/candidacies/components/tests/form/JobCandidacyForm.test.tsx
+// File: frontend/src/features/jobs/candidacies/components/form/tests/JobCandidacyForm.test.tsx
 
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";

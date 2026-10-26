@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/postings/components/tests/JobPostingForm.test.tsx
+// File: frontend/src/features/jobs/postings/components/form/tests/JobPostingForm.test.tsx
 
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
-import type { JobPostingFormValues } from "../../types";
+import type { JobPostingFormValues } from "../../../types";
 import {
   JobPostingForm,
   type JobPostingFormProps,
-} from "../form/JobPostingForm";
-import { emptyJobPostingFormValues } from "../form/jobPostingFormMappers";
+} from "../../form/JobPostingForm";
+import { emptyJobPostingFormValues } from "../../form/jobPostingFormMappers";
 
 function renderJobPostingForm({
   initialValues = emptyJobPostingFormValues,

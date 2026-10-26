@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/postings/components/tests/JobPostingCard.test.tsx
+// File: frontend/src/features/jobs/postings/components/list/tests/JobPostingCard.test.tsx
 
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { createJobPostingListItemRead } from "@/tests/factories/jobPosting";
 
-import { JobPostingCard } from "../list/JobPostingCard";
-import type * as Utils from "../utils";
+import { JobPostingCard } from "../../list/JobPostingCard";
+import type * as Utils from "../../utils";
 
-vi.mock("../utils", async () => {
-  const actual = await vi.importActual<typeof Utils>("../utils");
+vi.mock("../../utils", async () => {
+  const actual = await vi.importActual<typeof Utils>("../../utils");
 
   return {
     ...actual,

@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/postings/components/tests/JobPostingFilters.test.tsx
+// File: frontend/src/features/jobs/postings/components/list/tests/JobPostingFilters.test.tsx
 
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import type { JobPostingFilters as Filters } from "../../types";
-import { JobPostingFilters } from "../list/JobPostingFilters";
+import type { JobPostingFilters as Filters } from "../../../types";
+import { JobPostingFilters } from "../../list/JobPostingFilters";
 
 const defaultParams: Filters = {
   ordering: "-posted_on",

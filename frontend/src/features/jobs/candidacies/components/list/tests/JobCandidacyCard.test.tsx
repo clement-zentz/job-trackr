@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/candidacies/components/tests/list/JobCandidacyCard.test.tsx
+// File: frontend/src/features/jobs/candidacies/components/list/tests/JobCandidacyCard.test.tsx
 
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";

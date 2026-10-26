@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/postings/components/tests/JobPostingList.test.tsx
+// File: frontend/src/features/jobs/postings/components/list/tests/JobPostingList.test.tsx
 
 import { fireEvent, render, screen } from "@testing-library/react";
 import { AxiosError, type AxiosResponse } from "axios";
@@ -15,15 +15,18 @@ import {
   getJobPostingDetailPath,
   JOB_POSTINGS_CREATE_PATH,
   JOB_POSTINGS_LIST_PATH,
-} from "../../constants";
-import { useJobPostings } from "../../hooks/useJobPostings";
-import type { JobPostingListItemRead, JobPostingListParams } from "../../types";
+} from "../../../constants";
+import { useJobPostings } from "../../../hooks/useJobPostings";
+import type {
+  JobPostingListItemRead,
+  JobPostingListParams,
+} from "../../../types";
 import {
   JobPostingList,
   type JobPostingListProps,
-} from "../list/JobPostingList";
+} from "../../list/JobPostingList";
 
-vi.mock("../../hooks/useJobPostings", () => ({
+vi.mock("../../../hooks/useJobPostings", () => ({
   useJobPostings: vi.fn(),
 }));
 

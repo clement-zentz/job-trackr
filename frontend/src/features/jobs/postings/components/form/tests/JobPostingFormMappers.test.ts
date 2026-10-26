@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// File: frontend/src/features/jobs/postings/components/tests/JobPostingFormMappers.test.ts
+// File: frontend/src/features/jobs/postings/components/form/tests/JobPostingFormMappers.test.ts
 
 import { describe, expect, it } from "vitest";
 
@@ -10,7 +10,7 @@ import {
   formValuesToCreatePayload,
   formValuesToUpdatePayload,
   jobPostingToFormValues,
-} from "../form/jobPostingFormMappers";
+} from "../../form/jobPostingFormMappers";
 
 describe("JobPostingFormMappers", () => {
   it("maps empty form values to create payload", () => {
